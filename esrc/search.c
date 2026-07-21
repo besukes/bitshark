@@ -3,16 +3,17 @@
 
 
 int depth_search(GameStruct * game , SearchInfo search_info , int cur_depth){
-    int cur_eval = evaluate_pos(game,search_info);
-    if(cur_depth == search_info.depth || cur_eval < search_info.alpha) return cur_eval;
-
+    int cur_alpha = evaluate_pos(game,search_info,0) ,
+        cur_beta = evaluate_pos(game,search_info,1)  ;
+    if(cur_depth == search_info.depth || cur_alpha < search_info.alpha) return cur_alpha;
+    move_algorithm(game,search_info.turn,cur_depth-1,search_info.ai_level,cur_beta);
     //necessita de verificar o turno atual e aplicar a melhor jogada , decrementando o turno e fazendo recursividade para procurar
     //os proximos melhor moves
     //secalhar utilizar a funcao move_algorithm e fazer algumas alteracoees
 }
 
 
-Moves search_algorithm (uint64_bit atks , GameStruct * game ,PieceEvaluation evals[2][NUMBER_PIECES] , SearchInfo search_info){
+Moves search_algorithm (uint64_bit atks , uint64_bit pos, GameStruct * game ,PieceEvaluation evals[2][NUMBER_PIECES] , SearchInfo search_info){
     int cntr = 0;
     uint64_bit casa_atual = 0 , bst = 0;
     while(atks!=0){
@@ -25,9 +26,9 @@ Moves search_algorithm (uint64_bit atks , GameStruct * game ,PieceEvaluation eva
                 search_info.alpha = new_alpha;
                 bst = casa_atual;
             }
-            else undoMove(game);
+            else undoMove(game,casa_atual,pos,0,search_info.piece_type,search_info.turn);
         }
-        atks>>=1;
+        atks>>=1; 
         cntr++;
     }
     Moves ret = {.move = bst , .move_evaluation = search_info.alpha};

@@ -15,6 +15,7 @@ typedef struct PieceEvaluation{
 typedef struct SearchInfo{
     int depth;
     int alpha;
+    int beta;
     int ai_level;
     Pieces piece_type;
     CorPiece bot_colour;
@@ -225,8 +226,12 @@ void initializeMovesStruct(PieceEvaluation array2[2][NUMBER_PIECES],int indx);
 
 /// depth_search /////////////////////////////
 
-Moves search_algorithm (uint64_bit atks , GameStruct * game ,PieceEvaluation evals[2][NUMBER_PIECES] , SearchInfo search_info);
+Moves search_algorithm (uint64_bit atks ,uint64_bit pos, GameStruct * game ,PieceEvaluation evals[2][NUMBER_PIECES] , SearchInfo search_info);
 
 /// evaluation //////////////////////////////
 
 int evaluate(GameStruct * game , CorPiece turno , int ai_level , PieceEvaluation pieces_eval[2][NUMBER_PIECES]);
+
+/// engine /////////////////////////////////
+
+Moves move_algorithm(GameStruct * game , CorPiece turn , int depth , int ai_level , int alpha);
