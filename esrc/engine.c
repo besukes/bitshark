@@ -1,7 +1,7 @@
 #include <engine.h>
 
-//alpha usually starts at -99999 , int alpha = -99999; //Current best black evaluation
-//beta usually starts at 99999 , int beta = 99999; //Current best white evaluation
+//alpha usually starts at -99999 , int alpha = -99999; --Current best white evaluation
+//beta usually starts at 99999 , int beta = 99999; --Current best black evaluation
 //alpha - white eval , beta - black eval
 
 Moves move_algorithm(GameStruct * game , CorPiece turn , int depth , int ai_level , int alpha , int beta){

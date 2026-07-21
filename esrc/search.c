@@ -2,10 +2,10 @@
 #include <stdlib.h>
 
 
-int depth_search(GameStruct * game , SearchInfo * search_info , int cur_depth){
-    int cur_alpha = evaluate_pos(game,search_info,0) ,
-        cur_beta = evaluate_pos(game,search_info,1)  ;
-    if(cur_depth >= search_info->depth || cur_alpha < search_info->alpha || cur_beta > search_info->beta) 
+int depth_search(GameStruct * game , SearchInfo * search_info , PieceEvaluation evals[2][NUMBER_PIECES]){
+    int cur_alpha = -99999 , cur_beta = 99999;
+    evaluate_pos(game,search_info,&cur_alpha,&cur_beta,evals);
+    if(search_info->depth <= 0 || cur_alpha < search_info->alpha || cur_beta > search_info->beta) 
         return ((search_info->turn == brancas) ? cur_alpha : cur_beta); 
     int new_turn = (search_info->turn == brancas) ? pretas : brancas;
     return move_algorithm(game,new_turn,search_info->depth-1,search_info->ai_level,cur_alpha,cur_beta).move_evaluation;
@@ -22,8 +22,7 @@ Moves search_algorithm (uint64_bit atks , uint64_bit pos, GameStruct * game ,Pie
         if(atks & 1ULL){
             casa_atual = 1ULL<<cntr;
             atualizaJogada(game,casa_atual,0,0);
-            int new_eval = depth_search(game,search_info,0);
-            //quando o turno troca , se chegarmos ao fim da depth estamos a conseguir a evaluation da jogada que fizemos , com o turno ja trocado
+            int new_eval = depth_search(game,search_info,evals);
             if(new_eval > search_info->alpha && search_info->turn == brancas){
                 search_info->alpha = new_eval;
                 bst = casa_atual;

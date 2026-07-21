@@ -231,6 +231,7 @@ Moves search_algorithm (uint64_bit atks ,uint64_bit pos, GameStruct * game ,Piec
 /// evaluation //////////////////////////////
 
 int evaluate(GameStruct * game , CorPiece turno , int ai_level , PieceEvaluation pieces_eval[2][NUMBER_PIECES]);
+int evaluate_pos(GameStruct * game , SearchInfo * search , int * cur_alpha , int * cur_beta , PieceEvaluation pieces_eval[2][NUMBER_PIECES]);
 
 /// engine /////////////////////////////////
 
