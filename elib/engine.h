@@ -234,4 +234,4 @@ int evaluate(GameStruct * game , CorPiece turno , int ai_level , PieceEvaluation
 
 /// engine /////////////////////////////////
 
-Moves move_algorithm(GameStruct * game , CorPiece turn , int depth , int ai_level , int alpha);
+Moves move_algorithm(GameStruct * game , CorPiece turn , int depth , int ai_level , int alpha , int beta);
