@@ -18,7 +18,7 @@ Moves move_algorithm(GameStruct * game , CorPiece turn , int depth , int ai_leve
             if(piece_bitboard & 1ULL != 0){
                 uint64_bit current_pos = 1ULL<<counter,
                            current_attacks = get_piece_attacks(current_pos,piece,game,turn);
-                Moves best_searched = search_algorithm(current_attacks,current_pos,game,pieces_eval,search);
+                Moves best_searched = search_algorithm(current_attacks,current_pos,game,pieces_eval,&search);
                 if(best_searched.move_evaluation > alpha){
                     alpha = best_searched.move_evaluation;
                     positional_best_move = best_searched.move;

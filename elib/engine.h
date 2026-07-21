@@ -226,7 +226,7 @@ void initializeMovesStruct(PieceEvaluation array2[2][NUMBER_PIECES],int indx);
 
 /// depth_search /////////////////////////////
 
-Moves search_algorithm (uint64_bit atks ,uint64_bit pos, GameStruct * game ,PieceEvaluation evals[2][NUMBER_PIECES] , SearchInfo search_info);
+Moves search_algorithm (uint64_bit atks ,uint64_bit pos, GameStruct * game ,PieceEvaluation evals[2][NUMBER_PIECES] , SearchInfo * search_info);
 
 /// evaluation //////////////////////////////
 
