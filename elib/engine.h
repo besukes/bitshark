@@ -221,7 +221,7 @@ int isPseudoValidMove(GameStruct * game, uint64_bit drop , Boolean * castle , Bo
 
 /// initialization ////////////////////////////
 
-void initializeMovesStruct(PieceEvaluation array2[2][NUMBER_PIECES],int indx);
+void initializeStructs(PieceEvaluation array[2][NUMBER_PIECES],int indx);
 
 
 /// depth_search /////////////////////////////
