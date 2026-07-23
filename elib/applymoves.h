@@ -57,8 +57,7 @@ void checkTurno(CorPiece turno , uint64_bit * * oposta , uint64_bit * * mesma_co
 }
 
 
-void atualizaJogada(GameStruct * game , uint64_bit click,Boolean castles,Boolean enpassant){
-    CorPiece turno = game->turnoJogador;
+void atualizaJogada(GameStruct * game , uint64_bit click,Boolean castles,Boolean enpassant , CorPiece turno){
     uint64_bit * bitboard_cor_oposta , * bitboard_cor_turno , (*ep)(uint64_bit,int);
     int square;
     checkTurno(turno,&bitboard_cor_oposta,&bitboard_cor_turno,&square,game,&ep);

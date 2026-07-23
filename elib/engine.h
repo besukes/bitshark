@@ -8,9 +8,7 @@ typedef struct Moves{
     int move_evaluation;
 }Moves;
 
-typedef struct PieceEvaluation{
-    int eval;
-}PieceEvaluation;
+
 
 typedef struct SearchInfo{
     int depth;
@@ -171,7 +169,7 @@ void fetch_change_board(GameStruct * game,uint64_bit click,uint64_bit * mesmaCor
 
 void checkTurno(CorPiece turno , uint64_bit * * oposta , uint64_bit * * mesma_cor,int * sq , GameStruct * game , uint64_bit (**ep)(uint64_bit,int));
 
-void atualizaJogada(GameStruct * game , uint64_bit click,Boolean castles,Boolean enpassant);
+void atualizaJogada(GameStruct * game , uint64_bit click,Boolean castles,Boolean enpassant , CorPiece turno);
 
 
 /// castle_logic ////////////////////////////
@@ -221,17 +219,17 @@ int isPseudoValidMove(GameStruct * game, uint64_bit drop , Boolean * castle , Bo
 
 /// initialization ////////////////////////////
 
-void initializeStructs(PieceEvaluation array[2][NUMBER_PIECES],int indx);
+void initializeStructs(int matrix[2][NUMBER_PIECES],int indx);
 
 
 /// depth_search /////////////////////////////
 
-Moves search_algorithm (uint64_bit atks ,uint64_bit pos, GameStruct * game ,PieceEvaluation evals[2][NUMBER_PIECES] , SearchInfo * search_info);
+Moves search_algorithm (uint64_bit atks ,uint64_bit pos, GameStruct * game ,int piece_evals[2][NUMBER_PIECES] , SearchInfo * search_info);
 
 /// evaluation //////////////////////////////
 
-int evaluate(GameStruct * game , CorPiece turno , int ai_level , PieceEvaluation pieces_eval[2][NUMBER_PIECES]);
-int evaluate_pos(GameStruct * game , SearchInfo * search , int * cur_alpha , int * cur_beta , PieceEvaluation pieces_eval[2][NUMBER_PIECES]);
+int evaluate(GameStruct * game , CorPiece turno , int ai_level , int pieces_evals[2][NUMBER_PIECES]);
+int evaluate_pos(GameStruct * game , SearchInfo * search , int * cur_alpha , int * cur_beta , int piece_evals[2][NUMBER_PIECES] , int cur_piece_eval);
 
 /// engine /////////////////////////////////
 
