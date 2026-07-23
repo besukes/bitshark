@@ -5,7 +5,7 @@
 //alpha - white eval , beta - black eval
 
 Moves move_algorithm(GameStruct * game , CorPiece turn , int depth , int ai_level , int alpha , int beta){
-    PieceEvaluation pieces_eval[2][NUMBER_PIECES];
+    int pieces_eval[2][NUMBER_PIECES] = {};
     initializeStructs(pieces_eval,NUMBER_PIECES);
     evaluate(game,turn,ai_level,pieces_eval);
     uint64_bit positional_best_move = 0; //No move to start with
