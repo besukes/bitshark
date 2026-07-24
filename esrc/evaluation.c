@@ -61,10 +61,10 @@ int evaluate(GameStruct * game , CorPiece turno , int ai_level , int pieces_eval
                                         other_turn,ai_level,&game->estadoJogo);
 
         pieces_evals[turno][i] = piece_eval_turn;
-        *turn_eval+=piece_eval_turn;
+        *turn_eval+= (piece_eval_turn*who2Move);
 
         pieces_evals[other_turn][i] = piece_eval_other_turn;
-        *other_turn_eval += piece_eval_other_turn;
+        *other_turn_eval += (piece_eval_other_turn*whoNot2Move);
 
         eval+= piece_eval_turn*who2Move + piece_eval_other_turn*whoNot2Move;
     }
