@@ -7,9 +7,10 @@
 uint64_bit get_best_move(GameStruct * game , CorPiece turn){
     int depth = MAX_DEPTH_SEARCH , ai_level = CHESS_AI_DIFFICULTY;
     int pieces_eval[2][NUMBER_PIECES] = {};
+    int black_eval = 0 , white_eval = 0;
     initializeStructs(pieces_eval,NUMBER_PIECES);
-    evaluate(game,turn,ai_level,pieces_eval);
-    Moves best_move = move_algorithm(game,turn,depth,ai_level,-99999,99999,0,0,pieces_eval);
+    evaluate(game,turn,ai_level,pieces_eval,&white_eval,&black_eval);
+    Moves best_move = move_algorithm(game,turn,depth,ai_level,-99999,99999,white_eval,black_eval,pieces_eval);
     return (best_move.move);
 }
 
