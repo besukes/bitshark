@@ -45,7 +45,7 @@ int evaluate_pos(GameStruct * game , SearchInfo * search , int * w_eval , int * 
 
 int evaluate(GameStruct * game , CorPiece turno , int ai_level , int pieces_evals[2][NUMBER_PIECES]){
     CorPiece other_turn = (turno==brancas) ? pretas : brancas;
-    int eval = 0 , who2Move = (turno==brancas) ? 1 : (-1);
+    int eval = 0 , who2Move = (turno==brancas) ? 1 : (-1) , whoNot2Move = (turno==brancas) ? (-1) : 1;
     for(int i=0;i<NUMBER_PIECES;i++){
         int piece_eval_turn = evaluate_piece(game->estadoJogo.tabuleirojogo[turno][i],(Pieces)i,turno,
                                         ai_level,&game->estadoJogo);
@@ -53,7 +53,7 @@ int evaluate(GameStruct * game , CorPiece turno , int ai_level , int pieces_eval
                                         other_turn,ai_level,&game->estadoJogo);
         pieces_evals[turno][i] = piece_eval_turn;
         pieces_evals[other_turn][i] = piece_eval_other_turn;
-        eval+= piece_eval_turn*who2Move + piece_eval_other_turn*who2Move;
+        eval+= piece_eval_turn*who2Move + piece_eval_other_turn*whoNot2Move;
     }
     return eval;
 }

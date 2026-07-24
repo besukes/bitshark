@@ -16,7 +16,9 @@ uint64_bit get_best_move(GameStruct * game , CorPiece turn){
 
 Moves move_algorithm(GameStruct * game , CorPiece turn , int depth , int ai_level , int alpha , int beta , int weval , int beval , int evals[2][NUMBER_PIECES]){
     uint64_bit positional_best_move = 0; //No move to start with
-    SearchInfo search = {.ai_level = ai_level , .alpha = alpha , .beta = beta, .depth = depth , .bot_colour = turn , .turn = turn};
+    SearchInfo search = {.ai_level = ai_level , .alpha = alpha , .beta = beta, .depth = depth , 
+                        .bot_colour = turn , .turn = turn , .white_eval = weval , .black_eval = beval
+                        };
     for(int i=0;i<NUMBER_PIECES;i++){
         int counter=0;
         uint64_bit piece_bitboard = game->estadoJogo.tabuleirojogo[turn][i];

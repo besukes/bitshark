@@ -192,6 +192,7 @@ int is_castelling_king(GameStruct * game , CorPiece cor, uint64_bit drop);
 int invalidCastle(GameStruct * game , uint64_bit click , CorPiece turno);
 void verifica_direito_castle(GameStruct * game ,MoveInfo * mov);
 void atualizaJogada(GameStruct * game , uint64_bit click,Boolean castles,Boolean enpassant , MoveInfo * mov);
+void castle_King(GameStruct * game , uint64_bit click , int square, uint64_bit * mesmaCor , CorPiece turno);
 
 
 
