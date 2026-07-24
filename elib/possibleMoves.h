@@ -168,15 +168,15 @@ int pawnPromoting(uint64_bit pos,CorPiece cor){
 }
 
 
-int isPseudoValidMove(GameStruct * game, uint64_bit drop , Boolean * castle , Boolean * enpassant , Boolean * promote){
-    Pieces piece = game->pieceSelecionada;
-    CorPiece cor = game->turnoJogador;
-    uint64_bit pos_piece = game->pieceCoords,
+int isPseudoValidMove(GameStruct * game, uint64_bit drop , Booleans * bools, MoveInfo * move){
+    Pieces piece = move->piece_moved;
+    CorPiece cor = move->turn;
+    uint64_bit pos_piece = move->last_piece_pos,
                pos_atacks = get_piece_attacks(pos_piece,piece,game,cor),
                pos_mesma_cor = get_same_colour_bitboard(&(game->estadoJogo),cor);
     uint64_bit jogada = (~pos_mesma_cor & (pos_atacks & drop));
-    *promote = ( (jogada != 0) && (piece == Pawn) && pawnPromoting(drop,cor) );
-    *castle = game->pieceSelecionada == King  && is_castelling_king(game,cor,drop);
-    *enpassant = can_en_passant(game,drop,cor);
-    return (jogada != 0 || *castle || *enpassant);
+    *(bools->promote) = ( (jogada != 0) && (piece == Pawn) && pawnPromoting(drop,cor) );
+    *(bools->castles) = piece == King  && is_castelling_king(game,cor,drop);
+    *(bools->enpassant) = can_en_passant(game,drop,move);
+    return (jogada != 0 || *(bools->castles) || *(bools->enpassant));
 }

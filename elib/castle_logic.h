@@ -27,8 +27,7 @@ int is_castelling_king(GameStruct * game , CorPiece cor, uint64_bit drop){
 
 
 //Necessita ser feita
-int invalidCastle(GameStruct * game , uint64_bit click){
-    CorPiece turno = game->turnoJogador;
+int invalidCastle(GameStruct * game , uint64_bit click , CorPiece turno){
     int pos = posTabuleiro(click) , offset = 0;
     unsigned int indx = 0;
     if(pos == (-1)) return 0;
@@ -45,28 +44,30 @@ int invalidCastle(GameStruct * game , uint64_bit click){
 }
 
 
-void verifica_direito_castle(GameStruct * game ,CorPiece turno){
-    if(game->pieceSelecionada == King){
-        game->estadoJogo.canCastle[turno][Short] = 0;
-        game->estadoJogo.canCastle[turno][Long] = 0;
+void verifica_direito_castle(GameStruct * game ,MoveInfo * mov){
+    Pieces piece = mov->piece_moved;
+    CorPiece turn = mov->turn;
+    uint64_bit cur_pos = mov->last_piece_pos;
+    if(piece == King){
+        game->estadoJogo.canCastle[turn][Short] = 0;
+        game->estadoJogo.canCastle[turn][Long] = 0;
     }
-    else if(game->pieceSelecionada==Rook){
-        if(turno==brancas){
-            if(game->pieceCoords == (1ULL<<H1)) game->estadoJogo.canCastle[turno][Short] = 0;
-            if(game->pieceCoords == (1ULL)) game->estadoJogo.canCastle[turno][Long] = 0;
+    else if(piece==Rook){
+        if(turn==brancas){
+            if(cur_pos == (1ULL<<H1)) game->estadoJogo.canCastle[turn][Short] = 0;
+            if(cur_pos == (1ULL)) game->estadoJogo.canCastle[turn][Long] = 0;
         }
         else{
-            if(game->pieceCoords == (1ULL<<H8)) game->estadoJogo.canCastle[turno][Short] = 0;
-            if(game->pieceCoords == (1ULL<<A8)) game->estadoJogo.canCastle[turno][Long] = 0;
+            if(cur_pos == (1ULL<<H8)) game->estadoJogo.canCastle[turn][Short] = 0;
+            if(cur_pos == (1ULL<<A8)) game->estadoJogo.canCastle[turn][Long] = 0;
         }
     }
 }
 
 
 
-void castle_King(GameStruct * game , uint64_bit click , int square, uint64_bit * mesmaCor){
+void castle_King(GameStruct * game , uint64_bit click , int square, uint64_bit * mesmaCor , CorPiece turno){
     int pos = posTabuleiro(click) , offset = 0 , shiftam = 3;
-    CorPiece turno = game->turnoJogador;
     uint64_bit (*funcRook)(uint64_bit,int) = &shiftl,
                (*funcKing)(uint64_bit,int) = &shiftr;
     if(pos%8 > 4){

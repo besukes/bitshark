@@ -2,6 +2,17 @@
 #define MAX_DEPTH_SEARCH 30
 #define NUMBER_PIECES 6
 
+typedef struct Booleans{
+    Boolean * castles;
+    Boolean * enpassant;
+    Boolean * promote;
+}Booleans;
+
+typedef struct MoveInfo{
+    Pieces piece_moved;
+    CorPiece turn;
+    uint64_bit last_piece_pos;
+}MoveInfo;
 
 typedef struct Moves{
     uint64_bit move;
@@ -165,11 +176,11 @@ void promotePiece(GameStruct * game , Pieces piece, uint64_bit promotion_square)
 
 void efetuaJogada(uint64_bit * selected_piece , uint64_bit * todas_pieces , uint64_bit original_coords , uint64_bit click , uint64_bit * mesmacor);
 
-void fetch_change_board(GameStruct * game,uint64_bit click,uint64_bit * mesmaCor , uint64_bit * corOposta);
+void fetch_change_board(GameStruct * game,uint64_bit click,uint64_bit * mesmaCor , uint64_bit * corOposta , MoveInfo * mov);
 
 void checkTurno(CorPiece turno , uint64_bit * * oposta , uint64_bit * * mesma_cor,int * sq , GameStruct * game , uint64_bit (**ep)(uint64_bit,int));
 
-void atualizaJogada(GameStruct * game , uint64_bit click,Boolean castles,Boolean enpassant , CorPiece turno);
+void atualizaJogada(GameStruct * game , uint64_bit click,Boolean castles,Boolean enpassant , MoveInfo * mov);
 
 
 /// castle_logic ////////////////////////////
@@ -178,9 +189,9 @@ int is_open_castle_path(uint64_bit bitboard_todas_pieces,uint64_bit path , uint6
 
 int is_castelling_king(GameStruct * game , CorPiece cor, uint64_bit drop);
 
-int invalidCastle(GameStruct * game , uint64_bit click);
+int invalidCastle(GameStruct * game , uint64_bit click , CorPiece turno);
 
-void verifica_direito_castle(GameStruct * game ,CorPiece turno);
+void verifica_direito_castle(GameStruct * game ,MoveInfo * mov);
 
 void castle_King(GameStruct * game , uint64_bit click , int square, uint64_bit * mesmaCor);
 
@@ -198,7 +209,7 @@ int check_move(GameStruct * game, Boolean castles , uint64_bit click);
 /// en_passant /////////////////////////////
 
 void update_en_passant(GameStruct * game , uint64_bit click);
-Boolean can_en_passant(GameStruct * game , uint64_bit drop,CorPiece cor);
+Boolean can_en_passant(GameStruct * game , uint64_bit drop,MoveInfo * mov);
 void enpassant_move(GameStruct * game , uint64_bit * cor_oposta , uint64_bit * mesma_cor,ShiftFunction ep_shift);
 
 
@@ -214,7 +225,7 @@ uint64_bit get_king_moves(uint64_bit pos);
 uint64_bit get_possible_pawn_moves(uint64_bit pos,uint64_bit bitboard_pieces,CorPiece turno,uint64_bit (*func)(uint64_bit,int),GameStruct * game);
 uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , CorPiece cor_turno);
 int pawnPromoting(uint64_bit pos,CorPiece cor);
-int isPseudoValidMove(GameStruct * game, uint64_bit drop , Boolean * castle , Boolean * enpassant , Boolean * promote);
+int isPseudoValidMove(GameStruct * game, uint64_bit drop , Booleans * bools , MoveInfo * move);
 
 
 /// initialization ////////////////////////////
