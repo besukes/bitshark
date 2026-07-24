@@ -25,6 +25,8 @@ typedef struct SearchInfo{
     int depth;
     int alpha;
     int beta;
+    int white_eval;
+    int black_eval;
     int ai_level;
     Pieces piece_type;
     CorPiece bot_colour;
@@ -186,14 +188,10 @@ void atualizaJogada(GameStruct * game , uint64_bit click,Boolean castles,Boolean
 /// castle_logic ////////////////////////////
 
 int is_open_castle_path(uint64_bit bitboard_todas_pieces,uint64_bit path , uint64_bit extraPositions);
-
 int is_castelling_king(GameStruct * game , CorPiece cor, uint64_bit drop);
-
 int invalidCastle(GameStruct * game , uint64_bit click , CorPiece turno);
-
 void verifica_direito_castle(GameStruct * game ,MoveInfo * mov);
-
-void castle_King(GameStruct * game , uint64_bit click , int square, uint64_bit * mesmaCor);
+void atualizaJogada(GameStruct * game , uint64_bit click,Boolean castles,Boolean enpassant , MoveInfo * mov);
 
 
 
@@ -202,13 +200,13 @@ void castle_King(GameStruct * game , uint64_bit click , int square, uint64_bit *
 Boolean is_in_check(EstadoJogo * estado , uint64_bit kingpos , CorPiece cor);
 void notInCheck(GameStruct * game);
 int isCheckMate(GameStruct * game , CorPiece cor);
-int check_move(GameStruct * game, Boolean castles , uint64_bit click);
+int check_move(GameStruct * game, Boolean castles , uint64_bit click,MoveInfo * mov);
 
 
 
 /// en_passant /////////////////////////////
 
-void update_en_passant(GameStruct * game , uint64_bit click);
+void update_en_passant(GameStruct * game , uint64_bit click , MoveInfo * mov);
 Boolean can_en_passant(GameStruct * game , uint64_bit drop,MoveInfo * mov);
 void enpassant_move(GameStruct * game , uint64_bit * cor_oposta , uint64_bit * mesma_cor,ShiftFunction ep_shift);
 
@@ -235,7 +233,7 @@ void initializeStructs(int matrix[2][NUMBER_PIECES],int indx);
 
 /// depth_search /////////////////////////////
 
-Moves search_algorithm (uint64_bit atks ,uint64_bit pos, GameStruct * game ,int piece_evals[2][NUMBER_PIECES] , SearchInfo * search_info);
+Moves search_algorithm (uint64_bit posi , uint64_bit atks ,uint64_bit pos, GameStruct * game ,int piece_evals[2][NUMBER_PIECES] , SearchInfo * search_info);
 
 /// evaluation //////////////////////////////
 
@@ -244,4 +242,4 @@ int evaluate_pos(GameStruct * game , SearchInfo * search , int * cur_alpha , int
 
 /// engine /////////////////////////////////
 
-Moves move_algorithm(GameStruct * game , CorPiece turn , int depth , int ai_level , int alpha , int beta);
+Moves move_algorithm(GameStruct * game , CorPiece turn , int depth , int ai_level , int alpha , int beta , int weval , int beval , int evals[2][NUMBER_PIECES]);

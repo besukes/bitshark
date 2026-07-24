@@ -17,17 +17,17 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , in
 }
 
 
-int evaluate_pos(GameStruct * game , SearchInfo * search , int * cur_alpha , int * cur_beta , int pieces_evals[2][NUMBER_PIECES] , int cur_piece_eval){
+int evaluate_pos(GameStruct * game , SearchInfo * search , int * w_eval , int * b_eval , int pieces_evals[2][NUMBER_PIECES] , int cur_piece_eval){
     int * cur_player_eval , who2Move ;
     CorPiece other_turn , cur_turn;
     Pieces piece = search->piece_type;
     if(search->turn == brancas){
-        cur_player_eval = cur_alpha;
+        cur_player_eval = w_eval;
         other_turn = pretas; cur_turn = brancas;
         who2Move = 1;
     }
     else{
-        cur_player_eval = cur_beta;
+        cur_player_eval = b_eval;
         other_turn = brancas; cur_turn = pretas;
         who2Move = (-1);
     }
@@ -53,7 +53,7 @@ int evaluate(GameStruct * game , CorPiece turno , int ai_level , int pieces_eval
                                         other_turn,ai_level,&game->estadoJogo);
         pieces_evals[turno][i] = piece_eval_turn;
         pieces_evals[other_turn][i] = piece_eval_other_turn;
-        eval+= piece_eval_turn + piece_eval_other_turn;
+        eval+= piece_eval_turn*who2Move + piece_eval_other_turn*who2Move;
     }
     return eval;
 }

@@ -3,27 +3,29 @@
 
 
 int depth_search(GameStruct * game , SearchInfo * search_info , int piece_evals[2][NUMBER_PIECES] , int cur_piece_eval){
-    int cur_alpha = -99999 , cur_beta = 99999;
-    evaluate_pos(game,search_info,&cur_alpha,&cur_beta,piece_evals,cur_piece_eval);
-    if(search_info->depth <= 0 || cur_alpha < search_info->alpha || cur_beta > search_info->beta) 
+    int cur_alpha = search_info->alpha , cur_beta = search_info->beta;
+    int white_eval = search_info->white_eval , black_eval = search_info->black_eval;
+    evaluate_pos(game,search_info,&white_eval,&black_eval,piece_evals,cur_piece_eval);
+    if(search_info->depth <= 0 || cur_alpha > white_eval || cur_beta < black_eval) 
         return ((search_info->turn == brancas) ? cur_alpha : cur_beta); 
     int new_turn = (search_info->turn == brancas) ? pretas : brancas;
-    return move_algorithm(game,new_turn,search_info->depth-1,search_info->ai_level,cur_alpha,cur_beta).move_evaluation;
+    return move_algorithm(game,new_turn,search_info->depth-1,search_info->ai_level,cur_alpha,cur_beta,white_eval,black_eval,piece_evals).move_evaluation;
     //necessita de verificar o turno atual e aplicar a melhor jogada , decrementando o turno e fazendo recursividade para procurar
     //os proximos melhor moves
     //secalhar utilizar a funcao move_algorithm e fazer algumas alteracoes
 }
 
 
-Moves search_algorithm (uint64_bit atks , uint64_bit pos, GameStruct * game ,int piece_evals[2][NUMBER_PIECES] , SearchInfo * search_info){
+Moves search_algorithm (uint64_bit posi , uint64_bit atks , uint64_bit pos, GameStruct * game ,int piece_evals[2][NUMBER_PIECES] , SearchInfo * search_info){
     int cntr = 0;
     uint64_bit casa_atual = 0 , bst = 0;
     CorPiece turn = search_info->turn;
     int piece_eval = piece_evals[turn][search_info->piece_type];
+    MoveInfo mov = {.piece_moved =search_info->piece_type,.turn = turn , .last_piece_pos = posi};
     while(atks!=0){
         if(atks & 1ULL){
             casa_atual = 1ULL<<cntr;
-            atualizaJogada(game,casa_atual,0,0,turn);
+            atualizaJogada(game,casa_atual,0,0,&mov);
             if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
                 int new_eval = depth_search(game,search_info,piece_evals,piece_eval);
                 if(new_eval > search_info->alpha && search_info->turn == brancas){
