@@ -5,9 +5,8 @@
 int depth_search(GameStruct * game , SearchInfo * search_info , int piece_evals[2][NUMBER_PIECES] , int cur_piece_eval){
     int cur_alpha = search_info->alpha , cur_beta = search_info->beta;
     int white_eval = search_info->white_eval , black_eval = search_info->black_eval;
-    evaluate_pos(game,search_info,&white_eval,&black_eval,piece_evals,cur_piece_eval,0);
-    if(search_info->depth <= 0 || cur_alpha > white_eval || cur_beta < black_eval) 
-        return ((search_info->turn == brancas) ? cur_alpha : cur_beta); 
+    evaluate_pos(game,search_info,&white_eval,&black_eval,piece_evals,cur_piece_eval);
+    if(search_info->depth <= 0) return ((search_info->turn == brancas) ? cur_alpha : cur_beta); 
     int new_turn = (search_info->turn == brancas) ? pretas : brancas;
     return move_algorithm(game,new_turn,search_info->depth-1,search_info->ai_level,cur_alpha,cur_beta,white_eval,black_eval,piece_evals).move_evaluation;
     //necessita de verificar o turno atual e aplicar a melhor jogada , decrementando o turno e fazendo recursividade para procurar
