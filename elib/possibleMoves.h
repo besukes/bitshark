@@ -1,6 +1,19 @@
 #include <engine.h>
 
 
+int is_attacked_piece(uint64_bit is_attacked , Pieces attacked_piece , CorPiece turn , GameStruct * game , int piece_score){
+    for(int i=0;i<NUMBER_PIECES;i++){
+        uint64_bit attacker = game->estadoJogo.tabuleirojogo[turn][i];
+        Pieces piece = (Pieces)i;
+        if(attacker!=0 && piece_value(piece) < piece_score){
+            uint64_bit atks = get_piece_attacks(is_attacked,attacked_piece,game,turn);
+            if((atks & attacker)!=0) return 1;
+        }
+    }
+    return 0;
+}
+
+
 void get_attacks(int max , uint64_bit (*func)(uint64_bit,int),uint64_bit pos_limites,uint64_bit pos_piece,int shift ,uint64_bit * atk){
     *atk = 0;
     for(int i=1;i<=max ;i++){

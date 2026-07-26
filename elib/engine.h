@@ -225,6 +225,7 @@ uint64_bit get_possible_pawn_moves(uint64_bit pos,uint64_bit bitboard_pieces,Cor
 uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , CorPiece cor_turno);
 int pawnPromoting(uint64_bit pos,CorPiece cor);
 int isPseudoValidMove(GameStruct * game, uint64_bit drop , Booleans * bools , MoveInfo * move);
+int is_attacked_piece(uint64_bit is_attacked , Pieces attacked_piece , CorPiece turn , GameStruct * game , int piece_score);
 
 
 /// initialization ////////////////////////////

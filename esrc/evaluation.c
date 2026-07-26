@@ -23,13 +23,36 @@ int is_end_game(EstadoJogo * estado){
 }
 
 
-int get_mobility_score_piece(Pieces type , uint64_bit pos , CorPiece turn , EstadoJogo * state){
+int atks_stronger_piece(uint64_bit pos , Pieces type , CorPiece turn , CorPiece op_turn , GameStruct * game , int piece_score){
+    uint64_bit piece_atks = get_piece_attacks(pos,type,game,turn);
+    for(int i=0;i<NUMBER_PIECES;i++){
+        uint64_bit tab = game->estadoJogo.tabuleirojogo[op_turn][i];
+        int p_value = piece_value((Pieces)i);
+        if(p_value > piece_score && (tab&piece_atks) !=0) return p_value; 
+    }
+    return 0;
+}
+
+
+int get_mobility_score_piece(Pieces type , uint64_bit pos , CorPiece turn , GameStruct * game , int piece_score){
     int m_score = 0;
+    CorPiece op_turn = (turn==brancas) ? pretas : brancas;
+    int is_attacked = is_attacked_piece(pos,type,op_turn,game,piece_score);
+    if(is_attacked){
+        if(type==King) return (-99999);
+        else m_score-=piece_score;
+    }
+    else{
+        int can_take_score = atks_stronger_piece(pos,type,turn,op_turn,game,piece_score);
+        if(can_take_score){
+            m_score+= can_take_score;
+        }
+    }
     return (m_score);
 }
 
 
-int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , int ai_lvl , EstadoJogo * estado){
+int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , int ai_lvl , GameStruct * game){
     //piece evaluation is based on the position of the piece , its mobility , what pieces it attacks
     //and how it coordinates with other pieces
     /*  
@@ -55,14 +78,14 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , in
             position_score = black_queen_evals[indx];
         break;
         case King:
-            if(is_end_game(estado)){
+            if(is_end_game(&game->estadoJogo)){
                 position_score = black_king_endGame_evals[indx];
             }
             else position_score = black_king_middleGame_evals[indx];
         break;
         default:break;
     }
-    mobility_score = get_mobility_score_piece(piece_type,piece_pos,turn,estado);
+    mobility_score = get_mobility_score_piece(piece_type,piece_pos,turn,game,piece_score);
     return (piece_score + position_score + mobility_score);
 }
 
@@ -85,7 +108,7 @@ int evaluate_pos(GameStruct * game , SearchInfo * search , int * w_eval , int * 
     if(isCheckMate(game,other_turn)) *cur_player_eval = (search->turn == brancas) ? 99999 : (-99999);
     else{
         int new_piece_eval = evaluate_piece(game->estadoJogo.tabuleirojogo[cur_turn][piece],piece,
-                                            cur_turn,search->ai_level,&game->estadoJogo);
+                                            cur_turn,search->ai_level,game);
         *cur_player_eval += (new_piece_eval - pieces_evals[cur_turn][piece]);
         *cur_player_eval *= who2Move;
     }
@@ -106,9 +129,9 @@ int evaluate(GameStruct * game , CorPiece turno , int ai_level , int pieces_eval
     }
     for(int i=0;i<NUMBER_PIECES;i++){
         int piece_eval_turn = evaluate_piece(game->estadoJogo.tabuleirojogo[turno][i],(Pieces)i,turno,
-                                        ai_level,&game->estadoJogo);
+                                        ai_level,game);
         int piece_eval_other_turn = evaluate_piece(game->estadoJogo.tabuleirojogo[other_turn][i],(Pieces)i,
-                                        other_turn,ai_level,&game->estadoJogo);
+                                        other_turn,ai_level,game);
 
         pieces_evals[turno][i] = piece_eval_turn;
         *turn_eval+= (piece_eval_turn*who2Move);
