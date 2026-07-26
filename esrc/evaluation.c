@@ -6,14 +6,41 @@
 //Changing alpha and beta depending to that comparation
 
 
-int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , int ai_lvl , EstadoJogo * estado){
+int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , int ai_lvl , EstadoJogo * estado , Boolean is_middle_game){
     //piece evaluation is based on the position of the piece , its mobility , what pieces it attacks
     //and how it coordinates with other pieces
-    /*  piece_eval = position_score + mobility_score + attacks_score 
+    /*  piece_eval = piece_score + position_score + mobility_score + attacks_score 
                     + same_colour_coordination - op_colour_coordination;
     */
-   int piece_eval = 0;
-   return piece_eval;
+    int position_score = 0 , mobility_score = 0 , attacks_score = 0 ,
+       same_colour_coord = 0 ,  op_colour_coord = 0 , piece_score = piece_value(piece_type);
+    int pos = posTabuleiro(piece_pos);
+    int line = pos/8 , column = pos%8 , indx = (turn==brancas) ? ((7-line)*8 + column) : (line*8 + column);
+    switch(piece_type){
+        case Pawn :
+            position_score = pawn_evals_black[indx];
+        break;
+        case Rook:
+            position_score = black_rook_evals[indx];
+        break;
+        case Horse:
+            position_score = knight_evals[line*8 + column];
+        break;
+        case Bishop:
+            position_score = black_bishop_evals[indx];
+        break;
+        case Queen:
+            position_score = black_queen_evals[indx];
+        break;
+        case King:
+            if(is_middle_game){
+                position_score = black_king_middleGame_evals[indx];
+            }
+            else position_score = black_king_endGame_evals[indx];
+        break;
+        default:break;
+    }
+    return (piece_score + position_score + mobility_score + attacks_score + same_colour_coord - op_colour_coord);
 }
 
 
@@ -35,7 +62,7 @@ int evaluate_pos(GameStruct * game , SearchInfo * search , int * w_eval , int * 
     if(isCheckMate(game,other_turn)) *cur_player_eval = (search->turn == brancas) ? 99999 : (-99999);
     else{
         int new_piece_eval = evaluate_piece(game->estadoJogo.tabuleirojogo[cur_turn][piece],piece,
-                                            cur_turn,search->ai_level,&game->estadoJogo);
+                                            cur_turn,search->ai_level,&game->estadoJogo,0);
         *cur_player_eval += (new_piece_eval - pieces_evals[cur_turn][piece]);
         *cur_player_eval *= who2Move;
     }
@@ -56,9 +83,9 @@ int evaluate(GameStruct * game , CorPiece turno , int ai_level , int pieces_eval
     }
     for(int i=0;i<NUMBER_PIECES;i++){
         int piece_eval_turn = evaluate_piece(game->estadoJogo.tabuleirojogo[turno][i],(Pieces)i,turno,
-                                        ai_level,&game->estadoJogo);
+                                        ai_level,&game->estadoJogo,0);
         int piece_eval_other_turn = evaluate_piece(game->estadoJogo.tabuleirojogo[other_turn][i],(Pieces)i,
-                                        other_turn,ai_level,&game->estadoJogo);
+                                        other_turn,ai_level,&game->estadoJogo,0);
 
         pieces_evals[turno][i] = piece_eval_turn;
         *turn_eval+= (piece_eval_turn*who2Move);

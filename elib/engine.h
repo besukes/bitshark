@@ -141,7 +141,7 @@ int piece_value(Pieces piece){
         case 2: return 320;
         case 3: return 330;
         case 4: return 900;
-        case 5: return 20000;
+        case 5: return 1000;
         default: 
             printf("[ERROR] Pieces index out of range\n");
             return 0;
@@ -239,7 +239,7 @@ Moves search_algorithm (uint64_bit posi , uint64_bit atks ,uint64_bit pos, GameS
 /// evaluation //////////////////////////////
 
 int evaluate(GameStruct * game , CorPiece turno , int ai_level , int pieces_evals[2][NUMBER_PIECES] , int * white_eval , int * black_eval);
-int evaluate_pos(GameStruct * game , SearchInfo * search , int * w_eval , int * b_eval , int piece_evals[2][NUMBER_PIECES] , int cur_piece_eval);
+int evaluate_pos(GameStruct * game , SearchInfo * search , int * w_eval , int * b_eval , int piece_evals[2][NUMBER_PIECES] , int cur_piece_eval , int nmbr_pieces);
 
 /// engine /////////////////////////////////
 

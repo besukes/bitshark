@@ -5,7 +5,7 @@
 int depth_search(GameStruct * game , SearchInfo * search_info , int piece_evals[2][NUMBER_PIECES] , int cur_piece_eval){
     int cur_alpha = search_info->alpha , cur_beta = search_info->beta;
     int white_eval = search_info->white_eval , black_eval = search_info->black_eval;
-    evaluate_pos(game,search_info,&white_eval,&black_eval,piece_evals,cur_piece_eval);
+    evaluate_pos(game,search_info,&white_eval,&black_eval,piece_evals,cur_piece_eval,0);
     if(search_info->depth <= 0 || cur_alpha > white_eval || cur_beta < black_eval) 
         return ((search_info->turn == brancas) ? cur_alpha : cur_beta); 
     int new_turn = (search_info->turn == brancas) ? pretas : brancas;
