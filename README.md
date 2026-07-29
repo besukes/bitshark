@@ -17,7 +17,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 
 ## Compilação
 
-O projeto não possui compilação , sendo apenas um algoritmo de xadrez
+O projeto não possui compilação , sendo apenas um algoritmo de xadrez (Até ao momento porque tenciono criar uma interface para este bot)
 
 
 ## Créditos
