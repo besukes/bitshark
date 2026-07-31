@@ -1,15 +1,15 @@
 <div align="center">
 
-  ![TIGRSHARK](13795_small.png)
+  ![BITSHARK](13795_small.png)
 
-  <h3>TIGRSHARK</h3>
+  <h3>BITSHARK</h3>
    An average chess engine.
   <br>
 </div>
   
 ## Overview
 
-**Tigrshark** é uma pequena chess engine feita em C para o jogo clássico de xadrez, que depois vai ser modificada para ser um BOT no modo história do jogo CChess, feito pelo mesmo criador desta engine.
+**Bitshark** é uma pequena chess engine feita em C para o jogo clássico de xadrez, que depois vai ser modificada para ser um BOT no modo história do jogo CChess, feito pelo mesmo criador desta engine.
 <br>
 Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Engenharia Informática na UMinho.
 
