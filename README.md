@@ -1,6 +1,6 @@
 <div align="center">
 
-  ![TIGRSHARK](IMG_20260731_092516.png)
+  ![TIGRSHARK](13795_small.png)
 
   <h3>tigrshark</h3>
 </div>
