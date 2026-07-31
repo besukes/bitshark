@@ -2,7 +2,7 @@
 
   ![TIGRSHARK](13795_small.png)
 
-  <h3>tigrshark</h3>
+  <h3>TIGRSHARK</h3>
 </div>
 
 # tigrshark
