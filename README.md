@@ -1,6 +1,6 @@
 <div align="center">
-
-  ![BITSHARK](13803_resized.png)
+  <img src="IMG_20260731_184533.png"
+     width = 50% alt = "Bitshark">
 
   <h3>BITSHARK</h3>
    An average chess engine.
