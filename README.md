@@ -4,10 +4,13 @@
 
   <h3>TIGRSHARK</h3>
 </div>
+   A free and strong UCI chess engine.
+  <br>
+  
+## Overview
 
-# tigrshark
-
-Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Engenharia Informática na UMinho e consiste numa pequena Chess Engine feita em C para o jogo clássico de xadrez , que depois vai ser modificada para ser um BOT no modo história do jogo CChess.
+**Tigrshark** é uma pequena chess engine feita em C para o jogo clássico de xadrez, que depois vai ser modificada para ser um BOT no modo história do jogo CChess, feito pelo mesmo criador desta engine.
+Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Engenharia Informática na UMinho.
 
 ## Tecnologias Utilizadas
 
