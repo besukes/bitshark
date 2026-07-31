@@ -3,9 +3,9 @@
   ![TIGRSHARK](13795_small.png)
 
   <h3>TIGRSHARK</h3>
-</div>
-   A free and strong UCI chess engine.
+   A free and average chess engine.
   <br>
+</div>
   
 ## Overview
 
