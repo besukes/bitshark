@@ -1,6 +1,5 @@
 ![TIGRSHARK](IMG_20260731_092516.png)
 
-                    **TIGRSHARK**
 
 # tigrshark
 
