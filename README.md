@@ -1,6 +1,6 @@
 <div align="center">
 
-  ![BITSHARK](13802_small.png)
+  ![BITSHARK](13803_resized.png)
 
   <h3>BITSHARK</h3>
    An average chess engine.
