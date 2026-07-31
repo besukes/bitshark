@@ -3,7 +3,7 @@
   ![TIGRSHARK](13795_small.png)
 
   <h3>TIGRSHARK</h3>
-   A free and average chess engine.
+   An average chess engine.
   <br>
 </div>
   
