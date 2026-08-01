@@ -23,6 +23,8 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 * Piece Square Tables
 * Basic mobility score
 * Incremental evaluation
+* Quiescence Search
+* Move ordering
 
 
 ## Estrutura do Projeto
