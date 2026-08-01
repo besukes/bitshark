@@ -13,9 +13,17 @@
 <br>
 Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Engenharia Informática na UMinho.
 
-## Tecnologias Utilizadas
+## Tools
 
 * Linguagem: **C**
+
+## Features
+
+* NegaMax search
+* Piece Square Tables
+* Basic mobility score
+* Incremental evaluation
+
 
 ## Estrutura do Projeto
 ```bash
