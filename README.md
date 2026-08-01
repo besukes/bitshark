@@ -25,6 +25,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 * Incremental evaluation
 * Quiescence Search
 * Move ordering
+* Transposition table (Maybe in the future)
 
 
 ## Estrutura do Projeto
