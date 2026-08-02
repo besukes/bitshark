@@ -22,11 +22,12 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 * Search
   * NegaMax search
   * Alpha-Beta pruning
-* Piece Square Tables
-* Basic mobility score
-* Incremental evaluation
-* Quiescence Search
-* Move ordering
+  * Quiescence Search
+  * Move ordering
+* Evaluation
+  * Piece Square Tables
+  * Basic mobility score
+  * Incremental evaluation
 * Transposition table (Maybe in the future)
 
 
