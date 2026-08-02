@@ -17,7 +17,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 
 * Linguagem: **C**
 
-## Features
+## Features (Still under work)
 
 * Search
   * NegaMax search
