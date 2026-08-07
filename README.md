@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="IMG_20260731_184533.png"
+  <img src="assets/logo/bitshark.png"
      width = 25% alt = "Bitshark">
 
   <h3>BITSHARK</h3>
