@@ -24,7 +24,7 @@ int is_end_game(EstadoJogo * estado){
 
 
 int atks_stronger_piece(uint64_bit pos , Pieces type , CorPiece turn , CorPiece op_turn , GameStruct * game , int piece_score){
-    uint64_bit piece_atks = get_piece_attacks(pos,type,game,turn);
+    uint64_bit piece_atks = get_piece_attacks(pos,type,game,turn,1);
     for(int i=0;i<NUMBER_PIECES;i++){
         uint64_bit tab = game->estadoJogo.tabuleirojogo[op_turn][i];
         int p_value = pieces_value[i];
@@ -38,7 +38,7 @@ int is_defended_piece(uint64_bit pos , Pieces type , CorPiece turn , GameStruct 
         uint64_bit tab = game->estadoJogo.tabuleirojogo[turn][i];
         while(tab){
             uint64_bit single = tab & (-tab); // isola o bit mais baixo
-            uint64_bit atks = get_piece_attacks(single,(Pieces)i,game,turn);
+            uint64_bit atks = get_piece_attacks(single,(Pieces)i,game,turn,1);
             if((atks&pos) != 0) return 1;
             tab &= tab - 1; // remove esse bit
         }

@@ -137,7 +137,7 @@ uint64_bit get_possible_pawn_moves(uint64_bit pos,uint64_bit bitboard_pieces,Cor
 
 
 
-uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , CorPiece cor_turno){
+uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , CorPiece cor_turno , int only_captures){
     uint64_bit bitboardPieces = game->estadoJogo.bitboard_todas_pieces;
     switch(piece){
         case Pawn :
@@ -157,7 +157,7 @@ uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , Cor
             return (get_sliding_attacks(pos,bitboardPieces) | get_cross_attacks(pos,bitboardPieces));
         break;
         case King :
-            return (get_king_moves(pos) | get_castle_moves(pos,bitboardPieces,game,cor_turno));
+            return ((only_captures) ? get_king_moves(pos) : (get_king_moves(pos)| get_castle_moves(pos,bitboardPieces,game,cor_turno)));
         break;
         default :
             return 0ULL;
@@ -178,9 +178,18 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
     if(jogada->peca_movida == Empty || jogada->destino == 64 || jogada->origem == 64) return 0;
     uint64_bit pos_dest = 1ULL<<jogada->destino;
     Pieces piece = jogada->peca_movida;
-    uint64_bit pos_piece = 1ULL<<jogada->origem,
-               pos_mesma_cor = get_same_colour_bitboard(&(game->estadoJogo),cor);
+    uint64_bit pos_mesma_cor = get_same_colour_bitboard(&(game->estadoJogo),cor);
     uint64_bit move = (~pos_mesma_cor & (pos_attacks & pos_dest));
+
+    //fix de reis nao se poderem tocar
+    if(piece == King){
+        CorPiece oponente = (cor == brancas) ? pretas : brancas;
+        uint64_bit rei_oponente = game->estadoJogo.tabuleirojogo[oponente][King];
+        if(rei_oponente & pos_dest){
+            return 0;
+        }
+    }
+
     jogada->promocao = ( (jogada != 0) && (piece == Pawn) && pawnPromoting(pos_dest,cor) );
     jogada->especial = piece == King  && is_castelling_king(game,cor,pos_dest);
     if(jogada->especial) jogada->especial = FLAG_CASTLE;
@@ -203,7 +212,7 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
         uint64_bit bitboard = game->estadoJogo.tabuleirojogo[cor][piece];
         while (bitboard) {
             uint64_bit single_piece = bitboard & (-bitboard); // Isola o bit mais baixo
-            uint64_bit attacks = get_piece_attacks(single_piece, piece,game, cor);
+            uint64_bit attacks = get_piece_attacks(single_piece, piece,game, cor,only_captures);
             if(only_captures) attacks &= *oposto; // Se for apenas capturas, filtra os ataques para incluir apenas as peças do oponente{
             while (attacks) {
                 uint64_bit single_attack = attacks & (-attacks);

@@ -49,7 +49,7 @@ int isCheckMate(GameStruct * game , CorPiece cor){
         j.peca_movida = piece_atual;
         while(tab_piece !=0 && in_check){
             uint64_bit pos_piece = (1ULL<<(__builtin_ctzll(tab_piece) ));
-            uint64_bit pieces_move = get_piece_attacks(pos_piece,piece_atual,game,cor);
+            uint64_bit pieces_move = get_piece_attacks(pos_piece,piece_atual,game,cor,0);
             uint64_bit tries = pieces_move & ~same_colour;
             j.origem = __builtin_ctzll(pos_piece);
             while( tries !=0 && in_check){

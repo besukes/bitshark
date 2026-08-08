@@ -34,6 +34,22 @@ typedef struct {
 extern Jogada killer_moves[MAX_DEPTH_SEARCH][2]; //Armazena os killer moves para cada profundidade de busca
 extern int history_table[NUMBER_PIECES*2][NUM_SQUARES]; //Armazena a tabela de histórico para cada peça e posição
 
+// Transposition table: guarda resultados de posições já pesquisadas para evitar recalculá-las
+// quando se chega lá outra vez por uma ordem de jogadas diferente (transposição).
+#define TT_SIZE (1 << 20) // ~1M entradas (potência de 2 para indexar com & em vez de %)
+ 
+typedef enum { TT_EMPTY, TT_EXACT, TT_LOWERBOUND, TT_UPPERBOUND } TTFlag;
+ 
+typedef struct TTEntry{
+    uint64_bit key;
+    int depth;
+    int score;
+    TTFlag flag;
+    Jogada best_move;
+} TTEntry;
+ 
+extern TTEntry * transposition_table;
+
 
 typedef int Boolean; //Forma mais intuitiva de perceber quando as variáveis são usadas como valores lógicos.
 
@@ -265,7 +281,7 @@ uint64_bit get_knight_attacks(uint64_bit piece_pos);
 uint64_bit get_pawn_attacks(uint64_bit piece_pos,CorPiece cor);
 uint64_bit get_sliding_attacks(uint64_bit piece_pos, uint64_bit pos_limites);
 uint64_bit get_cross_attacks(uint64_bit piece_pos , uint64_bit pos_limites);
-uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game,CorPiece cor_turno);
+uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game,CorPiece cor_turno , int only_captures);
 uint64_bit get_king_moves(uint64_bit pos);
 void king_line_dependant_moves(uint64_bit * atk ,uint64_bit (*func)(uint64_bit,int),uint64_bit pos_rei , uint64_bit colunaA , uint64_bit colunaH);
 int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int only_captures);

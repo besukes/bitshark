@@ -29,4 +29,5 @@ void loadAssets(GUISettings * settings , SDL_Renderer * sdl_renderer){
 
     settings->textures.miscTextures[0] = IMG_LoadTexture(sdl_renderer,"assets/misc/white_moves.png");
     settings->textures.miscTextures[1] = IMG_LoadTexture(sdl_renderer,"assets/misc/black_moves.png");
+    settings->textures.miscTextures[2] = IMG_LoadTexture(sdl_renderer,"assets/tabuleiro/checkerboard.png");
 }
