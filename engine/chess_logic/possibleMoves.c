@@ -180,16 +180,6 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
     Pieces piece = jogada->peca_movida;
     uint64_bit pos_mesma_cor = get_same_colour_bitboard(&(game->estadoJogo),cor);
     uint64_bit move = (~pos_mesma_cor & (pos_attacks & pos_dest));
-
-    //fix de reis nao se poderem tocar
-    if(piece == King){
-        CorPiece oponente = (cor == brancas) ? pretas : brancas;
-        uint64_bit rei_oponente = game->estadoJogo.tabuleirojogo[oponente][King];
-        if(rei_oponente & pos_dest){
-            return 0;
-        }
-    }
-
     jogada->promocao = ( (jogada != 0) && (piece == Pawn) && pawnPromoting(pos_dest,cor) );
     jogada->especial = piece == King  && is_castelling_king(game,cor,pos_dest);
     if(jogada->especial) jogada->especial = FLAG_CASTLE;

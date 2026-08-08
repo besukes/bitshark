@@ -31,22 +31,25 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth){
         Jogada * cur_move = pick_best_move(jogadas, num_jogadas, i);
         // Aplica a jogada nas Bitboards e atualiza a Avaliação Incremental (Delta)
         int delta = applyDeltaMove(game,cur_move,turn);
-        // Chamada recursiva do NEGAMAX:
-        int eval = -search(game, depth - 1, -beta , -alpha, eval_wb_inicial + delta, initial_time, initial_time + 5000, op_turn);
-        undoMove(game,cur_move,turn);
-        // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
-        if((-eval) == FLAG_TIMEOUT) {
-            printf("[engine] engine_search: timeout reached during search\n");
-            return (jogadabot){{.origem = 64, .destino = 64, .peca_movida = Empty, .peca_capturada = Empty, .promocao = 0, .especial = 0}
-                                , FLAG_TIMEOUT
-                                , SDL_GetTicks() - initial_time};
+        Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
+        if(!in_check){
+            // Chamada recursiva do NEGAMAX:
+            int eval = -search(game, depth - 1, -beta , -alpha, eval_wb_inicial + delta, initial_time, initial_time + 5000, op_turn);
+            undoMove(game,cur_move,turn);
+            // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
+            if(SDL_GetTicks() - initial_time >= initial_time + 5000) {
+                printf("[engine] engine_search: timeout reached during search\n");
+                return (jogadabot){{.origem = 64, .destino = 64, .peca_movida = Empty, .peca_capturada = Empty, .promocao = 0, .especial = 0}
+                                    , FLAG_TIMEOUT, SDL_GetTicks() - initial_time};
+            }
+            // Guarda a melhor pontuação encontrada para o jogador atual
+            if(eval > melhor_eval) {
+                melhor_eval = eval;
+                best_move = *cur_move;
+            }
+            alpha = (melhor_eval>alpha) ? melhor_eval : alpha;
         }
-        // Guarda a melhor pontuação encontrada para o jogador atual
-        if(eval > melhor_eval) {
-            melhor_eval = eval;
-            best_move = *cur_move;
-        }
-        alpha = (melhor_eval>alpha) ? melhor_eval : alpha;
+        else undoMove(game,cur_move,turn);
     }
     jogadabot result = {.best_move = best_move,.move_eval = alpha ,.move_time = SDL_GetTicks() - initial_time};
     return result;

@@ -55,7 +55,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     Jogada jogadas[256];int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     if (num_jogadas == 0) { // Se não houver jogadas legais: Xeque-Mate ou Empate (Afogamento)
         if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)) {
-            return -VALOR_INFINITO + depth; // Xeque-mate (prioriza mates mais rápidos)
+            return (-VALOR_INFINITO + depth); // Xeque-mate (prioriza mates mais rápidos)
         }
         return 0; // Empate por afogamento
     }
@@ -65,7 +65,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         int delta = applyDeltaMove(game,best_move,turn);
-        int in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
+        Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             // Chamada recursiva do NEGAMAX:
             int eval = -search(game, depth - 1, -beta, -alpha, wb_eval + delta, initial_time, time_limit, (turn == brancas) ? pretas : brancas);
