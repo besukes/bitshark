@@ -84,7 +84,7 @@ void efetuaEventoClique(GameStruct * game , GUISettings * settings,SDL_Event * e
         }
     }
     else if(click != 0 && !*is_leaving){
-        Pieces piece = comparePiece(game->estadoJogo ,game->turnoJogador, click);
+        Pieces piece = comparePiece(&game->estadoJogo ,game->turnoJogador, click);
         game->pieceCoords = click;
         game->pieceSelecionada = piece;
         if(piece==Empty) game->jogada = Invalid;

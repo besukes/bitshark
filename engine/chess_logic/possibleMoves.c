@@ -189,6 +189,7 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor){
 
 int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int only_captures){
     uint64_bit * oposto = (cor==brancas) ? &(game->estadoJogo.bitboard_pretas) : &(game->estadoJogo.bitboard_brancas);
+    CorPiece op_cor = (cor==brancas) ? pretas : brancas;
     int num_jogadas = 0;
     uint64_bit prev_enpassant = game->estadoJogo.enpassant;
     int prev_canCastleShort = game->estadoJogo.canCastle[cor][Short];
@@ -202,9 +203,12 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
             if(only_captures) attacks &= *oposto; // Se for apenas capturas, filtra os ataques para incluir apenas as peças do oponente{
             while (attacks) {
                 uint64_bit single_attack = attacks & (-attacks);
+                Pieces p_cap = comparePiece(&game->estadoJogo,op_cor,single_attack);
                 Jogada jogada = {.origem = (uint8_t)posTabuleiro(single_piece), .destino = (uint8_t)posTabuleiro(single_attack), .peca_movida = piece, 
-                                .peca_capturada = Empty, .promocao = 0, .especial = 0 , .score = 0};
+                                .peca_capturada = p_cap, .promocao = 0, .especial = 0 , .score = 0};
                 if (isPseudoValidMove(game, &jogada, cor)){
+                    if(jogada.especial == FLAG_ENPASSANT) 
+                        jogada.peca_capturada = Pawn; // en passant come um peão fora da casa de destino
                     jogadas[num_jogadas++] = jogada;
                 }
                 attacks &= attacks - 1; // Remove esse bit

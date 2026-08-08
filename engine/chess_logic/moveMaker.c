@@ -35,7 +35,7 @@ void fetch_change_board(GameStruct * game,uint64_bit click,uint64_bit * mesmaCor
     CorPiece cor_oposta = (turno == brancas) ? pretas : brancas;
     Pieces selected = jogada->peca_movida;
 
-    Pieces piece_comida = comparePiece(game->estadoJogo, cor_oposta, click);
+    Pieces piece_comida = comparePiece(&game->estadoJogo, cor_oposta, click);
     if(piece_comida == Empty || selected == Empty )return;
 
     jogada->peca_capturada = piece_comida;

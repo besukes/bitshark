@@ -1,9 +1,9 @@
 CC = gcc
 
 TFLAGS = -Wall -ggdb -Wextra -g3 -fsanitize=address,undefined -I. -Iengine/chess_lib
-SFLAGS = -Wall -O3 -I. -Iengine/chess_lib
+CFLAGS = -Wall -O3 -DNDEBUG -I. -Iengine/chess_lib
 LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lSDL2_gfx -lm -fsanitize=address,undefined
-LLFLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lSDL2_gfx -lm
+LCFLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lSDL2_gfx -lm
 
 SRC =	engine/chess_logic/castle_logic.c \
 		engine/chess_logic/checkAndCheckmate.c \
@@ -19,11 +19,11 @@ SRC =	engine/chess_logic/castle_logic.c \
 		gui/initialization/initStructs.c \
 		gui/initialization/initTabuleiro.c \
 		gui/initialization/startAndCleanup.c \
+		gui/initialization/loadAssets.c \
 		gui/interface/corefunctions.c \
 		gui/interface/events.c \
 		gui/interface/handleGameplay.c \
 		gui/interface/main.c \
-		gui/user/loadAssets.c \
 		gui/user/music.c \
 		gui/user/gui.c \
 		gui/user/universal_draws.c \
@@ -36,11 +36,11 @@ TARGET = bshark
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $@ $(LLFLAGS)
+	$(CC) $(OBJ) -o $@ $(LCFLAGS)
 
 build/%.o: %.c
 	@mkdir -p $(dir $@)
-	$(CC) $(SFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -rf build
