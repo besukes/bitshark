@@ -17,7 +17,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 
 * Linguagem: **C**
 
-## Features (Still under work)
+## Features
 
 * Search
   * NegaMax search
@@ -28,7 +28,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
   * Piece Square Tables
   * Basic mobility score
   * Incremental evaluation
-* Transposition table (Maybe in the future)
+* Transposition table (Currently implementing)
 
 
 ## Estrutura do Projeto
@@ -42,7 +42,19 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 
 ## Compilação
 
-O projeto não possui compilação , sendo apenas um algoritmo de xadrez (Até ao momento porque tenciono criar uma interface para este bot).
+Para compilar este projeto e jogar contra o bot (que joga sempre com as pretas) , basta fazer :
+
+```
+make
+```
+
+E será gerado um executável chamado **bshark** e , executando o seguinte comando :
+
+```
+./bshark
+```
+
+Poderá jogar contra esta chess engine.
 
 
 ## Créditos
