@@ -48,13 +48,12 @@ Para compilar este projeto e jogar contra o bot (que joga sempre com as pretas) 
 make
 ```
 
-E será gerado um executável chamado **bshark** e , executando o seguinte comando :
+E será gerado um executável chamado **bshark** .
+Executando o seguinte comando , poderá assim jogar contra esta chess engine:
 
 ```
 ./bshark
 ```
-
-Poderá jogar contra esta chess engine.
 
 
 ## Créditos
