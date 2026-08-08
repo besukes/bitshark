@@ -14,6 +14,7 @@ GUISettings initGUISettings(SDL_Renderer * sdl_renderer , SDL_Window * window){
     settings.posMouseX = 0;
     settings.posMouseY = 0;
     settings.ticks = 0;
+    settings.screen = GameScreen;
     loadAssets(&settings,sdl_renderer);
     TTF_Init();
     settings.fonteJogoTitles = TTF_OpenFont("assets/ttf/m6x11plus.ttf", 35);
