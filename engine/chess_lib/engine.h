@@ -34,22 +34,6 @@ typedef struct {
 extern Jogada killer_moves[MAX_DEPTH_SEARCH][2]; //Armazena os killer moves para cada profundidade de busca
 extern int history_table[NUMBER_PIECES*2][NUM_SQUARES]; //Armazena a tabela de histórico para cada peça e posição
 
-// Transposition table: guarda resultados de posições já pesquisadas para evitar recalculá-las
-// quando se chega lá outra vez por uma ordem de jogadas diferente (transposição).
-#define TT_SIZE (1 << 20) // ~1M entradas (potência de 2 para indexar com & em vez de %)
- 
-typedef enum { TT_EMPTY, TT_EXACT, TT_LOWERBOUND, TT_UPPERBOUND } TTFlag;
- 
-typedef struct TTEntry{
-    uint64_bit key;
-    int depth;
-    int score;
-    TTFlag flag;
-    Jogada best_move;
-} TTEntry;
- 
-extern TTEntry * transposition_table;
-
 
 typedef int Boolean; //Forma mais intuitiva de perceber quando as variáveis são usadas como valores lógicos.
 
@@ -73,6 +57,21 @@ typedef unsigned long long uint64_bit;
 
 typedef uint64_bit (*ShiftFunction)(uint64_bit,int); //Tipo que define um endereço de memória de uma função que recebe um unsigned long long de 64 bits e um int normal
 
+// Transposition table: guarda resultados de posições já pesquisadas para evitar recalculá-las
+// quando se chega lá outra vez por uma ordem de jogadas diferente (transposição).
+#define TT_SIZE (1 << 20) // ~1M entradas (potência de 2 para indexar com & em vez de %)
+ 
+typedef enum { TT_EMPTY, TT_EXACT, TT_LOWERBOUND, TT_UPPERBOUND } TTFlag;
+ 
+typedef struct TTEntry{
+    uint64_bit key;
+    int depth;
+    int score;
+    TTFlag flag;
+    Jogada best_move;
+} TTEntry;
+ 
+extern TTEntry * transposition_table;
 
 /*Enum que guarda todas as peças possíveis do jogo*/
 typedef enum {
@@ -394,3 +393,13 @@ Jogada * pick_best_move(Jogada * jogadas, int num_jogadas, int start_index);
 void moveScoring(Jogada * jogadas , int num_jogadas , Jogada * hash_move , int depth);
 void moveScoringCaptures(Jogada * jogadas , int num_jogadas , Jogada * hash_move);
 int matches_killer_move(int depth, Jogada * jogada, int index) ;
+
+
+/// transposition /////////////////////////
+
+uint64_bit xorshift64(uint64_bit *state);
+void init_zobrist(void);
+void tt_init(void);
+uint64_bit compute_zobrist(GameStruct * game, CorPiece turn);
+TTEntry * tt_probe(uint64_bit key);
+void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move);

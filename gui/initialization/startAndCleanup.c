@@ -40,7 +40,7 @@ SDL_Initializators sdl_initializer(void){
     int op = getOption();
     int resX = 1200 , resY = 900;
     setResolution(&resX,&resY,op);
-    window = SDL_CreateWindow("CChess", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, resX , resY , 0);
+    window = SDL_CreateWindow("Bitshark", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, resX , resY , 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     //para não precisar de dar scale às imagens no ecrã
     SDL_RenderSetLogicalSize(renderer, 1200, 900);

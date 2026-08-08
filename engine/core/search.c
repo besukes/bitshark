@@ -47,9 +47,10 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     if (SDL_GetTicks() - initial_time >= time_limit || (e.type == SDL_QUIT)) {
         return FLAG_TIMEOUT;
     }
+
     if (depth == 0) { // Quando atinge a profundidade 0 ou o jogo acaba, lê a avaliação incremental atual
         double time = SDL_GetTicks();
-        return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , time , time + 2000);
+        return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , time , time_limit);
     }
     Jogada jogadas[256];int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     if (num_jogadas == 0) { // Se não houver jogadas legais: Xeque-Mate ou Empate (Afogamento)
@@ -58,7 +59,9 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         }
         return 0; // Empate por afogamento
     }
-    moveScoring(jogadas, num_jogadas, NULL, depth); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
+    
+    moveScoring(jogadas, num_jogadas, NULL , depth); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
+    
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         int delta = applyDeltaMove(game,best_move,turn);
