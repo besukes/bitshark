@@ -12,7 +12,7 @@
 
 void desenhaInterfaceJogo(GameStruct * game ,GUISettings * settings){
     desenhaFundo(settings,settings->textures.fundo);
-    SDL_Rect tabuleiro = {210,140,800,800};
+    SDL_Rect tabuleiro = {250,100,700,700};
     SDL_RenderCopy(settings->gameRenderer,settings->textures.tabTexture,NULL,&tabuleiro);
     if(game->selected_piece_attacks != 0){
         uint64_bit op = get_opposing_colour_bitboard(&game->estadoJogo,game->turnoJogador);
@@ -28,7 +28,5 @@ void desenhaInterfaceJogo(GameStruct * game ,GUISettings * settings){
 
     if(game->promoted.pawnPromoted) desenhaPromotion(game,settings);
 
-    SDL_Rect turn = {250,(-40),700,210};
-    SDL_RenderCopy(settings->gameRenderer,settings->textures.miscTextures[game->turnoJogador],NULL,&turn);
     desenhaArrows(game,settings->gameRenderer,settings->textures.arrow);
 }

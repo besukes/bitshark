@@ -29,7 +29,7 @@ SRC =	engine/chess_logic/castle_logic.c \
 OBJ = $(SRC:%.c=build/%.o)
 
 
-TARGET = bitshark
+TARGET = bshark
 
 all: $(TARGET)
 
@@ -42,7 +42,7 @@ build/%.o: %.c
 
 clean:
 	rm -rf build
-	rm bitshark
+	rm bshark
 
 check:
 	@command -v gcc >/dev/null 2>&1 || { echo "gcc not installed"; exit 1; }

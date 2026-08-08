@@ -5,6 +5,7 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <stdio.h>
 
+#define SQ_SIZE 88
 
 void drawLevel(int nivel,SDL_Renderer * renderer , TTF_Font* f,int x , int y, float scale){
     char str[256];
@@ -63,7 +64,7 @@ void desenhaCheck(GameStruct * game , GUISettings * settings){
 
     int coluna = pos_tab % 8 , linha = pos_tab / 8;
     SDL_SetRenderDrawColor(settings->gameRenderer, 255 , 0 , 0, 150); 
-    SDL_Rect check = {100*coluna+210, 1080 - (100 * linha + 240),100,100};
+    SDL_Rect check = {SQ_SIZE*coluna+248, 1080 - (SQ_SIZE * linha + 367),SQ_SIZE,SQ_SIZE};
     SDL_RenderFillRect(settings->gameRenderer, &check);
 }
 
@@ -75,12 +76,12 @@ void desenharPieceAttacks(GUISettings * settings , uint64_bit passant , uint64_b
         if(casa_atual & attacks){
             int linha = counter/8 , coluna = counter % 8;
             if(1ULL<<counter & (cor_oposta | passant)){
-                filledCircleRGBA(settings->gameRenderer, 100*coluna+260, 1080 - (100 * linha + 192) , 40 , 0 , 0, 0, 150);
-                aacircleRGBA(settings->gameRenderer, 100*coluna+260, 1080 - (100 * linha + 192) , 40 , 0 , 0, 0, 150);
+                filledCircleRGBA(settings->gameRenderer, SQ_SIZE*coluna+291, 1080 - (SQ_SIZE * linha + 320) , 40 , 0 , 0, 0, 150);
+                aacircleRGBA(settings->gameRenderer, SQ_SIZE*coluna+291, 1080 - (SQ_SIZE * linha + 320) , 40 , 0 , 0, 0, 150);
             }
             else {
-                filledCircleRGBA(settings->gameRenderer, 100*coluna+260, 1080 - (100 * linha + 192) , 10 , 0 , 0, 0, 150);
-                aacircleRGBA(settings->gameRenderer, 100*coluna+260, 1080 - (100 * linha + 192) , 10 , 0 , 0, 0, 150);
+                filledCircleRGBA(settings->gameRenderer, SQ_SIZE*coluna+291, 1080 - (SQ_SIZE * linha + 324) , 10 , 0 , 0, 0, 150);
+                aacircleRGBA(settings->gameRenderer, SQ_SIZE*coluna+291, 1080 - (SQ_SIZE * linha + 324) , 10 , 0 , 0, 0, 150);
             }
         }
         attacks = (attacks>>1);
@@ -90,14 +91,14 @@ void desenharPieceAttacks(GUISettings * settings , uint64_bit passant , uint64_b
 
 
 void desenharPiece(Pieces tipoPiece , int linha , int coluna , GUISettings * settings, int offset){
-    SDL_Rect posicaoPeca = {100*coluna+210, 1080 - (100 * linha + 246),100,100};
+    SDL_Rect posicaoPeca = {SQ_SIZE*coluna+253, 1080 - (SQ_SIZE * linha + 366),80,80};
     SDL_RenderCopy(settings->gameRenderer,settings->textures.chessPieces[tipoPiece + offset],NULL,&posicaoPeca);
 }
 
 
 void desenharPieceDrag(Pieces tipoPiece , int mouseX , int mouseY , GUISettings * settings , int offset)
 {
-    SDL_Rect centro = {mouseX-51,mouseY-51,100,100};
+    SDL_Rect centro = {mouseX-51,mouseY-51,90,90};
     SDL_RenderCopyEx(settings->gameRenderer,settings->textures.chessPieces[tipoPiece + offset], NULL, &centro, 0, NULL, SDL_FLIP_NONE);
 }
 
@@ -143,7 +144,7 @@ void desenhaPromotion(GameStruct * game , GUISettings * settings){
 
 
 void desenhaFundo(GUISettings * settings , SDL_Texture * texture){
-    SDL_Rect fundo = {0,0,1920,1080};
+    SDL_Rect fundo = {0,0,1200,900};
     SDL_RenderCopy(settings->gameRenderer,texture,NULL,&fundo);
 }
 
@@ -185,18 +186,18 @@ void drawSingleArrow(int (*vector)[2] , SDL_Renderer * renderer , SDL_Texture * 
     int xi = pos_draw_inicial % 8 , xf = pos_draw_final % 8 ,
         yi = pos_draw_inicial / 8 , yf = pos_draw_final / 8;
 
-    int centro_xi = 100*xi+260 , centro_xf = 100*xf + 260,
-        centro_yi = 1080 - (100 * yi + 246) + 40, centro_yf = 1080 - (100 * yf + 246) + 40;
+    int centro_xi = SQ_SIZE*xi+294 , centro_xf = SQ_SIZE*xf + 294,
+        centro_yi = 1080 - (SQ_SIZE * yi + 386) + 40, centro_yf = 1080 - (SQ_SIZE * yf + 386) + 40;
 
     double dx = centro_xf - centro_xi , dy = (-1)*(centro_yf - centro_yi);
-    int tam_arrow = (int)(sqrt(dx*dx + dy*dy)) - 57,
-        largura_arrow = 24;
+    int tam_arrow = (int)(sqrt(dx*dx + dy*dy)) - 48,
+        largura_arrow = 19;
 
     double angulo_rad = (-1) * atan2(dy, dx);
     double angulo_graus =  angulo_rad * (180.0 / M_PI) - 90;
     double angulo_graus_tip =  angulo_rad * (180.0 / M_PI) + 90;
     
-    int offset = (dy > 0) ? 0 : 30;
+    int offset = (dy > 0) ? 0 : 25;
 
     SDL_Rect arrow_rect = {
         .x = (int)(centro_xi - largura_arrow/2),
@@ -205,10 +206,10 @@ void drawSingleArrow(int (*vector)[2] , SDL_Renderer * renderer , SDL_Texture * 
         .h = tam_arrow
     };
     SDL_Rect arrow_tip = {
-        .x = (int)(centro_xf - 30) ,
+        .x = (int)(centro_xf - 26) ,
         .y = (int)(centro_yf) + offset,
-        .w = 60 , 
-        .h = 60
+        .w = 50 , 
+        .h = 50
     };
 
 

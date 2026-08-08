@@ -53,9 +53,9 @@ int calcPosClique(int lower_border_limit , int upper_border_limit , int pos , in
 
 uint64_bit click_table_position(int mouseX , int mouseY){
     uint64_bit p = 0;
-    int infHorizontal = 210 , supHorizontal = 1010 ,
-        infVertical = 140 , supVertical = 940;
-    int tamanhoQuadrado = 100;
+    int infHorizontal = 250 , supHorizontal = 950 ,
+        infVertical = 100 , supVertical = 800;
+    int tamanhoQuadrado = 88;
     int cx = calcPosClique(infHorizontal,supHorizontal,mouseX,tamanhoQuadrado,1) , 
         cy = calcPosClique(infVertical,supVertical,mouseY,tamanhoQuadrado,0);
     if(cx!=(-1) && cy != (-1)){

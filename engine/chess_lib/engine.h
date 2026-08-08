@@ -155,7 +155,7 @@ typedef struct AssetsCChess{
     SDL_Texture * chessPieces[12]; //Textura das pieces
     SDL_Texture * tabTexture; //Textura do tabuleiro
     SDL_Texture * fundo; //Textura do fundo
-    SDL_Texture * arrow; //Drawable arrows texture
+    SDL_Texture * arrow[2]; //Drawable arrows texture
     SDL_Texture * logo;
     SDL_Texture * miscTextures[20]; //Texturas misc 
 }AssetsCChess;
