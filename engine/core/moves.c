@@ -83,13 +83,7 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn){
     Pieces peca_movida = (Pieces)jogada->peca_movida;
     int old_moved_eval = evaluate_piece(origem_bit, peca_movida, turn, game);
 
-    Pieces peca_capturada = Empty;
-    for(int i=0;i<NUMBER_PIECES;i++){
-        if(game->estadoJogo.tabuleirojogo[op_turn][i] & destino_bit){
-            peca_capturada = (Pieces)i;
-            break;
-        }
-    }
+    Pieces peca_capturada = jogada->peca_capturada;
     int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(destino_bit, peca_capturada, op_turn, game) : 0;
 
     atualizaJogada(game, jogada, turn);

@@ -54,7 +54,7 @@ int isCheckMate(GameStruct * game , CorPiece cor){
             j.origem = __builtin_ctzll(pos_piece);
             while( tries !=0 && in_check){
                 j.destino = __builtin_ctzll(tries);
-                if(isPseudoValidMove(game,&j,cor)){
+                if(isPseudoValidMove(game,&j,cor,pieces_move)){
                     atualizaJogada(game,&j,cor);
                     in_check = is_in_check(&(game->estadoJogo),(game->estadoJogo.tabuleirojogo[cor][King]),cor);
                     undoMove(game,&j,cor);

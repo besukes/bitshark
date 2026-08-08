@@ -12,6 +12,8 @@
 
 #define COLUNA_A 0x0101010101010101ULL
 #define COLUNA_H 0x8080808080808080ULL
+#define COLUNA_B 0x0202020202020202ULL
+#define COLUNA_G 0x4040404040404040ULL
 
 #define FLAG_CASTLE 1
 #define FLAG_ENPASSANT 2
@@ -258,7 +260,7 @@ void promotePiece(GameStruct * game , Pieces piece, uint64_bit promotion_square 
 
 //Modulo possibleMoves.c
 
-int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece turno);
+int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece turno , uint64_bit pos_attacks);
 uint64_bit get_knight_attacks(uint64_bit piece_pos);
 uint64_bit get_pawn_attacks(uint64_bit piece_pos,CorPiece cor);
 uint64_bit get_sliding_attacks(uint64_bit piece_pos, uint64_bit pos_limites);

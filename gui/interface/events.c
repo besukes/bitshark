@@ -144,11 +144,12 @@ void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event e
     uint64_bit click = click_table_position(mouseX,mouseY);
     Jogada jogada = {.origem = posTabuleiro(game->pieceCoords) , .destino = posTabuleiro(click) , .peca_movida = game->pieceSelecionada
                     , .peca_capturada = Empty , .promocao = 0 , .especial = 0};
+    uint64_bit atks = get_piece_attacks(1ULL<<jogada.origem,jogada.peca_movida,game,turno);
     if(game->promoted.promotedSucessfully) {
         eventoPromotePiece(game,settings,&jogada,turno);
         promote_sfx(sfxarray);
     }
-    else if(click != 0 && isPseudoValidMove(game,&jogada,turno) && !game->promoted.pawnPromoted){
+    else if(click != 0 && isPseudoValidMove(game,&jogada,turno,atks) && !game->promoted.pawnPromoted){
             int check_antes = game->estadoJogo.king_in_check[game->turnoJogador];
             atualizaJogada(game,&jogada,turno);
             game->jogada = check_move(game,&jogada,turno);

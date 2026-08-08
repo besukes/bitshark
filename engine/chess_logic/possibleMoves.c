@@ -66,14 +66,8 @@ uint64_bit get_pawn_attacks(uint64_bit piece_pos,CorPiece cor){
 
 
 uint64_bit get_knight_attacks(uint64_bit piece_pos){
-    uint64_bit at = 0 , colunaA = 0 , colunaH = 0 ,
-               colunaB = 0 , colunaG = 0;
-    for(int i=0;i<8;i++){
-        colunaA |= (1ULL<< (8*i));
-        colunaB |= (1ULL<< (8*i + 1));
-        colunaH |= (1ULL<< (8*i + 7));
-        colunaG |= (1ULL<< (8*i + 6));
-    }
+    uint64_bit at = 0 , colunaA = COLUNA_A , colunaH = COLUNA_H,
+               colunaB = COLUNA_B , colunaG = COLUNA_G;
     at |= ((piece_pos & ~colunaA & ~colunaB )<<6);
     at |= ((piece_pos & ~colunaA)<<15);
     at |= ((piece_pos & ~colunaH & ~colunaG )<<10);
@@ -115,8 +109,7 @@ uint64_bit get_castle_moves(uint64_bit pos , uint64_bit bb_pieces , GameStruct *
 
 uint64_bit get_king_moves(uint64_bit pos){
     int posTab = posTabuleiro(pos);
-    uint64_bit at = 0 , colunaA = 0 , colunaH = 0;
-    getColunasAH(&colunaA,&colunaH);
+    uint64_bit at = 0 , colunaA = COLUNA_A , colunaH = COLUNA_H;
     if(0<=posTab && posTab<8) king_line_dependant_moves(&at,&shiftl,pos,colunaA,colunaH);
     else if(56<=posTab && posTab<64) king_line_dependant_moves(&at,&shiftr,pos,colunaA,colunaH);
     else {
@@ -181,14 +174,13 @@ int pawnPromoting(uint64_bit pos,CorPiece cor){
 }
 
 
-int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor){
+int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64_bit pos_attacks){
     if(jogada->peca_movida == Empty || jogada->destino == 64 || jogada->origem == 64) return 0;
     uint64_bit pos_dest = 1ULL<<jogada->destino;
     Pieces piece = jogada->peca_movida;
     uint64_bit pos_piece = 1ULL<<jogada->origem,
-               pos_atacks = get_piece_attacks(pos_piece,piece,game,cor),
                pos_mesma_cor = get_same_colour_bitboard(&(game->estadoJogo),cor);
-    uint64_bit move = (~pos_mesma_cor & (pos_atacks & pos_dest));
+    uint64_bit move = (~pos_mesma_cor & (pos_attacks & pos_dest));
     jogada->promocao = ( (jogada != 0) && (piece == Pawn) && pawnPromoting(pos_dest,cor) );
     jogada->especial = piece == King  && is_castelling_king(game,cor,pos_dest);
     if(jogada->especial) jogada->especial = FLAG_CASTLE;
@@ -218,7 +210,7 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
                 Pieces p_cap = comparePiece(&game->estadoJogo,op_cor,single_attack);
                 Jogada jogada = {.origem = (uint8_t)posTabuleiro(single_piece), .destino = (uint8_t)posTabuleiro(single_attack), .peca_movida = piece, 
                                 .peca_capturada = p_cap, .promocao = 0, .especial = 0 , .score = 0};
-                if (isPseudoValidMove(game, &jogada, cor)){
+                if (isPseudoValidMove(game, &jogada, cor , single_attack)){
                     if(jogada.especial == FLAG_ENPASSANT) 
                         jogada.peca_capturada = Pawn; // en passant come um peão fora da casa de destino
                     jogadas[num_jogadas++] = jogada;
