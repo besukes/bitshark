@@ -34,8 +34,11 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 ## Estrutura do Projeto
 ```bash
 .
-├── elib/          # Headers (.h) deste motor
-├── esrc/          # Ficheiros fonte do jogo 
+├── assets/        # Assets maioritariamente em png do programa (Logo do bitshark inclusive)
+├── build/         # Ficheiros binários (.o)
+├── engine/        # Ficheiros do motor de xadrez em si 
+├── gui/           # Ficheiros fonte da interface gráfica do programa
+├── sfx/           # Sons do jogo
 └── README.md      # Informações detalhadas sobre o projeto
 ```
 
