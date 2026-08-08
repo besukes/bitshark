@@ -70,7 +70,6 @@ uint64_bit get_selected_piece_attacks(GameStruct * game , uint64_bit click , Pie
 int is_attacked_piece(uint64_bit is_attacked , Pieces attacked_piece , CorPiece turn , GameStruct * game , int piece_score){
     for(int i=0;i<NUMBER_PIECES;i++){
         uint64_bit attacker = game->estadoJogo.tabuleirojogo[turn][i];
-        Pieces piece = (Pieces)i;
         if(attacker!=0 && pieces_value[i] < piece_score){
             uint64_bit atks = get_piece_attacks(is_attacked,attacked_piece,game,turn);
             if((atks & attacker)!=0) return 1;

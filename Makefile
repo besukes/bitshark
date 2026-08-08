@@ -1,7 +1,7 @@
 CC = gcc
 
 TFLAGS = -Wall -ggdb -Wextra -g3 -fsanitize=address,undefined -I. -Iengine/chess_lib
-CFLAGS = -Wall -O3 -DNDEBUG -I. -Iengine/chess_lib
+CFLAGS = -Wall -O3 -I. -Iengine/chess_lib
 LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lSDL2_gfx -lm -fsanitize=address,undefined
 LCFLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lSDL2_gfx -lm
 

@@ -70,7 +70,8 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
     /*  
         piece_eval = piece_score + position_score + mobility_score;
     */
-    int position_score = 0 , mobility_score = 0 , piece_score = pieces_value[piece_type];
+    int position_score = 0 , piece_score = pieces_value[piece_type];
+    //int mobility_score = 0;
     int pos = posTabuleiro(piece_pos);
     if(pos==(-1)) return 0;
     int line = pos/8 , column = pos%8 , indx = (turn==brancas) ? ((7-line)*8 + column) : pos;

@@ -35,6 +35,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
             }
             alpha = (eval > alpha) ? eval : alpha;
         }
+        else undoMove(game,best_move,turn);
     }
     return alpha;
 }
@@ -84,6 +85,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             }
             alpha = (eval > alpha) ? eval : alpha; // Atualiza o Alpha se a avaliação atual for melhor
         }
+        else undoMove(game,best_move,turn);
     }
     return alpha;
 }

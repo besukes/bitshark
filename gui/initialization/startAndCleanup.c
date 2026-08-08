@@ -11,8 +11,9 @@ int getOption(void){
             "(2)- 900x720\n"
             "(3)- 1200x900\n"
             "(DEFAULT) - FULLSCREEN\n");
-    scanf("%d",&o);
-    return o;
+    int u = scanf("%d",&o);
+    if(u) return o;
+    return 3;
 }
 
 /*Função que dado uma opção de resolução atribui os valores de largura e altura da janela*/
@@ -60,10 +61,14 @@ void free_allocated_memory(GameStruct * game , GUISettings * user , Mix_Chunk * 
     }
     SDL_DestroyTexture(user->textures.tabTexture);
     SDL_DestroyTexture(user->textures.fundo);
-    for(int i = 0; i < 9; i++){
+    SDL_DestroyTexture(user->textures.logo);
+
+    SDL_DestroyTexture(user->textures.arrow[0]);
+    SDL_DestroyTexture(user->textures.arrow[1]);
+
+    for(int i = 0; i < 2; i++){
         SDL_DestroyTexture(user->textures.miscTextures[i]);
     }
-    free(game->arrows.arrows_vector);
     SDL_DestroyRenderer(user->gameRenderer);
     freesfxchunks(sfxarray);
     TTF_CloseFont(user->fonteJogoTitles);
