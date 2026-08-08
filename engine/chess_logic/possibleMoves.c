@@ -101,6 +101,18 @@ void king_line_dependant_moves(uint64_bit * atk ,uint64_bit (*func)(uint64_bit,i
 }
 
 
+uint64_bit get_castle_moves(uint64_bit pos , uint64_bit bb_pieces , GameStruct * game , CorPiece turn){
+    uint64_bit castle = 0;
+    uint64_bit short_castle = (turn==brancas) ? (1ULL<<6) : (1ULL<<62);
+    uint64_bit long_castle = (turn==brancas) ? (1ULL<<2) : (1ULL << 58);
+
+    if(is_castelling_king(game,turn,short_castle)) (castle|=short_castle);
+    if(is_castelling_king(game,turn,long_castle))  (castle|=long_castle);
+
+    return castle;
+}
+
+
 uint64_bit get_king_moves(uint64_bit pos){
     int posTab = posTabuleiro(pos);
     uint64_bit at = 0 , colunaA = 0 , colunaH = 0;
@@ -152,7 +164,7 @@ uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , Cor
             return (get_sliding_attacks(pos,bitboardPieces) | get_cross_attacks(pos,bitboardPieces));
         break;
         case King :
-            return get_king_moves(pos);
+            return (get_king_moves(pos) | get_castle_moves(pos,bitboardPieces,game,cor_turno));
         break;
         default :
             return 0ULL;

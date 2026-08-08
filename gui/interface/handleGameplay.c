@@ -26,6 +26,10 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         if(best_move.promocao){
             promotePiece(game,Queen,1ULL<<best_move.destino,pretas);
         }
+        TipoJogada t = check_move(game,&best_move,pretas);
+        if(t == Checkmate ){
+            settings->screen = WinScreen;
+        }
         notInCheck(game);
         update_en_passant(game,&best_move,pretas);
         game->promoted.pawnPromoted = 0;
@@ -36,10 +40,6 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->indx_lastmoves = 0;
         game->turnoJogador = brancas;
         game->turns++;
-        TipoJogada t = check_move(game,&best_move,pretas);
-        if(t == Checkmate ){
-            settings->screen = WinScreen;
-        }
     }
     else if(event.type == SDL_MOUSEBUTTONDOWN && game->turnoJogador == brancas){
         if(event.button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown ==0){
