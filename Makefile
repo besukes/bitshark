@@ -1,7 +1,9 @@
 CC = gcc
 
-CFLAGS = -Wall -ggdb -Wextra -g3 -fsanitize=address,undefined -I. -Iengine/chess_lib
+TFLAGS = -Wall -ggdb -Wextra -g3 -fsanitize=address,undefined -I. -Iengine/chess_lib
+SFLAGS = -Wall -O3 -I. -Iengine/chess_lib
 LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lSDL2_gfx -lm -fsanitize=address,undefined
+LLFLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lSDL2_gfx -lm
 
 SRC =	engine/chess_logic/castle_logic.c \
 		engine/chess_logic/checkAndCheckmate.c \
@@ -34,11 +36,11 @@ TARGET = bshark
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $@ $(LDFLAGS)
+	$(CC) $(OBJ) -o $@ $(LLFLAGS)
 
 build/%.o: %.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(SFLAGS) -c $< -o $@
 
 clean:
 	rm -rf build
