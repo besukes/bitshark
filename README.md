@@ -48,14 +48,15 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 
 ## Compilação
 
-Para compilar este projeto e jogar contra o bot (que joga sempre com as pretas) , basta fazer :
+Para compilar este projeto e jogar contra o bot (que joga sempre com as pretas) execute o comando :
 
 ```
-make
+make bshark
 ```
 
-E será gerado um executável chamado **bshark** . <br>
-Executando o seguinte comando , poderá assim jogar contra esta chess engine:
+E será gerado um executável chamado **bshark**. <br>
+
+Para abrir o programa basta executar o comando 
 
 ```
 ./bshark
