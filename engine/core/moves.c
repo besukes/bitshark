@@ -87,7 +87,7 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn){
     int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(destino_bit, peca_capturada, op_turn, game) : 0;
 
     atualizaJogada(game, jogada, turn);
-    int promote_value = (jogada->promocao) ? 900 : 0;
+    int promote_value = (jogada->promocao) ? 800 : 0;
 
     int new_moved_eval = evaluate_piece(destino_bit, peca_movida, turn, game);
 

@@ -14,6 +14,25 @@ typedef struct jogadabot{
     int move_time;
 }jogadabot;
 
+jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiece turn , int n , int eval){
+    jogadabot move = {.move_time = 5000};
+    for(int i=0;i<n;i++){
+        int delta = applyDeltaMove(game,jogadas,turn);
+        if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
+            eval += delta;
+            move.move_eval = eval;
+            move.best_move = jogadas[i];
+            return move;
+        }
+        else undoMove(game,&jogadas[i],turn);
+    }
+    Jogada invalid = {.destino = 64 , .origem = 64 , .peca_capturada = Empty , .peca_movida = Empty,
+                      .especial = 0 , .promocao = 0 , .score = 0};
+    int who2Move = (turn == brancas) ? 1 : (-1);
+    move.move_eval = VALOR_INFINITO*who2Move;
+    move.best_move = invalid;
+    return move;
+}
 
 jogadabot engine_search(GameStruct * game , CorPiece turn , int depth){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
@@ -37,10 +56,9 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth){
             int eval = -search(game, depth - 1, -beta , -alpha, eval_wb_inicial + delta, initial_time, initial_time + 5000, op_turn);
             undoMove(game,cur_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
-            if(SDL_GetTicks() - initial_time >= initial_time + 5000) {
+            if((-eval) == FLAG_TIMEOUT) {
                 printf("[engine] engine_search: timeout reached during search\n");
-                return (jogadabot){{.origem = 64, .destino = 64, .peca_movida = Empty, .peca_capturada = Empty, .promocao = 0, .especial = 0}
-                                    , FLAG_TIMEOUT, SDL_GetTicks() - initial_time};
+                return (timeout_reached_move(game,jogadas,turn,num_jogadas,eval_wb_inicial));
             }
             // Guarda a melhor pontuação encontrada para o jogador atual
             if(eval > melhor_eval) {
