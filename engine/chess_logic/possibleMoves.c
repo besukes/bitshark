@@ -209,11 +209,10 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
                 Pieces p_cap = comparePiece(&game->estadoJogo,op_cor,single_attack);
                 Jogada jogada = {.origem = (uint8_t)posTabuleiro(single_piece), .destino = (uint8_t)posTabuleiro(single_attack), .peca_movida = piece, 
                                 .peca_capturada = p_cap, .promocao = 0, .especial = 0 , .score = 0};
-                if (isPseudoValidMove(game, &jogada, cor , single_attack)){
+                if ((!only_captures || jogada.peca_capturada != Empty ) && isPseudoValidMove(game, &jogada, cor , single_attack)){
                     if(jogada.especial == FLAG_ENPASSANT) 
                         jogada.peca_capturada = Pawn; // en passant come um peão fora da casa de destino
-                    if(!only_captures || jogada.peca_capturada != Empty)
-                        jogadas[num_jogadas++] = jogada;
+                    jogadas[num_jogadas++] = jogada;
                 }
                 attacks &= attacks - 1; // Remove esse bit
             }
