@@ -95,7 +95,7 @@ Jogada get_best_move(GameStruct * game , CorPiece turn){
     int reached_depth = 0;
     // Iterative deepening: pesquisa profundidade 1, depois 2, 3... até MAX_DEPTH_SEARCH
     for(int depth = 3; depth <= MAX_DEPTH_SEARCH; depth+=2){
-        GameStruct * game_aux = game;
+        GameStruct game_aux = *game;
         double elapsed = SDL_GetTicks() - initial_time;
         if(elapsed >= time_budget) break;
         jogadabot result = engine_search(&game_aux, turn, depth, initial_time, time_budget);
