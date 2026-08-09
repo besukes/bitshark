@@ -212,7 +212,8 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
                 if (isPseudoValidMove(game, &jogada, cor , single_attack)){
                     if(jogada.especial == FLAG_ENPASSANT) 
                         jogada.peca_capturada = Pawn; // en passant come um peão fora da casa de destino
-                    jogadas[num_jogadas++] = jogada;
+                    if(!only_captures || jogada.peca_capturada != Empty)
+                        jogadas[num_jogadas++] = jogada;
                 }
                 attacks &= attacks - 1; // Remove esse bit
             }
