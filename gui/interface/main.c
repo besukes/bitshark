@@ -31,7 +31,13 @@ void interfaceCChess(GameStruct * game ,GUISettings * settings , Mix_Chunk * sfx
             desenhaInterfaceJogo(game,settings);
         }
         else{
-            desenhaInterfaceJogo(game,settings);
+            printf("Numero de moves : %d",game->turns);
+            while(event.type != SDL_QUIT ){
+                SDL_RenderClear(settings->gameRenderer);
+                SDL_PollEvent(&event);
+                desenhaInterfaceJogo(game,settings);
+                SDL_RenderPresent(settings->gameRenderer);
+            }
             
         } //Por fazer endscreen
         SDL_RenderPresent(settings->gameRenderer);

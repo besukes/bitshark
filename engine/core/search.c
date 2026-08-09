@@ -61,7 +61,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     }
     
     int orig_alpha = alpha;
-    Jogada * hash_move;int move_eval = 0;
+    Jogada * hash_move = NULL; int move_eval = 0;
     uint64_bit key = compute_zobrist(game,turn);
     getPositionTTMove(key,depth,&alpha,&beta,&move_eval,&hash_move);
     if(move_eval != 0) return move_eval;

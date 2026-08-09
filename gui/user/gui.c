@@ -15,7 +15,7 @@ void desenhaMoved(GameStruct * game,GUISettings * settings){
     if(sq == (-1)) return;
     int line = sq / 8 , column = sq % 8;
 
-    SDL_SetRenderDrawColor(settings->gameRenderer, 0 , 0 , 190 , 50); 
+    SDL_SetRenderDrawColor(settings->gameRenderer, 0 , 0 , 140 , 40); 
     SDL_Rect moved = {88*column+248, 1080 - (88 * line + 366),89,89};
     SDL_RenderFillRect(settings->gameRenderer, &moved);
 }

@@ -111,7 +111,7 @@ void getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , i
             else if(entry->flag == TT_UPPERBOUND && entry->score < *beta){
                 *beta = entry->score;
             }
-            if(alpha >= beta){
+            if(*alpha >= *beta){
                 *move_eval = entry->score;
             }
         }

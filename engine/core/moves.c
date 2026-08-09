@@ -95,16 +95,15 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn){
 
     Pieces peca_capturada = jogada->peca_capturada;
     int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(destino_bit, peca_capturada, op_turn, game) : 0;
-
+    
     atualizaJogada(game, jogada, turn);
     int promote_value = (jogada->promocao) ? 800 : 0;
 
     int new_moved_eval = evaluate_piece(destino_bit, peca_movida, turn, game);
 
-    int force_king_to_corner_endgame = mopup_eval(game,op_turn);
 
     int who2Move = (turn == brancas) ? 1 : -1;
-    return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + force_king_to_corner_endgame));
+    return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value));
 }
 
 

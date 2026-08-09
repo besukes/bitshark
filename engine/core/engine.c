@@ -12,6 +12,7 @@ typedef struct jogadabot{
     Jogada best_move;
     int move_eval;
     int move_time;
+    int completed;
 }jogadabot;
 
 jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiece turn , int n , int eval){
@@ -35,7 +36,7 @@ jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiec
     return move;
 }
 
-jogadabot engine_search(GameStruct * game , CorPiece turn , int depth){
+jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double initial_time , double budget){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
     Jogada jogadas[256];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
@@ -49,7 +50,6 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth){
     int melhor_eval = -VALOR_INFINITO ,
         alpha = -VALOR_INFINITO,
         beta = VALOR_INFINITO;
-    double initial_time = SDL_GetTicks();
     int eval_wb_inicial = evaluate(game, brancas); // avaliação completa, calculada só uma vez (na raiz)
     Jogada best_move = {.origem = 64, .destino = 64, .peca_movida = Empty, .peca_capturada = Empty, .promocao = 0, .especial = 0};
 
@@ -61,7 +61,7 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth){
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             // Chamada recursiva do NEGAMAX:
-            int eval = -search(game, depth - 1, -beta , -alpha, eval_wb_inicial + delta, initial_time, 5000, op_turn);
+            int eval = -search(game, depth - 1, -beta , -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn);
             undoMove(game,cur_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if((-eval) == FLAG_TIMEOUT) {
@@ -77,21 +77,42 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth){
         }
         else undoMove(game,cur_move,turn);
     }
-    if(best_move.origem != 64){
+    int completed = best_move.origem != 64;
+    if(completed){
         TTFlag flag = (melhor_eval > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
         tt_store(hash_key, depth, melhor_eval, flag, best_move);
     }
-    jogadabot result = {.best_move = best_move,.move_eval = alpha ,.move_time = SDL_GetTicks() - initial_time};
+    jogadabot result = {.best_move = best_move,.move_eval = alpha ,.move_time = SDL_GetTicks() - initial_time , .completed = completed};
     return result;
 }
 
 
 
 Jogada get_best_move(GameStruct * game , CorPiece turn){
-    int depth = MAX_DEPTH_SEARCH;
-    jogadabot best_move = engine_search(game,turn,depth);
-    printf("[engine] get_best_move: piece %d from %d to %d , took %d ms with an eval of %f\n", best_move.best_move.peca_movida, 
-                (int)best_move.best_move.origem, (int)best_move.best_move.destino, best_move.move_time, (float)(best_move.move_eval) / 100);
-    return (best_move.best_move);
+    double initial_time = SDL_GetTicks();
+    const double time_budget = 3000; // orçamento total para a jogada, partilhado por todas as profundidades
+    jogadabot best_so_far = {0};
+    int reached_depth = 0;
+    // Iterative deepening: pesquisa profundidade 1, depois 2, 3... até MAX_DEPTH_SEARCH
+    for(int depth = 3; depth <= MAX_DEPTH_SEARCH; depth+=2){
+        GameStruct * game_aux = game;
+        double elapsed = SDL_GetTicks() - initial_time;
+        if(elapsed >= time_budget) break;
+        jogadabot result = engine_search(&game_aux, turn, depth, initial_time, time_budget);
+        if(result.completed){
+            best_so_far = result;
+            reached_depth = depth;
+        }
+        else{
+            if(reached_depth == 0){
+                best_so_far = result;
+            }
+            break;
+        }
+    }
+    printf("[engine] get_best_move: piece %d from %d to %d , depth alcancada %d/%d , took %d ms with an eval of %f\n", best_so_far.best_move.peca_movida, 
+                (int)best_so_far.best_move.origem, (int)best_so_far.best_move.destino, reached_depth, MAX_DEPTH_SEARCH,
+                (int)(SDL_GetTicks() - initial_time), (float)(best_so_far.move_eval) / 100);
+    return (best_so_far.best_move);
 }
 
