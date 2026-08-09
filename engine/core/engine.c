@@ -17,7 +17,7 @@ typedef struct jogadabot{
 jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiece turn , int n , int eval){
     jogadabot move = {.move_time = 5000};
     for(int i=0;i<n;i++){
-        int delta = applyDeltaMove(game,jogadas,turn);
+        int delta = applyDeltaMove(game,&jogadas[i],turn);
         if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
             eval += delta;
             move.move_eval = eval;
