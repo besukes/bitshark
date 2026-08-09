@@ -77,14 +77,14 @@ uint64_bit compute_zobrist(GameStruct * game, CorPiece turn){
  
 
 TTEntry * tt_probe(uint64_bit key){
-    TTEntry * entry = &transposition_table[key & (TT_SIZE - 1)];
+    TTEntry * entry = &transposition_table[key % TT_SIZE ];
     if(entry->flag != TT_EMPTY && entry->key == key) return entry;
     return NULL; // slot vazio, ou colisão de índice com outra posição (entrada substituída)
 }
  
 
 void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move){
-    TTEntry * entry = &transposition_table[key & (TT_SIZE - 1)];
+    TTEntry * entry = &transposition_table[key % TT_SIZE];
     // Política de substituição simples: só substitui se a nova entrada tem profundidade
     // igual ou maior (mais fiável), ou se o slot pertence a outra posição.
     if(entry->key != key || depth >= entry->depth){
@@ -93,5 +93,27 @@ void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_mov
         entry->score = score;
         entry->flag = flag;
         entry->best_move = best_move;
+    }
+}
+
+
+void getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move){
+    TTEntry * entry = tt_probe(key);
+    if(entry!=NULL){
+        *hash_move = &entry->best_move;
+        if(entry->depth >= depth){
+            if(entry->flag == TT_EXACT){
+                *move_eval = entry->score;
+            }
+            else if(entry->flag == TT_LOWERBOUND && entry->score > *alpha){
+                *alpha = entry->score;
+            }
+            else if(entry->flag == TT_UPPERBOUND && entry->score < *beta){
+                *beta = entry->score;
+            }
+            if(alpha >= beta){
+                *move_eval = entry->score;
+            }
+        }
     }
 }

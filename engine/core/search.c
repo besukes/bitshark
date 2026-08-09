@@ -60,8 +60,15 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         return 0; // Empate por afogamento
     }
     
-    moveScoring(jogadas, num_jogadas, NULL , depth); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
+    int orig_alpha = alpha;
+    Jogada * hash_move;int move_eval = 0;
+    uint64_bit key = compute_zobrist(game,turn);
+    getPositionTTMove(key,depth,&alpha,&beta,&move_eval,&hash_move);
+    if(move_eval != 0) return move_eval;
+    moveScoring(jogadas, num_jogadas, hash_move , depth); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
     
+    int best_score = -VALOR_INFINITO - 1;
+    Jogada best_move_found = jogadas[0];
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         int delta = applyDeltaMove(game,best_move,turn);
@@ -74,6 +81,10 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             if ((-eval) == FLAG_TIMEOUT) {
                 return FLAG_TIMEOUT;
             }
+            if(eval > best_score){
+                best_score = eval;
+                best_move_found = *best_move;
+            }
             // 4. PODA ALPHA-BETA (Pruning):
             // Se a avaliação atual ultrapassa o Beta do adversário, ele nunca deixará esta posição acontecer.
             if (eval >= beta) {
@@ -84,11 +95,15 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
 
                     history_table[best_move->peca_movida][best_move->destino] += depth * depth; // Atualiza a tabela de histórico
                 }
+                tt_store(key, depth, beta, TT_LOWERBOUND, *best_move);
                 return beta;
             }
             alpha = (eval > alpha) ? eval : alpha; // Atualiza o Alpha se a avaliação atual for melhor
         }
         else undoMove(game,best_move,turn);
     }
+    //Se best_score > orig_alpha , entao encontramos uma jogada melhor , caso contrario esta jogada piora a posicao (fail)
+    TTFlag flag = (best_score > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
+    tt_store(key, depth, alpha, flag, best_move_found);
     return alpha;
 }

@@ -156,6 +156,7 @@ typedef struct GameStruct{
     Pieces pieceSelecionada; //Guarda a peça que o utilizador está a ser segurada , caso esteja
     uint64_bit pieceCoords; //Guarda a posição de onde a peça que está a ser segurada veio , caso esteja
     uint64_bit selected_piece_attacks; //Guarda as posições da peça que estão sobre ataque da mesma
+    uint64_bit moved_to_square; //Guarda o square para o qual foi movida a piece
     CorPiece turnoJogador; //Guarda o turno do utilizador 
     TipoJogada jogada; //Guarda informacao sobre a jogada do utilizador
     int indx_lastmoves; //Guarda o número de pecas ja comidas no jogo
@@ -165,6 +166,7 @@ typedef struct GameStruct{
     int score_game; //Guarda o score do jogo (diferenca de pecas comidas)
     int turns; //Guarda os turnos ja jogados no jogo
     Boolean trying_to_leave; //Informa se o utilizador clicou no botao de sair
+    int repeated_moves;
 }GameStruct;
 
 /*Guarda as texturas que o jogo utiliza no seu decorrer , tal como o tema das peças*/
@@ -380,6 +382,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
 
 int evaluate(GameStruct * game , CorPiece turno);
 int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , GameStruct * game);
+int is_end_game(EstadoJogo * estado);
 
 
 /// engine /////////////////////////////////
@@ -403,3 +406,4 @@ void tt_init(void);
 uint64_bit compute_zobrist(GameStruct * game, CorPiece turn);
 TTEntry * tt_probe(uint64_bit key);
 void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move);
+void getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move);

@@ -164,6 +164,7 @@ void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event e
             else {
                 notInCheck(game);
                 update_en_passant(game,&jogada,turno);
+                game->moved_to_square = jogada.destino;
                 game->promoted.pawnPromoted = jogada.promocao;
                 if(jogada.promocao) {
                     game->promoted.promoted_square = click;

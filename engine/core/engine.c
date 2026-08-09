@@ -39,14 +39,21 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
     Jogada jogadas[256];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
+    // Consulta a transposition table para obter uma "hash move" que ajuda a ordenar
+    // melhor as jogadas logo desde a raiz.
+    uint64_bit hash_key = compute_zobrist(game, turn);
+    TTEntry * tt_entry = tt_probe(hash_key);
+    Jogada * hash_move = (tt_entry != NULL) ? &tt_entry->best_move : NULL;
 
-    moveScoring(jogadas, num_jogadas, NULL, depth); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
+    moveScoring(jogadas, num_jogadas, hash_move, depth); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
     int melhor_eval = -VALOR_INFINITO ,
         alpha = -VALOR_INFINITO,
         beta = VALOR_INFINITO;
     double initial_time = SDL_GetTicks();
     int eval_wb_inicial = evaluate(game, brancas); // avaliação completa, calculada só uma vez (na raiz)
     Jogada best_move = {.origem = 64, .destino = 64, .peca_movida = Empty, .peca_capturada = Empty, .promocao = 0, .especial = 0};
+
+    int orig_alpha = alpha;
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * cur_move = pick_best_move(jogadas, num_jogadas, i);
         // Aplica a jogada nas Bitboards e atualiza a Avaliação Incremental (Delta)
@@ -69,6 +76,10 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth){
             alpha = (melhor_eval>alpha) ? melhor_eval : alpha;
         }
         else undoMove(game,cur_move,turn);
+    }
+    if(best_move.origem != 64){
+        TTFlag flag = (melhor_eval > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
+        tt_store(hash_key, depth, melhor_eval, flag, best_move);
     }
     jogadabot result = {.best_move = best_move,.move_eval = alpha ,.move_time = SDL_GetTicks() - initial_time};
     return result;

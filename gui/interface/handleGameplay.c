@@ -40,6 +40,35 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->indx_lastmoves = 0;
         game->turnoJogador = brancas;
         game->turns++;
+        game->moved_to_square = best_move.destino;
+    }
+    else if(game->turnoJogador == brancas){
+        GameStruct game_aux = *game;
+        game_aux.indx_lastmoves = 0;
+        Jogada best_move = get_best_move(&game_aux,brancas);
+        if(best_move.peca_movida == Empty || best_move.destino >= 64 || best_move.origem >= 64){
+            game->turnoJogador = pretas;
+            return;
+        }
+        atualizaJogada(game,&best_move,brancas);
+        if(best_move.promocao){
+            promotePiece(game,Queen,1ULL<<best_move.destino,brancas);
+        }
+        TipoJogada t = check_move(game,&best_move,brancas);
+        if(t == Checkmate ){
+            settings->screen = WinScreen;
+        }
+        notInCheck(game);
+        update_en_passant(game,&best_move,brancas);
+        game->promoted.pawnPromoted = 0;
+        updateScore(game);
+        if(game->indx_lastmoves > 0) capturepiece_sfx(sfxarray);
+        else if(game->estadoJogo.king_in_check[pretas]) check_sfx(sfxarray);
+        else movepiece_sfx(sfxarray);
+        game->indx_lastmoves = 0;
+        game->turnoJogador = pretas;
+        game->turns++;
+        game->moved_to_square = best_move.destino;
     }
     else if(event.type == SDL_MOUSEBUTTONDOWN && game->turnoJogador == brancas){
         if(event.button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown ==0){

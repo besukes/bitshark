@@ -6,7 +6,19 @@
 #include <stdio.h>
 #include <math.h>
 
+void desenhaBitshark(GUISettings * settings){
 
+}
+
+void desenhaMoved(GameStruct * game,GUISettings * settings){
+    int sq = game->moved_to_square;
+    if(sq == (-1)) return;
+    int line = sq / 8 , column = sq % 8;
+
+    SDL_SetRenderDrawColor(settings->gameRenderer, 0 , 0 , 190 , 50); 
+    SDL_Rect moved = {88*column+248, 1080 - (88 * line + 366),89,89};
+    SDL_RenderFillRect(settings->gameRenderer, &moved);
+}
 
 
 
@@ -18,7 +30,11 @@ void desenhaInterfaceJogo(GameStruct * game ,GUISettings * settings){
         uint64_bit op = get_opposing_colour_bitboard(&game->estadoJogo,game->turnoJogador);
         desenharPieceAttacks(settings,game->estadoJogo.enpassant, game->selected_piece_attacks , op);
     }
+
+    desenhaBitshark(settings);
+    desenhaMoved(game,settings);
     desenhaCheck(game,settings);
+
     for(int i = 0 ; i < 6 ; i++){
         desenhaTipoPiece(game->estadoJogo.tabuleirojogo[0][i],(Pieces)i,settings,game,0);
     }

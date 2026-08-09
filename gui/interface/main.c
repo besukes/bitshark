@@ -30,7 +30,10 @@ void interfaceCChess(GameStruct * game ,GUISettings * settings , Mix_Chunk * sfx
             handleJogadaChess(game,settings,event , sfxarray);
             desenhaInterfaceJogo(game,settings);
         }
-        else{} //Por fazer endscreen
+        else{
+            desenhaInterfaceJogo(game,settings);
+            
+        } //Por fazer endscreen
         SDL_RenderPresent(settings->gameRenderer);
     }
 }
@@ -42,6 +45,8 @@ int main(void){
     GameStruct game = initGameStruct();
     Mix_Chunk * sfxarray[10];
     initsfx(sfxarray);
+    init_zobrist();
+    tt_init();
     interfaceCChess(&game,&settings , sfxarray);
     free_allocated_memory(&game,&settings , sfxarray);
     return 0;
