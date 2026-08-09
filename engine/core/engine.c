@@ -17,14 +17,15 @@ typedef struct jogadabot{
 jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiece turn , int n , int eval){
     jogadabot move = {.move_time = 5000};
     for(int i=0;i<n;i++){
-        int delta = applyDeltaMove(game,&jogadas[i],turn);
+        Jogada * cur_move = pick_best_move(jogadas, n, i);
+        int delta = applyDeltaMove(game,cur_move,turn);
         if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
             eval += delta;
             move.move_eval = eval;
             move.best_move = jogadas[i];
             return move;
         }
-        else undoMove(game,&jogadas[i],turn);
+        else undoMove(game,cur_move,turn);
     }
     Jogada invalid = {.destino = 64 , .origem = 64 , .peca_capturada = Empty , .peca_movida = Empty,
                       .especial = 0 , .promocao = 0 , .score = 0};
