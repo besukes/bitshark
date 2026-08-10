@@ -180,7 +180,8 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
     Pieces piece = jogada->peca_movida;
     uint64_bit pos_mesma_cor = get_same_colour_bitboard(&(game->estadoJogo),cor);
     uint64_bit move = (~pos_mesma_cor & (pos_attacks & pos_dest));
-    jogada->promocao = ( (jogada != 0) && (piece == Pawn) && pawnPromoting(pos_dest,cor) );
+    int is_promoting = ( (jogada != 0) && (piece == Pawn) && pawnPromoting(pos_dest,cor) );
+    jogada->promocao = (is_promoting) ? Queen : 0;
     jogada->especial = piece == King  && is_castelling_king(game,cor,pos_dest);
     if(jogada->especial) jogada->especial = FLAG_CASTLE;
     else jogada->especial = 0;

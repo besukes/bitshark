@@ -2,14 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
- 
-// Chaves de Zobrist: um número aleatório fixo por (cor, tipo de peça, casa),
-// mais chaves para direitos de castle, casa de en passant e de quem joga.
-// O hash de uma posição é o XOR de todas as chaves que "estão ativas" nela.
-static uint64_bit zobrist_pieces[2][NUMBER_PIECES][64];
-static uint64_bit zobrist_castle[2][2];
-static uint64_bit zobrist_ep[64];
-static uint64_bit zobrist_turn;
+
  
 TTEntry * transposition_table = NULL;
  
@@ -97,7 +90,7 @@ void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_mov
 }
 
 
-void getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move){
+TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move){
     TTEntry * entry = tt_probe(key);
     if(entry!=NULL){
         *hash_move = &entry->best_move;
@@ -116,4 +109,5 @@ void getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , i
             }
         }
     }
+    return entry;
 }

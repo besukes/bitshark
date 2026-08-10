@@ -19,7 +19,8 @@ jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiec
     jogadabot move = {.move_time = 5000};
     for(int i=0;i<n;i++){
         Jogada * cur_move = pick_best_move(jogadas, n, i);
-        int delta = applyDeltaMove(game,cur_move,turn);
+        CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+        int delta = applyDeltaMove(game,cur_move,turn,op_turn);
         if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
             eval += delta;
             move.move_eval = eval;
@@ -37,7 +38,6 @@ jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiec
 }
 
 jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double initial_time , double budget){
-    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
     Jogada jogadas[256];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     // Consulta a transposition table para obter uma "hash move" que ajuda a ordenar
@@ -56,12 +56,13 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
     int orig_alpha = alpha;
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * cur_move = pick_best_move(jogadas, num_jogadas, i);
+        CorPiece op_turn = (turn == brancas) ? pretas : brancas;
         // Aplica a jogada nas Bitboards e atualiza a Avaliação Incremental (Delta)
-        int delta = applyDeltaMove(game,cur_move,turn);
+        int delta = applyDeltaMove(game,cur_move,turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             // Chamada recursiva do NEGAMAX:
-            int eval = -search(game, depth - 1, -beta , -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn);
+            int eval = -search(game, depth - 1 , -beta , -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn);
             undoMove(game,cur_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if((-eval) == FLAG_TIMEOUT) {
@@ -87,32 +88,45 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
 }
 
 
-
-Jogada get_best_move(GameStruct * game , CorPiece turn){
+jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_depth){
     double initial_time = SDL_GetTicks();
     const double time_budget = 3000; // orçamento total para a jogada, partilhado por todas as profundidades
     jogadabot best_so_far = {0};
-    int reached_depth = 0;
     // Iterative deepening: pesquisa profundidade 1, depois 2, 3... até MAX_DEPTH_SEARCH
     for(int depth = 3; depth <= MAX_DEPTH_SEARCH; depth+=2){
-        GameStruct game_aux = *game;
         double elapsed = SDL_GetTicks() - initial_time;
         if(elapsed >= time_budget) break;
-        jogadabot result = engine_search(&game_aux, turn, depth, initial_time, time_budget);
+        jogadabot result = engine_search(game, turn, depth, initial_time, time_budget);
         if(result.completed){
             best_so_far = result;
-            reached_depth = depth;
+            *reached_depth = depth;
         }
         else{
-            if(reached_depth == 0){
+            if(*reached_depth == 0){
                 best_so_far = result;
             }
             break;
         }
     }
-    printf("[engine] get_best_move: piece %d from %d to %d , depth alcancada %d/%d , took %d ms with an eval of %f\n", best_so_far.best_move.peca_movida, 
-                (int)best_so_far.best_move.origem, (int)best_so_far.best_move.destino, reached_depth, MAX_DEPTH_SEARCH,
-                (int)(SDL_GetTicks() - initial_time), (float)(best_so_far.move_eval) / 100);
-    return (best_so_far.best_move);
+    return best_so_far;
+}
+
+
+Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening){
+    double initial_time = SDL_GetTicks();
+    int reached_depth = 0;
+    jogadabot best_jogada = {0};
+    if(is_interative_deepening){
+        best_jogada = iterative_deepening(game,turn,&reached_depth);
+    }
+    else{
+        reached_depth = 5;
+        best_jogada = engine_search(game,turn,MAX_DEPTH_SEARCH - 2,initial_time,3000);
+    }
+    int who2Move = (turn==brancas) ? 1 : (-1);
+    printf("[engine] get_best_move: piece %d from %d to %d , depth alcancada %d/%d , took %d ms with an eval of %f\n", best_jogada.best_move.peca_movida, 
+                (int)best_jogada.best_move.origem, (int)best_jogada.best_move.destino, reached_depth, MAX_DEPTH_SEARCH,
+                (int)(SDL_GetTicks() - initial_time), (float)(best_jogada.move_eval*who2Move) / 100);
+    return (best_jogada.best_move);
 }
 

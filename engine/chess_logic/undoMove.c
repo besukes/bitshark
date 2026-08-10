@@ -1,7 +1,6 @@
 #include "engine/chess_lib/engine.h"
 
 
-
 void undoPieceComida(GameStruct * game , uint64_bit * bb_cor_piece_comida, uint64_bit click){
     int * indx = &(game->indx_lastmoves);
     if(*indx <= 0){
@@ -56,12 +55,40 @@ void undoPiece_move(GameStruct * game , uint64_bit * sameCor,uint64_bit * opCor,
 }
 
 
+void undoZobrist(GameStruct * game , CorPiece turn){
+    uint64_bit h = game->pos_key;
+    for(int cor=0;cor<2;cor++){
+        for(int pieces=0;pieces<NUMBER_PIECES;pieces++){
+            uint64_bit bb = game->estadoJogo.tabuleirojogo[cor][pieces];
+            while(bb){
+                int sq = __builtin_ctzll(bb);
+                h ^= zobrist_pieces[cor][pieces][sq];
+                bb &= bb - 1;
+            }
+        }
+    }
+    if(game->estadoJogo.canCastle[brancas][Short]) h ^= zobrist_castle[brancas][Short];
+    if(game->estadoJogo.canCastle[brancas][Long])  h ^= zobrist_castle[brancas][Long];
+    if(game->estadoJogo.canCastle[pretas][Short])  h ^= zobrist_castle[pretas][Short];
+    if(game->estadoJogo.canCastle[pretas][Long])   h ^= zobrist_castle[pretas][Long];
+    if(game->estadoJogo.enpassant){
+        int sq = __builtin_ctzll(game->estadoJogo.enpassant);
+        h ^= zobrist_ep[sq];
+    }
+    if(turn == pretas) h ^= zobrist_turn;
+    game->pos_key = h;
+}
+
+
 void undoMove(GameStruct * game , Jogada * jogada , CorPiece turn){
     uint64_bit * mesma_cor = &(game->estadoJogo.bitboard_brancas), 
                * cor_oposta = &(game->estadoJogo.bitboard_pretas);
     if(turn == pretas){
         mesma_cor = &(game->estadoJogo.bitboard_pretas);
         cor_oposta = &(game->estadoJogo.bitboard_brancas);
+    }
+    if(jogada->promocao){
+        game->estadoJogo.tabuleirojogo[turn][jogada->promocao] &= ~(1ULL<<jogada->destino);
     }
     undoPiece_move(game,mesma_cor,cor_oposta,jogada->destino,jogada->origem,jogada->especial
                     ,(Pieces)(jogada->peca_movida),turn);

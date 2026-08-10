@@ -20,6 +20,12 @@
 
 #define NUM_SQUARES 64
 
+/*Struct que define a posicao de uma peca no tabuleiro de xadrez usando um long 64 bit*/
+typedef unsigned long long uint64_bit;
+
+typedef uint64_bit (*ShiftFunction)(uint64_bit,int); //Tipo que define um endereço de memória de uma função que recebe um unsigned long long de 64 bits e um int normal
+
+
 // Estrutura leve para Bitboards (6 bytes)
 typedef struct {
     uint8_t origem;
@@ -33,6 +39,11 @@ typedef struct {
 
 extern Jogada killer_moves[MAX_DEPTH_SEARCH][2]; //Armazena os killer moves para cada profundidade de busca
 extern int history_table[NUMBER_PIECES*2][NUM_SQUARES]; //Armazena a tabela de histórico para cada peça e posição
+
+extern uint64_bit zobrist_pieces[2][NUMBER_PIECES][64];
+extern uint64_bit zobrist_castle[2][2];
+extern uint64_bit zobrist_ep[64];
+extern uint64_bit zobrist_turn;
 
 
 typedef int Boolean; //Forma mais intuitiva de perceber quando as variáveis são usadas como valores lógicos.
@@ -51,11 +62,6 @@ typedef struct SDL_Initializators{
 typedef enum { GameScreen , WinScreen } UserScreen;
 
 typedef enum { Invalid , Leave , Valid , Checkmate , TooLarge , Stalemate} TipoJogada; //Define o tipo de jogada que o utilizador efetuou
-
-/*Struct que define a posicao de uma peca no tabuleiro de xadrez usando um long 64 bit*/
-typedef unsigned long long uint64_bit;
-
-typedef uint64_bit (*ShiftFunction)(uint64_bit,int); //Tipo que define um endereço de memória de uma função que recebe um unsigned long long de 64 bits e um int normal
 
 // Transposition table: guarda resultados de posições já pesquisadas para evitar recalculá-las
 // quando se chega lá outra vez por uma ordem de jogadas diferente (transposição).
@@ -167,6 +173,7 @@ typedef struct GameStruct{
     int turns; //Guarda os turnos ja jogados no jogo
     Boolean trying_to_leave; //Informa se o utilizador clicou no botao de sair
     int repeated_moves;
+    uint64_bit pos_key;
 }GameStruct;
 
 /*Guarda as texturas que o jogo utiliza no seu decorrer , tal como o tema das peças*/
@@ -387,16 +394,16 @@ int is_end_game(EstadoJogo * estado);
 
 /// engine /////////////////////////////////
 
-Jogada get_best_move(GameStruct * game , CorPiece turn);
+Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening);
 
 /// moves /////////////////////////////////
 
-int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn);
+int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiece op_turn);
 Jogada * pick_best_move(Jogada * jogadas, int num_jogadas, int start_index);
 void moveScoring(Jogada * jogadas , int num_jogadas , Jogada * hash_move , int depth);
 void moveScoringCaptures(Jogada * jogadas , int num_jogadas , Jogada * hash_move);
-int matches_killer_move(int depth, Jogada * jogada, int index) ;
-
+int matches_killer_move(int depth, Jogada * jogada, int index);
+int calculate_extension_depth(GameStruct * game , int depth , CorPiece op_turn);
 
 /// transposition /////////////////////////
 
@@ -406,4 +413,4 @@ void tt_init(void);
 uint64_bit compute_zobrist(GameStruct * game, CorPiece turn);
 TTEntry * tt_probe(uint64_bit key);
 void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move);
-void getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move);
+TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move);

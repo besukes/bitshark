@@ -6,6 +6,13 @@
 Jogada killer_moves[MAX_DEPTH_SEARCH][2] = {0};
 int history_table[NUMBER_PIECES*2][NUM_SQUARES] = {0};
 
+// Chaves de Zobrist: um número aleatório fixo por (cor, tipo de peça, casa),
+// mais chaves para direitos de castle, casa de en passant e de quem joga.
+// O hash de uma posição é o XOR de todas as chaves que "estão ativas" nela.
+uint64_bit zobrist_pieces[2][NUMBER_PIECES][64];
+uint64_bit zobrist_castle[2][2];
+uint64_bit zobrist_ep[64];
+uint64_bit zobrist_turn;
 
 
 void interfaceCChess(GameStruct * game ,GUISettings * settings , Mix_Chunk * sfxarray[]){
@@ -31,7 +38,7 @@ void interfaceCChess(GameStruct * game ,GUISettings * settings , Mix_Chunk * sfx
             desenhaInterfaceJogo(game,settings);
         }
         else{
-            printf("Numero de moves : %d",game->turns);
+            printf("Numero de moves : %d\n",game->turns);
             while(event.type != SDL_QUIT ){
                 SDL_RenderClear(settings->gameRenderer);
                 SDL_PollEvent(&event);
@@ -53,6 +60,7 @@ int main(void){
     initsfx(sfxarray);
     init_zobrist();
     tt_init();
+    game.pos_key = compute_zobrist(&game,brancas);
     interfaceCChess(&game,&settings , sfxarray);
     free_allocated_memory(&game,&settings , sfxarray);
     return 0;

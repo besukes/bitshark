@@ -23,15 +23,17 @@ int is_end_game(EstadoJogo * estado){
 }
 
 
-int atks_stronger_piece(uint64_bit pos , Pieces type , CorPiece turn , CorPiece op_turn , GameStruct * game , int piece_score){
-    uint64_bit piece_atks = get_piece_attacks(pos,type,game,turn,1);
-    for(int i=0;i<NUMBER_PIECES;i++){
-        uint64_bit tab = game->estadoJogo.tabuleirojogo[op_turn][i];
-        int p_value = pieces_value[i];
-        if(p_value > piece_score && (tab&piece_atks) !=0) return p_value; 
+int mopup_eval(GameStruct * game , CorPiece op_turn){
+    if(is_end_game(&game->estadoJogo)){
+        int king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[op_turn][King]);
+        int king_dist_to_center = abs(28 - king_pos);
+        int force_king_to_corner_endgame = 4*king_dist_to_center;
+        return force_king_to_corner_endgame;
     }
     return 0;
 }
+
+
 
 int is_defended_piece(uint64_bit pos , Pieces type , CorPiece turn , GameStruct * game , int piece_score){
     for(int i=0;i<NUMBER_PIECES;i++){
@@ -46,22 +48,7 @@ int is_defended_piece(uint64_bit pos , Pieces type , CorPiece turn , GameStruct 
     return 0;
 }
 
-int get_mobility_score_piece(Pieces type , uint64_bit pos , CorPiece turn , GameStruct * game , int piece_score){
-    int m_score = 0;
-    CorPiece op_turn = (turn==brancas) ? pretas : brancas;
-    int is_attacked = is_attacked_piece(pos,type,op_turn,game,piece_score);
-    int is_defended = is_defended_piece(pos,type,turn,game,piece_score);
-    if(is_attacked && !is_defended){
-        m_score-=piece_score;
-    }
-    else{
-        int can_take_greater_score = atks_stronger_piece(pos,type,turn,op_turn,game,piece_score);
-        if(can_take_greater_score && is_defended){
-            m_score += (4*can_take_greater_score)/3;
-        }
-    }
-    return (m_score);
-}
+
 
 
 int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , GameStruct * game){
@@ -104,6 +91,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
 }
 
 
+
 int evaluate_piece_type(uint64_bit bitboard , Pieces piece_type, CorPiece turn, GameStruct * game){
     int score = 0;
     uint64_bit bb = bitboard;
@@ -116,30 +104,6 @@ int evaluate_piece_type(uint64_bit bitboard , Pieces piece_type, CorPiece turn, 
 }
 
 
-/*int evaluate_pos(GameStruct * game ){
-    int * cur_player_eval , who2Move ;
-    CorPiece other_turn , cur_turn;
-    Pieces piece = search->piece_type;
-    if(search->turn == brancas){
-        cur_player_eval = w_eval;
-        other_turn = pretas; cur_turn = brancas;
-        who2Move = 1;
-    }
-    else{
-        cur_player_eval = b_eval;
-        other_turn = brancas; cur_turn = pretas;
-        who2Move = (-1);
-    }
-
-    if(0){}
-    //if(isCheckMate(game,other_turn)) *cur_player_eval = 99999*who2Move;
-    else{
-        int new_piece_eval = evaluate_piece_type(game->estadoJogo.tabuleirojogo[cur_turn][piece],piece,
-                                                cur_turn,game,search->ai_level);
-        *cur_player_eval += (new_piece_eval - pieces_evals[cur_turn][piece])*who2Move;
-    }
-    return (*cur_player_eval);
-}*/
 
 
 int evaluate(GameStruct * game , CorPiece turno){

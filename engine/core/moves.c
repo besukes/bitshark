@@ -76,18 +76,9 @@ void moveScoring(Jogada * jogadas , int num_jogadas , Jogada * hash_move , int d
     }
 }
 
-int mopup_eval(GameStruct * game , CorPiece op_turn){
-    if(is_end_game(&game->estadoJogo)){
-        int king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[op_turn][King]);
-        int king_dist_to_center = abs(28 - king_pos);
-        int force_king_to_corner_endgame = 4*king_dist_to_center;
-        return force_king_to_corner_endgame;
-    }
-    return 0;
-}
 
-int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn){
-    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+
+int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiece op_turn){
     uint64_bit origem_bit = 1ULL << jogada->origem;
     uint64_bit destino_bit = 1ULL << jogada->destino;
     Pieces peca_movida = (Pieces)jogada->peca_movida;
@@ -101,10 +92,17 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn){
 
     int new_moved_eval = evaluate_piece(destino_bit, peca_movida, turn, game);
 
-
     int who2Move = (turn == brancas) ? 1 : -1;
     return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value));
 }
 
 
+int calculate_extension_depth(GameStruct * game , int depth , CorPiece op_turn){
+    int extension = 0;
+    if(depth < MAX_DEPTH_SEARCH + 2){
+        if(is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[op_turn][King],op_turn))
+            extension+=2;
+    }
+    return extension;
+}
 

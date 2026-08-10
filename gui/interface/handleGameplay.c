@@ -3,7 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
-
+#define ITERATIVE_DEEPENING 1
 
 void softReset(GameStruct * game){
     game->pieceCoords = 0;
@@ -17,7 +17,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
     if(game->turnoJogador == pretas){
         GameStruct game_aux = *game;
         game_aux.indx_lastmoves = 0;
-        Jogada best_move = get_best_move(&game_aux,pretas);
+        Jogada best_move = get_best_move(&game_aux,pretas,ITERATIVE_DEEPENING);
         if(best_move.peca_movida == Empty || best_move.destino >= 64 || best_move.origem >= 64){
             game->turnoJogador = brancas;
             return;
@@ -45,7 +45,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
     else if(game->turnoJogador == brancas){
         GameStruct game_aux = *game;
         game_aux.indx_lastmoves = 0;
-        Jogada best_move = get_best_move(&game_aux,brancas);
+        Jogada best_move = get_best_move(&game_aux,brancas,ITERATIVE_DEEPENING);
         if(best_move.peca_movida == Empty || best_move.destino >= 64 || best_move.origem >= 64){
             game->turnoJogador = pretas;
             return;

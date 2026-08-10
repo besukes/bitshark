@@ -16,18 +16,30 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     }
     if (est_eval >= beta) return beta;
     if (alpha < est_eval) alpha = est_eval;
+    
+    int orig_alpha = alpha;
+    Jogada * hash_move = NULL; int move_eval = 0;
+    uint64_bit key = compute_zobrist(game,turn);
+    getPositionTTMove(key,q_depth,&alpha,&beta,&move_eval,&hash_move);
+    if(move_eval != 0) return move_eval;
 
     Jogada jogadas[256];
     int num_jogadas = gerar_jogadas_legais(game, jogadas, turn, FLAG_ONLY_CAPTURES); // idealmente só capturas aqui
-    moveScoringCaptures(jogadas, num_jogadas, NULL); // Ordena as jogadas de captura para melhorar a poda alpha-beta
+    moveScoringCaptures(jogadas, num_jogadas, hash_move); // Ordena as jogadas de captura para melhorar a poda alpha-beta
+
+    int best_score = -VALOR_INFINITO - 1;
+    Jogada best_move_found = jogadas[0];
+
     for (int i = 0; i < num_jogadas; i++){
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
-        int delta = applyDeltaMove(game,best_move,turn);
+        CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+        int delta = applyDeltaMove(game,best_move,turn,op_turn);
         if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
             int eval = -quiescence(game, -beta, -alpha, quiescence_eval + delta, (turn==brancas)?pretas:brancas , q_depth + 1 , init_time , max_time);
             undoMove(game,best_move,turn);
             if (eval >= beta){
                 history_table[jogadas[i].peca_movida][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
+                tt_store(key, q_depth, beta, TT_LOWERBOUND, *best_move);
                 return beta;
             }
             if((-eval) == FLAG_TIMEOUT) {
@@ -37,8 +49,11 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
         }
         else undoMove(game,best_move,turn);
     }
+    TTFlag flag = (best_score > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
+    tt_store(key, q_depth, alpha, flag, best_move_found);
     return alpha;
 }
+
 
 
 // A função Search usando Negamax + Alpha-Beta
@@ -47,6 +62,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     if (SDL_GetTicks() - initial_time >= time_limit || (e.type == SDL_QUIT)) {
         return FLAG_TIMEOUT;
     }
+
 
     if (depth == 0) { // Quando atinge a profundidade 0 ou o jogo acaba, lê a avaliação incremental atual
         double time = SDL_GetTicks();
@@ -71,11 +87,12 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     Jogada best_move_found = jogadas[0];
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
-        int delta = applyDeltaMove(game,best_move,turn);
+        CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+        int delta = applyDeltaMove(game,best_move,turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             // Chamada recursiva do NEGAMAX:
-            int eval = -search(game, depth - 1, -beta, -alpha, wb_eval + delta, initial_time, time_limit, (turn == brancas) ? pretas : brancas);
+            int eval = -search(game, depth - 1 , -beta, -alpha, wb_eval + delta, initial_time, time_limit, (turn == brancas) ? pretas : brancas);
             undoMove(game,best_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if ((-eval) == FLAG_TIMEOUT) {
