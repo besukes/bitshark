@@ -1,16 +1,10 @@
 #include "engine/chess_lib/engine.h"
 
 
-void undoPieceComida(GameStruct * game , uint64_bit * bb_cor_piece_comida, uint64_bit click){
-    int * indx = &(game->indx_lastmoves);
-    if(*indx <= 0){
-        printf("Error: No captured pieces to undo.\n");
-        return;
-    }
-    game->estadoJogo.tabuleirojogo[game->lastmoves[*indx - 1].cor_piece][game->lastmoves[*indx - 1].tipo_piece] |= click;
+void undoPieceComida(GameStruct * game , uint64_bit * bb_cor_piece_comida, uint64_bit click,CorPiece op_turn,Pieces capturada){
+    game->estadoJogo.tabuleirojogo[op_turn][capturada] |= click;
     *bb_cor_piece_comida |= click;
     game->estadoJogo.bitboard_todas_pieces |= click;
-    (*indx)--;
 }
 
 
@@ -50,6 +44,7 @@ void undoPiece_move(GameStruct * game , uint64_bit * sameCor,uint64_bit * opCor,
     else{
         *piece_tab = ((*piece_tab & ~nova_pos) | antiga_pos);
         *sameCor = ((*sameCor & ~nova_pos) | antiga_pos);
+        if(special == FLAG_ENPASSANT) *opCor |= (turn==brancas) ? (antiga_pos>>8) : (antiga_pos<<8);
     }
     game->estadoJogo.bitboard_todas_pieces = *sameCor | *opCor;
 }
@@ -83,16 +78,19 @@ void undoZobrist(GameStruct * game , CorPiece turn){
 void undoMove(GameStruct * game , Jogada * jogada , CorPiece turn){
     uint64_bit * mesma_cor = &(game->estadoJogo.bitboard_brancas), 
                * cor_oposta = &(game->estadoJogo.bitboard_pretas);
+    CorPiece op_turn = pretas;
     if(turn == pretas){
         mesma_cor = &(game->estadoJogo.bitboard_pretas);
         cor_oposta = &(game->estadoJogo.bitboard_brancas);
+        op_turn = brancas;
     }
     if(jogada->promocao){
         game->estadoJogo.tabuleirojogo[turn][jogada->promocao] &= ~(1ULL<<jogada->destino);
     }
     undoPiece_move(game,mesma_cor,cor_oposta,jogada->destino,jogada->origem,jogada->especial
                     ,(Pieces)(jogada->peca_movida),turn);
-    if(game->indx_lastmoves > 0 && game->lastmoves[game->indx_lastmoves - 1].pos_de_piece == (1ULL<<jogada->destino)){
-        undoPieceComida(game,cor_oposta,1ULL<<jogada->destino);
+    if(jogada->peca_capturada != Empty && jogada->especial != FLAG_ENPASSANT){
+        uint64_bit captured_pos = 1ULL<<jogada->destino;
+        undoPieceComida(game,cor_oposta,captured_pos,op_turn,jogada->peca_capturada);
     }
 }

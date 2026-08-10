@@ -21,22 +21,17 @@ void efetuaJogada(uint64_bit * selected_piece , uint64_bit * todas_pieces , uint
 }
 
 
-void addToArray(PecaComida * array , Pieces piece_comida , uint64_bit pos_piece , CorPiece cor , int indx){
-    if(indx>=30){
-        printf("Error: Exceeded maximum number of captured pieces in the game.\n");
-        return;
-    }
-    array[indx].tipo_piece = piece_comida;
-    array[indx].pos_de_piece = pos_piece;
-    array[indx].cor_piece = cor;
-}
-
 void fetch_change_board(GameStruct * game,uint64_bit click,uint64_bit * mesmaCor , uint64_bit * corOposta, Jogada * jogada , CorPiece turno){
     CorPiece cor_oposta = (turno == brancas) ? pretas : brancas;
     Pieces selected = jogada->peca_movida;
 
-    addToArray(game->lastmoves, jogada->peca_capturada, click, cor_oposta, game->indx_lastmoves);
-    game->indx_lastmoves++;
+    //sem esta verificacao ha problemas e pecas tornam se duplicadas
+    Pieces capturada = comparePiece(&game->estadoJogo,cor_oposta,click);
+    if((capturada != jogada->peca_capturada) || jogada->peca_capturada == Empty){
+        printf("Foi encontrada a piece: %d inves da %d\n",capturada , jogada->peca_capturada);
+        return;
+    }
+
     game->estadoJogo.tabuleirojogo[cor_oposta][jogada->peca_capturada] &= ~click;
     *corOposta &= ~click;
     game->estadoJogo.bitboard_todas_pieces &= ~click;
