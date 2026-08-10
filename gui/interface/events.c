@@ -106,11 +106,11 @@ void eventoPromotePiece(GameStruct * game , GUISettings * settings,Jogada * j , 
 
 
 
-void updateScore(GameStruct *game){
-    if(game->indx_lastmoves > 0){
-        Pieces p = game->lastmoves[game->indx_lastmoves].tipo_piece;
+void updateScore(GameStruct * game , Jogada* jogada,CorPiece turn){
+    if(jogada->peca_capturada != Empty){
+        Pieces p = jogada->peca_capturada;
         int mult = 1;
-        if(game->lastmoves[game->indx_lastmoves].cor_piece == brancas) mult = (-1);
+        if(turn == brancas) mult = (-1);
         switch(p){
             case 0:
                 game->score_game+=1*mult;
@@ -141,6 +141,7 @@ void updateScore(GameStruct *game){
 void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event event, Mix_Chunk * sfxarray[]){
     int mouseX = event.button.x , mouseY = event.button.y;
     CorPiece turno = game->turnoJogador;
+    CorPiece op_turn = (turno==brancas) ? pretas : brancas;
     uint64_bit click = click_table_position(mouseX,mouseY);
     Jogada jogada = {.origem = posTabuleiro(game->pieceCoords) , .destino = posTabuleiro(click) , .peca_movida = game->pieceSelecionada
                     , .peca_capturada = comparePiece(&game->estadoJogo,pretas,click) , .promocao = 0 , .especial = 0};
@@ -171,7 +172,7 @@ void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event e
                     promote_sfx(sfxarray);
                 }
                 else {
-                    updateScore(game);
+                    updateScore(game,&jogada,op_turn);
                     if(game->indx_lastmoves > 0) capturepiece_sfx(sfxarray);
                     else if(game->estadoJogo.king_in_check[(game->turnoJogador == brancas) ? pretas : brancas]) check_sfx(sfxarray);
                     else movepiece_sfx(sfxarray);

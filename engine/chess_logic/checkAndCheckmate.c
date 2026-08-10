@@ -40,7 +40,7 @@ int isCheckMate(GameStruct * game , CorPiece cor){
     //return 1; // Testes de checkmate , importante remover depois
     Jogada j = {.peca_movida = Empty , .origem = 0 , .destino =  0, .promocao = 0 , .especial = 0};
     int in_check = 1;
-    CorPiece cor_atual = game->turnoJogador;
+    CorPiece cor_atual = game->turnoJogador , op_colour = (cor==brancas) ? pretas : brancas;
     game->turnoJogador = cor;
     uint64_bit same_colour = get_same_colour_bitboard(&(game->estadoJogo),cor);
     for(int i=0;i<6 && in_check;i++){
@@ -55,6 +55,7 @@ int isCheckMate(GameStruct * game , CorPiece cor){
             while( tries !=0 && in_check){
                 j.destino = __builtin_ctzll(tries);
                 if(isPseudoValidMove(game,&j,cor,pieces_move)){
+                    j.peca_capturada = comparePiece(&game->estadoJogo,op_colour,1ULL<<j.destino);
                     atualizaJogada(game,&j,cor);
                     in_check = is_in_check(&(game->estadoJogo),(game->estadoJogo.tabuleirojogo[cor][King]),cor);
                     undoMove(game,&j,cor);

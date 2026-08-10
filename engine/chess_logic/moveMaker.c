@@ -26,13 +26,12 @@ void fetch_change_board(GameStruct * game,uint64_bit click,uint64_bit * mesmaCor
     Pieces selected = jogada->peca_movida;
 
     //sem esta verificacao ha problemas e pecas tornam se duplicadas
-    Pieces capturada = comparePiece(&game->estadoJogo,cor_oposta,click);
-    if((capturada != jogada->peca_capturada) || jogada->peca_capturada == Empty){
-        printf("Foi encontrada a piece: %d inves da %d\n",capturada , jogada->peca_capturada);
-        return;
-    }
+    Pieces piece_comida = comparePiece(&game->estadoJogo, cor_oposta, click);
+    if(piece_comida == Empty || selected == Empty )return;
 
-    game->estadoJogo.tabuleirojogo[cor_oposta][jogada->peca_capturada] &= ~click;
+    jogada->peca_capturada = piece_comida;
+    game->estadoJogo.tabuleirojogo[cor_oposta][piece_comida] &= ~click;
+
     *corOposta &= ~click;
     game->estadoJogo.bitboard_todas_pieces &= ~click;
     efetuaJogada(&(game->estadoJogo.tabuleirojogo[turno][selected]),

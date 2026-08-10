@@ -16,7 +16,7 @@ typedef struct jogadabot{
 }jogadabot;
 
 jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiece turn , int n , int eval){
-    jogadabot move = {.move_time = 5000};
+    jogadabot move = {.move_time = 5000 , .completed = 0};
     for(int i=0;i<n;i++){
         Jogada * cur_move = pick_best_move(jogadas, n, i);
         CorPiece op_turn = (turn == brancas) ? pretas : brancas;
@@ -25,6 +25,7 @@ jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiec
             eval += delta;
             move.move_eval = eval;
             move.best_move = jogadas[i];
+            undoMove(game,cur_move,turn);
             return move;
         }
         else undoMove(game,cur_move,turn);

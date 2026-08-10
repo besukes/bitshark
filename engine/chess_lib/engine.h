@@ -271,7 +271,7 @@ void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event e
 void cleanArrowEvent(GameStruct * game);
 void efetuaEventoClickArrows(GameStruct * game , SDL_Event event);
 void efetuaEventoSoltarArrows(GameStruct * game , SDL_Event event);
-void updateScore(GameStruct *game);
+void updateScore(GameStruct * game , Jogada* jogada,CorPiece turn);
 
 
 
