@@ -30,7 +30,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
   * Incremental evaluation
 * Memorization
   * Transposition Tables
-  * KillerMoves
+  * Killer Moves
   * Move Heuristics
 
 
