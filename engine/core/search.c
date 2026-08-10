@@ -63,7 +63,6 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         return FLAG_TIMEOUT;
     }
 
-
     if (depth == 0) { // Quando atinge a profundidade 0 ou o jogo acaba, lê a avaliação incremental atual
         double time = SDL_GetTicks();
         return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , time , time_limit);
@@ -80,6 +79,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     Jogada * hash_move = NULL; int move_eval = 0;
     uint64_bit key = compute_zobrist(game,turn);
     getPositionTTMove(key,depth,&alpha,&beta,&move_eval,&hash_move);
+    if(is_repeated_position(key)) return 0;
     if(move_eval != 0) return move_eval;
     moveScoring(jogadas, num_jogadas, hash_move , depth); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
     
@@ -88,7 +88,10 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+        //Apply the move and then add it to the list of positions already checked
         int delta = applyDeltaMove(game,best_move,turn,op_turn);
+        hash_key_stack[hash_stack_indx++] = key;
+
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             // Chamada recursiva do NEGAMAX:
@@ -96,6 +99,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             undoMove(game,best_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if ((-eval) == FLAG_TIMEOUT) {
+                hash_stack_indx--;
                 return FLAG_TIMEOUT;
             }
             if(eval > best_score){
@@ -113,11 +117,13 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
                     history_table[best_move->peca_movida][best_move->destino] += depth * depth; // Atualiza a tabela de histórico
                 }
                 tt_store(key, depth, beta, TT_LOWERBOUND, *best_move);
+                hash_stack_indx--;
                 return beta;
             }
             alpha = (eval > alpha) ? eval : alpha; // Atualiza o Alpha se a avaliação atual for melhor
         }
         else undoMove(game,best_move,turn);
+        hash_stack_indx--;
     }
     //Se best_score > orig_alpha , entao encontramos uma jogada melhor , caso contrario esta jogada piora a posicao (fail)
     TTFlag flag = (best_score > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;

@@ -64,8 +64,7 @@ GameStruct initGameStruct(void){
     game.score_game = 0;
     game.turns=0;
     game.trying_to_leave = 0;
-    game.repeated_moves = 0;
-    game.pos_key = 0;
+    game.cur_pos_key = 0;
     initArrowsStruct(&game);
     return game;
 }
@@ -88,8 +87,7 @@ void initializeGame(GameStruct * game){
     game->score_game = 0;
     game->turns=0;
     game->trying_to_leave = 0;
-    game->repeated_moves = 0;
-    game->pos_key = 0;
+    game->cur_pos_key = 0;
     initArrowsStruct(game);
 }
 

@@ -6,7 +6,7 @@
 
 
 #define NUMBER_PIECES 6
-#define MAX_DEPTH_SEARCH 15
+#define MAX_DEPTH_SEARCH 21
 #define FLAG_TIMEOUT -999999
 #define VALOR_INFINITO 99999
 
@@ -174,8 +174,7 @@ typedef struct GameStruct{
     int score_game; //Guarda o score do jogo (diferenca de pecas comidas)
     int turns; //Guarda os turnos ja jogados no jogo
     Boolean trying_to_leave; //Informa se o utilizador clicou no botao de sair
-    int repeated_moves;
-    uint64_bit pos_key;
+    uint64_bit cur_pos_key; //Current zobrist key da posicao
 }GameStruct;
 
 /*Guarda as texturas que o jogo utiliza no seu decorrer , tal como o tema das peças*/
@@ -406,6 +405,7 @@ void moveScoring(Jogada * jogadas , int num_jogadas , Jogada * hash_move , int d
 void moveScoringCaptures(Jogada * jogadas , int num_jogadas , Jogada * hash_move);
 int matches_killer_move(int depth, Jogada * jogada, int index);
 int calculate_extension_depth(GameStruct * game , int depth , CorPiece op_turn);
+int is_repeated_position(uint64_bit key);
 
 /// transposition /////////////////////////
 

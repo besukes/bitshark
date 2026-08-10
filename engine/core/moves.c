@@ -77,6 +77,13 @@ void moveScoring(Jogada * jogadas , int num_jogadas , Jogada * hash_move , int d
 }
 
 
+int is_repeated_position(uint64_bit key){
+    for(int i = hash_stack_indx - 1;i>=0;i--){
+        if(hash_key_stack[i] == key) return 1;
+    }
+    return 0;
+}
+
 
 int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiece op_turn){
     uint64_bit origem_bit = 1ULL << jogada->origem;
@@ -87,10 +94,10 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
     Pieces peca_capturada = jogada->peca_capturada;
     int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(destino_bit, peca_capturada, op_turn, game) : 0;
     
+
+
     atualizaJogada(game, jogada, turn);
     int promote_value = (jogada->promocao) ? 800 : 0;
-
-    //int repeated_pos = lookup_for_repeated_position()
 
     int new_moved_eval = evaluate_piece(destino_bit, peca_movida, turn, game);
 

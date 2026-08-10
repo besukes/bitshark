@@ -56,7 +56,7 @@ void undoPiece_move(GameStruct * game , uint64_bit * sameCor,uint64_bit * opCor,
 
 
 void undoZobrist(GameStruct * game , CorPiece turn){
-    uint64_bit h = game->pos_key;
+    uint64_bit h = game->cur_pos_key;
     for(int cor=0;cor<2;cor++){
         for(int pieces=0;pieces<NUMBER_PIECES;pieces++){
             uint64_bit bb = game->estadoJogo.tabuleirojogo[cor][pieces];
@@ -76,7 +76,7 @@ void undoZobrist(GameStruct * game , CorPiece turn){
         h ^= zobrist_ep[sq];
     }
     if(turn == pretas) h ^= zobrist_turn;
-    game->pos_key = h;
+    game->cur_pos_key = h;
 }
 
 

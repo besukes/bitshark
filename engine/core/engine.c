@@ -92,8 +92,12 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
     double initial_time = SDL_GetTicks();
     const double time_budget = 3000; // orçamento total para a jogada, partilhado por todas as profundidades
     jogadabot best_so_far = {0};
+    int start_hash_indx = hash_stack_indx;
+    int start_indx_lastmoves = game->indx_lastmoves;
     // Iterative deepening: pesquisa profundidade 1, depois 2, 3... até MAX_DEPTH_SEARCH
     for(int depth = 1; depth <= MAX_DEPTH_SEARCH; depth++){
+        hash_stack_indx = start_hash_indx;
+        game->indx_lastmoves = start_indx_lastmoves;
         double elapsed = SDL_GetTicks() - initial_time;
         if(elapsed >= time_budget) break;
         jogadabot result = engine_search(game, turn, depth, initial_time, time_budget);
@@ -108,6 +112,8 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
             break;
         }
     }
+    uint64_bit key = compute_zobrist(game,turn);
+    hash_key_stack[hash_stack_indx++] = key;
     return best_so_far;
 }
 
