@@ -20,7 +20,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     int orig_alpha = alpha;
     Jogada * hash_move = NULL; int move_eval = 0;
     uint64_bit key = compute_zobrist(game,turn);
-    getPositionTTMove(key,q_depth,&alpha,&beta,&move_eval,&hash_move);
+    getPositionTTMove(key,0,&alpha,&beta,&move_eval,&hash_move);
     if(move_eval != 0) return move_eval;
 
     Jogada jogadas[256];
@@ -39,7 +39,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
             undoMove(game,best_move,turn);
             if (eval >= beta){
                 history_table[jogadas[i].peca_movida][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
-                tt_store(key, q_depth, beta, TT_LOWERBOUND, *best_move);
+                tt_store(key, 0 , beta, TT_LOWERBOUND, *best_move);
                 return beta;
             }
             if((-eval) == FLAG_TIMEOUT) {

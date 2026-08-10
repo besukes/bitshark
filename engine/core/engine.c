@@ -93,7 +93,7 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
     const double time_budget = 3000; // orçamento total para a jogada, partilhado por todas as profundidades
     jogadabot best_so_far = {0};
     // Iterative deepening: pesquisa profundidade 1, depois 2, 3... até MAX_DEPTH_SEARCH
-    for(int depth = 3; depth <= MAX_DEPTH_SEARCH; depth+=2){
+    for(int depth = 1; depth <= MAX_DEPTH_SEARCH; depth++){
         double elapsed = SDL_GetTicks() - initial_time;
         if(elapsed >= time_budget) break;
         jogadabot result = engine_search(game, turn, depth, initial_time, time_budget);
