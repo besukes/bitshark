@@ -50,7 +50,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
         else undoMove(game,best_move,turn);
     }
     TTFlag flag = (best_score > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
-    tt_store(key, q_depth, alpha, flag, best_move_found);
+    tt_store(key, 0 , alpha, flag, best_move_found);
     return alpha;
 }
 

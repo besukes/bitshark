@@ -15,9 +15,11 @@ int is_end_game(EstadoJogo * estado){
                       + __builtin_popcountll(estado->tabuleirojogo[brancas][Bishop]);
     int black_minors = __builtin_popcountll(estado->tabuleirojogo[pretas][Horse])
                       + __builtin_popcountll(estado->tabuleirojogo[pretas][Bishop]);
+    int white_rooks = __builtin_popcountll(estado->tabuleirojogo[brancas][Rook]);
+    int black_rooks = __builtin_popcountll(estado->tabuleirojogo[pretas][Rook]);
 
-    Boolean white_ok = (white_queens == 0) || (white_minors <= 1);
-    Boolean black_ok = (black_queens == 0) || (black_minors <= 1);
+    Boolean white_ok = (white_queens == 0 && white_minors <= 1) || (white_minors <= 1 && white_rooks == 0);
+    Boolean black_ok = (black_queens == 0 && black_minors <= 1) || (black_minors <= 1 && black_rooks == 0);
 
     return (white_ok && black_ok);
 }
@@ -64,7 +66,10 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
     int line = pos/8 , column = pos%8 , indx = (turn==brancas) ? ((7-line)*8 + column) : pos;
     switch(piece_type){
         case Pawn :
-            position_score = pawn_evals_black[indx];
+            if(is_end_game(&game->estadoJogo)){
+                position_score = pawn_evals_black_endgame[indx];
+            }
+            else position_score = pawn_evals_black[indx];
         break;
         case Rook:
             position_score = black_rook_evals[indx];
