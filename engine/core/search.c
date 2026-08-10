@@ -67,13 +67,9 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         double time = SDL_GetTicks();
         return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , time , time_limit);
     }
-    Jogada jogadas[256];int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
-    if (num_jogadas == 0) { // Se não houver jogadas legais: Xeque-Mate ou Empate (Afogamento)
-        if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)) {
-            return (-VALOR_INFINITO + depth); // Xeque-mate (prioriza mates mais rápidos)
-        }
-        return 0; // Empate por afogamento
-    }
+
+    Jogada jogadas[256];
+    int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     
     int orig_alpha = alpha;
     Jogada * hash_move = NULL; int move_eval = 0;
@@ -85,6 +81,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     
     int best_score = -VALOR_INFINITO - 1;
     Jogada best_move_found = jogadas[0];
+    int legal_moves = 0;
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         CorPiece op_turn = (turn == brancas) ? pretas : brancas;
@@ -94,6 +91,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
 
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
+            legal_moves = 1;
             // Chamada recursiva do NEGAMAX:
             int eval = -search(game, depth - 1 , -beta, -alpha, wb_eval + delta, initial_time, time_limit, (turn == brancas) ? pretas : brancas);
             undoMove(game,best_move,turn);
@@ -124,6 +122,12 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         }
         else undoMove(game,best_move,turn);
         hash_stack_indx--;
+        if(!legal_moves){
+            if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)) {
+                return (-VALOR_INFINITO + depth); // Xeque-mate (prioriza mates mais rápidos)
+            }
+            return 0; // Empate por afogamento
+        }
     }
     //Se best_score > orig_alpha , entao encontramos uma jogada melhor , caso contrario esta jogada piora a posicao (fail)
     TTFlag flag = (best_score > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;

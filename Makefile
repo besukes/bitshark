@@ -37,11 +37,11 @@ TARGET = bshark
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $@ $(LTFLAGS)
+	$(CC) $(OBJ) -o $@ $(LCFLAGS)
 
 build/%.o: %.c
 	@mkdir -p $(dir $@)
-	$(CC) $(TFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -rf build
