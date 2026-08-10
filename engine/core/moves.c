@@ -90,6 +90,8 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
     atualizaJogada(game, jogada, turn);
     int promote_value = (jogada->promocao) ? 800 : 0;
 
+    //int repeated_pos = lookup_for_repeated_position()
+
     int new_moved_eval = evaluate_piece(destino_bit, peca_movida, turn, game);
 
     int who2Move = (turn == brancas) ? 1 : -1;

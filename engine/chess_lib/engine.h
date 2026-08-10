@@ -45,6 +45,8 @@ extern uint64_bit zobrist_castle[2][2];
 extern uint64_bit zobrist_ep[64];
 extern uint64_bit zobrist_turn;
 
+extern int hash_stack_indx;
+extern uint64_bit hash_key_stack[2048];
 
 typedef int Boolean; //Forma mais intuitiva de perceber quando as variáveis são usadas como valores lógicos.
 

@@ -14,6 +14,9 @@ uint64_bit zobrist_castle[2][2];
 uint64_bit zobrist_ep[64];
 uint64_bit zobrist_turn;
 
+int hash_stack_indx = 0;
+uint64_bit hash_key_stack[2048];
+
 
 void interfaceCChess(GameStruct * game ,GUISettings * settings , Mix_Chunk * sfxarray[]){
     SDL_Event event;
