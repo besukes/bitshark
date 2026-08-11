@@ -120,17 +120,16 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             alpha = (eval > alpha) ? eval : alpha; // Atualiza o Alpha se a avaliação atual for melhor
         }
         else undoMove(game,best_move,turn);
-        if(!legal_moves){
-            hash_stack_indx--;
-            if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
-                return (-VALOR_INFINITO + depth); // Xeque-mate (prioriza mates mais rápidos)
-            }
-            return 0; // Empate por afogamento
+    }
+    hash_stack_indx--;
+    if(!legal_moves){
+        if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
+            return (-VALOR_INFINITO + depth); // Xeque-mate (prioriza mates mais rápidos)
         }
+        return 0; // Empate por afogamento
     }
     //Se best_score > orig_alpha , entao encontramos uma jogada melhor , caso contrario esta jogada piora a posicao (fail)
     TTFlag flag = (best_score > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
     tt_store(key, depth, alpha, flag, best_move_found);
-    hash_stack_indx--;
     return alpha;
 }
