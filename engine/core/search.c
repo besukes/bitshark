@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include <math.h>
 
 #define NO_FLAGS 0
 #define FLAG_ONLY_CAPTURES 1
@@ -93,7 +94,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         //Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
-        int R = (num_jogadas > 3 && depth >= 3) ? log(depth)*log(i) : 0;
+        int R = ( i > 2 && depth >= 3) ? log(depth)*log(i) : 0;
         int reduced_depth = maximum(1,depth - 1 - R);
 
         int delta = applyDeltaMove(game,best_move,turn,op_turn);
@@ -103,7 +104,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             // Chamada recursiva do NEGAMAX:
             int eval = -search(game, reduced_depth, -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn);
             // So faz full depth search se a jogada for muito boa ou se o alpha for negativo (o current turn estiver numa ma posicao)
-            if(R > 0 && ( (eval > alpha && alpha < 0) || (eval - 2000 > alpha))) 
+            if(R > 0 && ( (eval > alpha && alpha < 0) || (eval - 1500 > alpha))) 
                 eval = -search(game , depth - 1 , -beta , -alpha , wb_eval+delta , initial_time , time_limit, op_turn);
             undoMove(game,best_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
