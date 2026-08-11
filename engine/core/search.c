@@ -2,13 +2,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
-#include <math.h>
 
 #define NO_FLAGS 0
 #define FLAG_ONLY_CAPTURES 1
 
 
-
+int lateMoveReduction(int indx_move , int cur_depth , int total_moves){
+    int R = (cur_depth>10) ? 5 : 1;
+    if(total_moves > 10){
+        if(indx_move > 5) R+= 1;
+        if(indx_move > 10) R+= 2;
+        if(indx_move > 15) R+= 3;
+        if(indx_move > 20) R+= 4;
+    }
+    if(R>cur_depth) R=2;
+    return (R);
+}
 
 int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorPiece turn , int q_depth , int init_time , int max_time){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
@@ -95,10 +104,10 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         //Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
-        int can_apply_lmr = i >= 3 && depth >= 3 , 
+        int can_apply_lmr = i >= 3 && depth >= 4 , 
             isnt_important_move = !best_move->promocao && best_move->peca_capturada == Empty;
-        int applied_reduction = (can_apply_lmr && isnt_important_move) ? 5*log(depth)*log(i) : 0;
-        int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) : depth - 1;
+        int applied_reduction = (can_apply_lmr && isnt_important_move) ? lateMoveReduction(i,depth,num_jogadas) : 0;
+        int reduced_depth = (applied_reduction) ? (depth - 1 - applied_reduction) : (depth - 1);
 
         int delta = applyDeltaMove(game,best_move,turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
@@ -107,7 +116,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             // Chamada recursiva do NEGAMAX:
             int eval = -search(game, reduced_depth , -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn);
             // So faz full depth search se a jogada for muito boa ou se o alpha for negativo (o current turn estiver numa ma posicao)
-            if(applied_reduction && ( (eval > alpha && alpha < 0) || (eval - 1500 > alpha))) 
+            if(applied_reduction && ( (eval > alpha && alpha < 0) || (eval - 1500 > alpha)))
                 eval = -search(game , depth - 1 , -beta , -alpha , wb_eval+delta , initial_time , time_limit, op_turn);
             undoMove(game,best_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada

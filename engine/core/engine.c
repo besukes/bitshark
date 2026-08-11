@@ -128,7 +128,9 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
     }
     else{
         reached_depth = 5;
-        best_jogada = engine_search(game,turn,MAX_DEPTH_SEARCH - 2,initial_time,3000);
+        best_jogada = engine_search(game,turn,5,initial_time,3000);
+        uint64_bit key = compute_zobrist(game,turn);
+        hash_key_stack[hash_stack_indx++] = key;
     }
     int who2Move = (turn==brancas) ? 1 : (-1);
     printf("[engine] get_best_move: piece %d from %d to %d , depth alcancada %d/%d , took %d ms with an eval of %f\n", best_jogada.best_move.peca_movida, 
