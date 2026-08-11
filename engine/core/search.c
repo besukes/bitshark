@@ -15,7 +15,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     int stc_eval = quiescence_eval; // Avaliação estática da posição atual
     //Como depth agora é 0  , é seguro usar mopup evaluation aqui , pois assim não ha inflação de valores
     //Est_eval nunca é usada para além de verificações
-    stc_eval+=mopup_eval(game,op_turn);
+    stc_eval += mopup_eval(game,op_turn);
     stc_eval = (turn==brancas) ? stc_eval : -stc_eval;
 
 
@@ -95,7 +95,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         //Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
         int R = ( i > 2 && depth >= 3) ? log(depth)*log(i) : 0;
-        int reduced_depth = maximum(1,depth - 1 - R);
+        int reduced_depth = (depth <= 1) ? 0 : maximum(1,depth - 1 - R);
 
         int delta = applyDeltaMove(game,best_move,turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
