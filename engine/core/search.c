@@ -82,13 +82,12 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     int best_score = -VALOR_INFINITO - 1;
     Jogada best_move_found = jogadas[0];
     int legal_moves = 0;
+    hash_key_stack[hash_stack_indx++] = key;
     for (int i = 0; i < num_jogadas; i++) {
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         CorPiece op_turn = (turn == brancas) ? pretas : brancas;
-        //Apply the move and then add it to the list of positions already checked
-        int delta = applyDeltaMove(game,best_move,turn,op_turn);
-        hash_key_stack[hash_stack_indx++] = key;
 
+        int delta = applyDeltaMove(game,best_move,turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             legal_moves = 1;
@@ -121,9 +120,9 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             alpha = (eval > alpha) ? eval : alpha; // Atualiza o Alpha se a avaliação atual for melhor
         }
         else undoMove(game,best_move,turn);
-        hash_stack_indx--;
         if(!legal_moves){
-            if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)) {
+            hash_stack_indx--;
+            if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
                 return (-VALOR_INFINITO + depth); // Xeque-mate (prioriza mates mais rápidos)
             }
             return 0; // Empate por afogamento
@@ -132,5 +131,6 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     //Se best_score > orig_alpha , entao encontramos uma jogada melhor , caso contrario esta jogada piora a posicao (fail)
     TTFlag flag = (best_score > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
     tt_store(key, depth, alpha, flag, best_move_found);
+    hash_stack_indx--;
     return alpha;
 }

@@ -32,8 +32,7 @@ jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiec
     }
     Jogada invalid = {.destino = 64 , .origem = 64 , .peca_capturada = Empty , .peca_movida = Empty,
                       .especial = 0 , .promocao = 0 , .score = 0};
-    int who2Move = (turn == brancas) ? 1 : (-1);
-    move.move_eval = VALOR_INFINITO*who2Move;
+    move.move_eval = -VALOR_INFINITO;
     move.best_move = invalid;
     return move;
 }
@@ -75,7 +74,7 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
                 melhor_eval = eval;
                 best_move = *cur_move;
             }
-            alpha = (melhor_eval>alpha) ? melhor_eval : alpha;
+            alpha = (melhor_eval > alpha) ? melhor_eval : alpha;
         }
         else undoMove(game,cur_move,turn);
     }
@@ -95,6 +94,7 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
     jogadabot best_so_far = {0};
     int start_hash_indx = hash_stack_indx;
     int start_indx_lastmoves = game->indx_lastmoves;
+    hash_key_stack[hash_stack_indx++] = compute_zobrist(game,turn);
     // Iterative deepening: pesquisa profundidade 1, depois 2, 3... até MAX_DEPTH_SEARCH
     for(int depth = 1; depth <= MAX_DEPTH_SEARCH; depth++){
         hash_stack_indx = start_hash_indx;
