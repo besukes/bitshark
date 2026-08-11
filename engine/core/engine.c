@@ -15,7 +15,7 @@ typedef struct jogadabot{
     int completed;
 }jogadabot;
 
-jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiece turn , int n , int eval){
+jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[MAX_NUMBER_MOVES] , CorPiece turn , int n , int eval){
     jogadabot move = {.move_time = 5000 , .completed = 0};
     for(int i=0;i<n;i++){
         Jogada * cur_move = pick_best_move(jogadas, n, i);
@@ -38,7 +38,7 @@ jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[256] , CorPiec
 }
 
 jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double initial_time , double budget){
-    Jogada jogadas[256];
+    Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     // Consulta a transposition table para obter uma "hash move" que ajuda a ordenar
     // melhor as jogadas logo desde a raiz.

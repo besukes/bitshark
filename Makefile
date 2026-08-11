@@ -17,6 +17,7 @@ SRC =	engine/chess_logic/castle_logic.c \
 		engine/core/moves.c \
 		engine/core/search.c \
 		engine/core/transposition.c \
+		engine/core/initLT.c \
 		gui/initialization/initStructs.c \
 		gui/initialization/initTabuleiro.c \
 		gui/initialization/startAndCleanup.c \

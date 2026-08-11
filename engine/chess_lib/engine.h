@@ -19,6 +19,7 @@
 #define FLAG_ENPASSANT 2
 
 #define NUM_SQUARES 64
+#define MAX_NUMBER_MOVES 256
 
 /*Struct que define a posicao de uma peca no tabuleiro de xadrez usando um long 64 bit*/
 typedef unsigned long long uint64_bit;
@@ -47,6 +48,8 @@ extern uint64_bit zobrist_turn;
 
 extern int hash_stack_indx;
 extern uint64_bit hash_key_stack[2048];
+
+extern int lmr_lt[MAX_DEPTH_SEARCH][256];
 
 typedef int Boolean; //Forma mais intuitiva de perceber quando as variáveis são usadas como valores lógicos.
 

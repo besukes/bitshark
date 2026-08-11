@@ -7,18 +7,6 @@
 #define FLAG_ONLY_CAPTURES 1
 
 
-int lateMoveReduction(int indx_move , int cur_depth , int total_moves){
-    int R = (cur_depth>10) ? 5 : 1;
-    if(total_moves > 10){
-        if(indx_move > 5) R+= 1;
-        if(indx_move > 10) R+= 2;
-        if(indx_move > 15) R+= 3;
-        if(indx_move > 20) R+= 4;
-    }
-    if(R>cur_depth) R=2;
-    return (R);
-}
-
 int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorPiece turn , int q_depth , int init_time , int max_time){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
     int stc_eval = quiescence_eval; // Avaliação estática da posição atual
@@ -40,7 +28,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     getPositionTTMove(key,0,&alpha,&beta,&move_eval,&hash_move);
     if(move_eval != 0) return move_eval;
 
-    Jogada jogadas[256];
+    Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas, turn, FLAG_ONLY_CAPTURES); // idealmente só capturas aqui
     moveScoringCaptures(jogadas, num_jogadas, hash_move); // Ordena as jogadas de captura para melhorar a poda alpha-beta
 
@@ -84,7 +72,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , time , time_limit);
     }
 
-    Jogada jogadas[256];
+    Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     
     int orig_alpha = alpha;
@@ -106,7 +94,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         //Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
         int can_apply_lmr = i >= 3 && depth >= 4 , 
             isnt_important_move = !best_move->promocao && best_move->peca_capturada == Empty;
-        int applied_reduction = (can_apply_lmr && isnt_important_move) ? lateMoveReduction(i,depth,num_jogadas) : 0;
+        int applied_reduction = (can_apply_lmr && isnt_important_move) ? lmr_lt[depth][i] : 0;
         int reduced_depth = (applied_reduction) ? (depth - 1 - applied_reduction) : (depth - 1);
 
         int delta = applyDeltaMove(game,best_move,turn,op_turn);
