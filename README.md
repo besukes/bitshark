@@ -25,6 +25,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
   * Quiescence Search
   * Move ordering
   * Iterative Deepening
+  * Late Move Reductions
 * Evaluation
   * Piece Square Tables
   * Incremental evaluation

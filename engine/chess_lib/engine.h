@@ -257,6 +257,7 @@ int posTabuleiro(uint64_bit bitboard);
 uint64_bit click_table_position(int mouseX , int mouseY);
 int dentroDoBotao(int mx , int my , int inf_x , int sup_x , int inf_y , int sup_y);
 int minimum(int n1,int n2);
+int maximum(int n1,int n2);
 Pieces comparePiece(EstadoJogo * estado , CorPiece cor , uint64_bit posclique);
 void getColunasAH(uint64_bit * colunaA , uint64_bit * colunaH);
 int mouseOver(GUISettings * settings, SDL_Rect r);

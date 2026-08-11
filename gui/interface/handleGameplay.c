@@ -44,7 +44,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->turns++;
         game->moved_to_square = best_move.destino;
     }
-    /*else if(game->turnoJogador == brancas){
+    else if(game->turnoJogador == brancas){
         GameStruct game_aux = *game;
         game_aux.indx_lastmoves = 0;
         //depois substituir por game_aux
@@ -72,7 +72,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->turnoJogador = pretas;
         game->turns++;
         game->moved_to_square = best_move.destino;
-    }*/
+    }
     else if(event.type == SDL_MOUSEBUTTONDOWN && game->turnoJogador == turno_j){
         if(event.button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown ==0){
             game->isKeyPressedDown = 1;
