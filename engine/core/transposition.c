@@ -94,7 +94,7 @@ TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * bet
     TTEntry * entry = tt_probe(key);
     if(entry!=NULL){
         *hash_move = &entry->best_move;
-        if(entry->depth >= depth){
+        if(entry->depth <= depth){
             if(entry->flag == TT_EXACT){
                 *move_eval = entry->score;
             }

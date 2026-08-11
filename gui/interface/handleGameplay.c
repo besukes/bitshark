@@ -14,7 +14,7 @@ void softReset(GameStruct * game){
 //teste temporario do bot , temos de mudar eventualmente
 //&& game->turnoJogador == brancas
 void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event , Mix_Chunk * sfxarray[]){
-    CorPiece turno_j = pretas;
+    CorPiece turno_j = brancas;
     if(game->turnoJogador == pretas){
         GameStruct game_aux = *game;
         game_aux.indx_lastmoves = 0;

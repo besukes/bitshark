@@ -27,10 +27,27 @@ int is_end_game(EstadoJogo * estado){
 
 int mopup_eval(GameStruct * game , CorPiece op_turn){
     if(is_end_game(&game->estadoJogo)){
-        int king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[op_turn][King]);
-        int king_dist_to_center = abs(28 - king_pos);
-        int force_king_to_corner_endgame = 4*king_dist_to_center;
-        return force_king_to_corner_endgame;
+        CorPiece turn = (op_turn == brancas) ? pretas : brancas;
+        int turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[turn][King]),
+            op_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[op_turn][King]);
+        if(op_turn_king_pos < 0 || turn_king_pos < 0) return 0; // segurança: sem rei (não deve acontecer)
+
+        // Distância de Chebyshev (linha/coluna) ao centro do tabuleiro
+        int op_rank = op_turn_king_pos / 8, op_file = op_turn_king_pos % 8;
+        int dist_rank = (op_rank <= 3) ? (3 - op_rank) : (op_rank - 4);
+        int dist_file = (op_file <= 3) ? (3 - op_file) : (op_file - 4);
+        int op_king_dist_to_center = (dist_rank > dist_file) ? dist_rank : dist_file;
+
+        // Distância entre os dois reis: sem aproximar o próprio rei do rei adversário, a torre
+        // sozinha não consegue fechar o mate (precisa do apoio do rei para cortar as casas de
+        // fuga) — sem este termo, o motor "empurra" o rei adversário para a borda mas nunca
+        // convergir para o fechar, ficando a oscilar indefinidamente perto do mate sem o concluir.
+        int mr = turn_king_pos/8, mf = turn_king_pos%8;
+        int dr = mr>op_rank ? mr-op_rank : op_rank-mr;
+        int df = mf>op_file ? mf-op_file : op_file-mf;
+        int kings_distance = (dr > df) ? dr : df;
+ 
+        return 70*op_king_dist_to_center + 30*(7 - kings_distance);
     }
     return 0;
 }

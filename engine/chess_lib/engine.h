@@ -391,6 +391,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
 int evaluate(GameStruct * game , CorPiece turno);
 int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , GameStruct * game);
 int is_end_game(EstadoJogo * estado);
+int mopup_eval(GameStruct * game , CorPiece op_turn);
 
 
 /// engine /////////////////////////////////
