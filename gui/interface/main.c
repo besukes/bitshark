@@ -65,6 +65,7 @@ int main(void){
     initsfx(sfxarray);
     init_zobrist();
     tt_init();
+    init_lmrLT_table();
     game.cur_pos_key = compute_zobrist(&game,brancas);
     hash_key_stack[hash_stack_indx++] = game.cur_pos_key;
     interfaceCChess(&game,&settings , sfxarray);

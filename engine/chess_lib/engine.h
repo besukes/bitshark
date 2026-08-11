@@ -421,3 +421,7 @@ uint64_bit compute_zobrist(GameStruct * game, CorPiece turn);
 TTEntry * tt_probe(uint64_bit key);
 void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move);
 TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move);
+
+/// LookUp Table init //////////////////////
+
+void init_lmrLT_table();
