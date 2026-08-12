@@ -43,6 +43,8 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->turnoJogador = brancas;
         game->turns++;
         game->moved_to_square = best_move.destino;
+        uint64_bit key = compute_zobrist(game,turn);
+        hash_key_stack[hash_stack_indx++] = key;
     }
     else if(game->turnoJogador == brancas){
         GameStruct game_aux = *game;
@@ -72,6 +74,8 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->turnoJogador = pretas;
         game->turns++;
         game->moved_to_square = best_move.destino;
+        uint64_bit key = compute_zobrist(game,turn);
+        hash_key_stack[hash_stack_indx++] = key;
     }
     else if(event.type == SDL_MOUSEBUTTONDOWN && game->turnoJogador == turno_j){
         if(event.button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown ==0){
