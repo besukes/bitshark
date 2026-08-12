@@ -95,7 +95,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         int can_apply_lmr = i >= 3 && depth >= 4 , 
             isnt_important_move = !best_move->promocao && best_move->peca_capturada == Empty;
         int applied_reduction = (can_apply_lmr && isnt_important_move) ? lmr_lt[depth][i] : 0;
-        int reduced_depth = (applied_reduction) ? (depth - 1 - applied_reduction) : (depth - 1);
+        int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) : (depth - 1);
 
         int delta = applyDeltaMove(game,best_move,turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
