@@ -62,7 +62,7 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             // Chamada recursiva do NEGAMAX:
-            int eval = -search(game, depth - 1 , -beta, -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn);
+            int eval = -search(game, depth - 1 , -beta, -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn,0);
             undoMove(game,cur_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if((-eval) == FLAG_TIMEOUT) {

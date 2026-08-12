@@ -388,7 +388,7 @@ void checkmate_sfx (Mix_Chunk * sfxarray[]);
 
 /// search /////////////////////////////
 
-int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn);
+int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply);
 
 /// evaluation //////////////////////////////
 

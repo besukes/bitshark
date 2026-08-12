@@ -61,7 +61,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
 
 
 // A função Search usando Negamax + Alpha-Beta
-int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn){
+int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply){
     SDL_Event e ; SDL_PollEvent(&e);
     if (SDL_GetTicks() - initial_time >= time_limit || (e.type == SDL_QUIT)) {
         return FLAG_TIMEOUT;
@@ -105,14 +105,14 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             int pvs_beta = (i==0) ? beta : (alpha + 1); //Define a janela
             legal_moves = 1; //Para verificações de checkmate
             // 3. Chamada recursiva do NEGAMAX:
-            int eval = -search(game, reduced_depth , -pvs_beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn);
+            int eval = -search(game, reduced_depth , -pvs_beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn , ply + 1);
             // So faz full depth search se a jogada for muito boa , dentro da janela alpha-beta
             // Volta a procurar com null window
             if(applied_reduction && eval > alpha)
-                    eval = -search(game , depth - 1 , -pvs_beta , -alpha , wb_eval+delta , initial_time , time_limit, op_turn);
+                    eval = -search(game , depth - 1 , -pvs_beta , -alpha , wb_eval+delta , initial_time , time_limit, op_turn , ply + 1);
             // Re-pesquisa na profundidade normal com JANELA CHEIA
             if (eval > alpha && eval < beta && i > 0)
-                eval = -search(game, depth - 1, -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn);
+                eval = -search(game, depth - 1, -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn , ply + 1);
             undoMove(game,best_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if ((-eval) == FLAG_TIMEOUT) {
@@ -144,7 +144,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     //Se não tiverem sido executado moves nenhuns , então é porque os movimentos eram inválidos
     if(!legal_moves){
         if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
-            return (-VALOR_INFINITO + depth - mopup_eval(game,turn)); // Xeque-mate ,prioriza mates mais rápidos e com o rei nos cantos do tabuleiro
+            return (-VALOR_INFINITO + ply - mopup_eval(game,turn)); // Xeque-mate ,prioriza mates mais rápidos e com o rei nos cantos do tabuleiro
         }
         return 0; // Empate por afogamento
     }

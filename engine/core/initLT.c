@@ -1,6 +1,8 @@
 #include <engine/chess_lib/engine.h>
 #include <math.h>
 
+
+
 void init_lmrLT_table(){
     for(int depth=1;depth<MAX_DEPTH_SEARCH;depth++){
         for(int jogadas=1;jogadas<MAX_NUMBER_MOVES;jogadas++){
