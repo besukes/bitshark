@@ -103,8 +103,8 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             legal_moves = 1;
             // Chamada recursiva do NEGAMAX:
             int eval = -search(game, reduced_depth , -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn);
-            // So faz full depth search se a jogada for muito boa ou se o alpha for negativo (o current turn estiver numa ma posicao)
-            if(applied_reduction && ( (eval > alpha && alpha < 0) || (eval - 1500 > alpha)))
+            // So faz full depth search se a jogada for muito boa , dentro da janela alpha-beta
+            if(applied_reduction && eval > alpha && eval < beta)
                 eval = -search(game , depth - 1 , -beta , -alpha , wb_eval+delta , initial_time , time_limit, op_turn);
             undoMove(game,best_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
