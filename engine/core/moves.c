@@ -25,7 +25,7 @@ int matches_killer_move(int depth, Jogada * jogada, int index) {
 }
 
 
-void moveScoringCaptures(Jogada * jogadas , int num_jogadas , Jogada * hash_move){
+void moveScoringCaptures(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada * hash_move , CorPiece turn){
     for(int i=0;i<num_jogadas;i++){
         Jogada * atual = &jogadas[i];
         Boolean matches_hash_move = (hash_move != NULL && atual->origem == hash_move->origem 
@@ -44,13 +44,16 @@ void moveScoringCaptures(Jogada * jogadas , int num_jogadas , Jogada * hash_move
             else{
                 atual->score = mvv_lva_table[captured][moved];
                 atual->score += history_table[moved][atual->destino];
+                int see = static_exchange_eval(game,atual,turn);
+                if(see<0) atual->score -= 100000;
+                else atual->score += see;
             }
         }
     }
 }
 
 
-void moveScoring(Jogada * jogadas , int num_jogadas , Jogada * hash_move , int depth){
+void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada * hash_move , int depth , CorPiece turn){
     for(int i=0;i<num_jogadas;i++){
         Jogada * atual = &jogadas[i];
         Boolean matches_hash_move = (hash_move != NULL && atual->origem == hash_move->origem 
@@ -62,7 +65,9 @@ void moveScoring(Jogada * jogadas , int num_jogadas , Jogada * hash_move , int d
         else if(atual->peca_capturada != Empty){
             int captured = atual->peca_capturada;
             int moved = atual->peca_movida;
-            atual->score = 1000000 + mvv_lva_table[captured][moved];
+            int see = static_exchange_eval(game,atual,turn);
+            if(see<0) atual->score -= 100000;
+            else atual->score += 1000000 + mvv_lva_table[captured][moved] + see;
         }
         else if(matches_killer_move(depth,atual,1)){
             atual->score = 900000;

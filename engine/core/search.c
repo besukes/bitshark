@@ -30,7 +30,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
 
     Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas, turn, FLAG_ONLY_CAPTURES); // idealmente só capturas aqui
-    moveScoringCaptures(jogadas, num_jogadas, hash_move); // Ordena as jogadas de captura para melhorar a poda alpha-beta
+    moveScoringCaptures(game,jogadas, num_jogadas, hash_move,turn); // Ordena as jogadas de captura para melhorar a poda alpha-beta
 
     int best_score = -VALOR_INFINITO - 1;
     Jogada best_move_found = jogadas[0];
@@ -78,7 +78,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     getPositionTTMove(key,depth,&alpha,&beta,&move_eval,&hash_move);
     if(is_repeated_position(key)) return 0;
     if(move_eval != 0) return move_eval;
-    moveScoring(jogadas, num_jogadas, hash_move , depth); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
+    moveScoring(game,jogadas, num_jogadas, hash_move , depth , turn); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
     
     int best_score = -VALOR_INFINITO - 1;
     Jogada best_move_found = jogadas[0];

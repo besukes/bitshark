@@ -145,3 +145,50 @@ int evaluate(GameStruct * game , CorPiece turno){
     eval = (turno==brancas) ? eval : (-eval);
     return eval;
 }
+
+//Needs to be done
+uint64_bit get_see_piece_attacks(uint64_bit single , Pieces piece , uint64_bit occupied , CorPiece turn){
+    uint64_bit piece_attks = 0;
+    return piece_attks;
+}
+
+
+int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
+    CorPiece cur_turn = (turn==brancas) ? pretas : brancas;
+    uint64_bit pos_cap = 1ULL<<jogada->destino;
+    int piece_taken_value = pieces_value[jogada->peca_capturada],
+        piece_taker_value = pieces_value[jogada->peca_movida];
+    int see = piece_taken_value;
+    uint64_bit pos_attks[2][NUMBER_PIECES] = {0};
+    int attackers[2][NUMBER_PIECES] = {0};
+    int captures_available = 0 , end_see = 0;
+    uint64_bit occupied_sq = game->estadoJogo.bitboard_todas_pieces &= ~(pos_cap | (1ULL<<jogada->origem));
+
+    while(!end_see){
+        captures_available = 0;
+        for(int i=1;i<NUMBER_PIECES;i++){
+            uint64_bit positions_piece = game->estadoJogo.tabuleirojogo[cur_turn][i];
+            int exist_attackers = attackers[cur_turn][i] > 0;
+            if(!exist_attackers){
+                while(positions_piece != 0){
+                    uint64_bit single_pos = positions_piece & (-positions_piece);
+                    pos_attks[cur_turn][i] |= (get_see_piece_attacks(single_pos,(Pieces)i,occupied_sq,cur_turn) & pos_cap);
+                    if(pos_attks[cur_turn][i] != 0) attackers[cur_turn][i]++;
+                    occupied_sq &= ~single_pos;
+                    positions_piece &= (positions_piece - 1); // Remove esse bit
+                }
+            }
+            int exist_captures = exist_attackers || (pos_attks[cur_turn][i] != 0);
+            if(exist_captures){
+                see = (cur_turn != turn) ? (see - piece_taker_value) : (see + piece_taker_value);
+                piece_taker_value = pieces_value[i];
+                attackers[cur_turn][i] -= (exist_attackers) ? 1 : 0;
+                captures_available = 1;
+                break;
+            }
+        }
+        cur_turn = (turn==brancas) ? pretas : brancas;
+        if(!captures_available || (see<0 && cur_turn != turn)) end_see = 1;
+    }
+    return see;
+}

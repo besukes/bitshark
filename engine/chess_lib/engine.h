@@ -396,6 +396,7 @@ int evaluate(GameStruct * game , CorPiece turno);
 int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , GameStruct * game);
 int is_end_game(EstadoJogo * estado);
 int mopup_eval(GameStruct * game , CorPiece op_turn);
+int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn);
 
 
 /// engine /////////////////////////////////
@@ -406,8 +407,8 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
 
 int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiece op_turn);
 Jogada * pick_best_move(Jogada * jogadas, int num_jogadas, int start_index);
-void moveScoring(Jogada * jogadas , int num_jogadas , Jogada * hash_move , int depth);
-void moveScoringCaptures(Jogada * jogadas , int num_jogadas , Jogada * hash_move);
+void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada * hash_move , int depth , CorPiece turn);
+void moveScoringCaptures(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada * hash_move , CorPiece turn);
 int matches_killer_move(int depth, Jogada * jogada, int index);
 int calculate_extension_depth(GameStruct * game , int depth , CorPiece op_turn);
 int is_repeated_position(uint64_bit key);

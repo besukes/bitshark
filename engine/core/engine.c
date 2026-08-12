@@ -46,7 +46,7 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
     TTEntry * tt_entry = tt_probe(hash_key);
     Jogada * hash_move = (tt_entry != NULL) ? &tt_entry->best_move : NULL;
 
-    moveScoring(jogadas, num_jogadas, hash_move, depth); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
+    moveScoring(game , jogadas, num_jogadas, hash_move, depth , turn); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
     int melhor_eval = -VALOR_INFINITO ,
         alpha = -VALOR_INFINITO,
         beta = VALOR_INFINITO;
