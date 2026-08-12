@@ -47,7 +47,7 @@ int mopup_eval(GameStruct * game , CorPiece op_turn){
         int df = mf>op_file ? mf-op_file : op_file-mf;
         int kings_distance = (dr > df) ? dr : df;
  
-        return 75*op_king_dist_to_center + 35*(7 - kings_distance);
+        return 65*op_king_dist_to_center + 25*(7 - kings_distance);
     }
     return 0;
 }

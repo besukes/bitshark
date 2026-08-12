@@ -66,11 +66,8 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     if (SDL_GetTicks() - initial_time >= time_limit || (e.type == SDL_QUIT)) {
         return FLAG_TIMEOUT;
     }
-
-    if (depth == 0) { // Quando atinge a profundidade 0 ou o jogo acaba, lê a avaliação incremental atual
-        double time = SDL_GetTicks();
-        return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , time , time_limit);
-    }
+    // Quando atinge a profundidade 0 ou o jogo acaba, lê a avaliação incremental atual
+    if (depth == 0) return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , initial_time , time_limit);
 
     Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
@@ -88,34 +85,42 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     int legal_moves = 0;
     hash_key_stack[hash_stack_indx++] = key;
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
-    for (int i = 0; i < num_jogadas; i++) {
-        
-        Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
-        //Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
-        int can_apply_lmr = i >= 3 && depth >= 4 , 
-            isnt_important_move = !best_move->promocao && best_move->peca_capturada == Empty;
-        int applied_reduction = (can_apply_lmr && isnt_important_move) ? lmr_lt[depth][i] : 0;
-        int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) : (depth - 1);
 
+
+    for (int i = 0; i < num_jogadas; i++) {
+        // 0. Incremental Sort & Incremental evaluation , depois de ordenados os moves , começamos por escolher o melhor deles e aplicar uma
+        // incremental evaluation ao move atual , de modo a não ter de recalcular a evaluation em todas as folhas da search tree
+        Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
         int delta = applyDeltaMove(game,best_move,turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
-        if(!in_check){
-            legal_moves = 1;
-            // Chamada recursiva do NEGAMAX:
-            int eval = -search(game, reduced_depth , -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn);
+        if(!in_check){ // Verifica se a jogada é válida (rei atual não fica em check)
+            // 1. Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
+            int can_apply_lmr = i >= 3 && depth >= 3 , 
+                isnt_important_move = !best_move->promocao && best_move->peca_capturada == Empty;
+            int applied_reduction = (can_apply_lmr && isnt_important_move) ? lmr_lt[depth][i] : 0;
+            int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) : (depth - 1);
+
+            // 2. Principal Variation Search , depois do primeiro move , procura numa window [alpha,alpha+1] ao invés de [alpha,beta
+            // Se esse move ultrapassar alpha , então pvs foi refutado , e portanto procuramos na full window [alpha,beta]
+            int pvs_beta = (i==0) ? beta : (alpha + 1); //Define a janela
+            legal_moves = 1; //Para verificações de checkmate
+            // 3. Chamada recursiva do NEGAMAX:
+            int eval = -search(game, reduced_depth , -pvs_beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn);
             // So faz full depth search se a jogada for muito boa , dentro da janela alpha-beta
-            if(applied_reduction && eval > alpha && eval < beta)
-                eval = -search(game , depth - 1 , -beta , -alpha , wb_eval+delta , initial_time , time_limit, op_turn);
+            // Volta a procurar com null window
+            if(applied_reduction && eval > alpha)
+                    eval = -search(game , depth - 1 , -pvs_beta , -alpha , wb_eval+delta , initial_time , time_limit, op_turn);
+            // Re-pesquisa na profundidade normal com JANELA CHEIA
+            if (eval > alpha && eval < beta && i > 0)
+                eval = -search(game, depth - 1, -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn);
             undoMove(game,best_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if ((-eval) == FLAG_TIMEOUT) {
                 hash_stack_indx--;
                 return FLAG_TIMEOUT;
             }
-            if(eval > best_score){
-                best_score = eval;
-                best_move_found = *best_move;
-            }
+            // Se a nova eval for melhor do que a ultima que tinhamos arranjado , entao
+            if(eval > best_score){best_score = eval;best_move_found = *best_move;}
             // 4. PODA ALPHA-BETA (Pruning):
             // Se a avaliação atual ultrapassa o Beta do adversário, ele nunca deixará esta posição acontecer.
             if (eval >= beta) {
@@ -126,6 +131,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
 
                     history_table[best_move->peca_movida][best_move->destino] += depth * depth; // Atualiza a tabela de histórico
                 }
+                // Guardamos um move na transposition table como um LOWERBOUND (causou beta pruning antes)
                 tt_store(key, depth, beta, TT_LOWERBOUND, *best_move);
                 hash_stack_indx--;
                 return beta;
@@ -135,6 +141,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         else undoMove(game,best_move,turn);
     }
     hash_stack_indx--;
+    //Se não tiverem sido executado moves nenhuns , então é porque os movimentos eram inválidos
     if(!legal_moves){
         if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
             return (-VALOR_INFINITO + depth - mopup_eval(game,turn)); // Xeque-mate ,prioriza mates mais rápidos e com o rei nos cantos do tabuleiro
