@@ -161,7 +161,8 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
     int see = piece_taken_value;
     uint64_bit pos_attks[2][NUMBER_PIECES] = {0};
     int attackers[2][NUMBER_PIECES] = {0};
-    int captures_available = 0 , end_see = 1; //Only for tests
+    int captures_available = 0 , 
+        end_see = 0; // For tests it could be turned to 1
     uint64_bit occupied_sq = game->estadoJogo.bitboard_todas_pieces &= ~(pos_cap | (1ULL<<jogada->origem));
 
     while(!end_see){
@@ -188,7 +189,7 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
             }
         }
         cur_turn = (turn==brancas) ? pretas : brancas;
-        if(!captures_available || (see<0 && cur_turn != turn)) end_see = 1;
+        if(!captures_available || ( see < 0 && cur_turn != turn)) end_see = 1;
     }
     return see;
 }
