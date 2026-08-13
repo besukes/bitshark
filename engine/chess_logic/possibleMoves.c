@@ -122,16 +122,21 @@ uint64_bit get_king_moves(uint64_bit pos){
 }
 
 
+uint64_bit get_enpassant_move(uint64_bit pawn_atks , uint64_bit pos_enpassant){
+    return (pawn_atks & pos_enpassant);
+}
+
 
 uint64_bit get_possible_pawn_moves(uint64_bit pos,uint64_bit bitboard_pieces,CorPiece turno,uint64_bit (*func)(uint64_bit,int),GameStruct * game){
     uint64_bit oposto = (turno==brancas) ? game->estadoJogo.bitboard_pretas : game->estadoJogo.bitboard_brancas;
     uint64_bit fst_step = func(pos,8) & ~bitboard_pieces;
+    uint64_bit pawn_attacks = get_pawn_attacks(pos,turno);
     if(pawnFirstRank(pos,turno)){
         uint64_bit snd_step = (fst_step) ? ( func(pos,16) & ~bitboard_pieces ) : 0;
-        return ( fst_step | snd_step | ( get_pawn_attacks(pos,turno) & oposto) );
+        return ( fst_step | snd_step | ( pawn_attacks & oposto));
     }
     else{
-        return ( fst_step | ( get_pawn_attacks(pos,turno) & oposto) );
+        return ( fst_step | ( pawn_attacks & oposto) | get_enpassant_move(pawn_attacks,game->estadoJogo.enpassant));
     }
 }
 
@@ -189,8 +194,11 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
     jogada->especial = piece == King  && is_castelling_king(game,cor,pos_dest);
     if(jogada->especial) jogada->especial = FLAG_CASTLE;
     else jogada->especial = 0;
-    int enpassant = can_en_passant(game,jogada,cor);
-    if(enpassant) jogada->especial = FLAG_ENPASSANT;
+    int enpassant = ((pos_dest & game->estadoJogo.enpassant) && (piece == Pawn));
+    if(enpassant){
+        jogada->especial = FLAG_ENPASSANT;
+        jogada->peca_capturada = Pawn;
+    }
     return (move != 0 || jogada->especial == FLAG_CASTLE || jogada->especial == FLAG_ENPASSANT);
 }
 
@@ -219,9 +227,6 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
                 int is_promoting = (piece == Pawn) && is7thRank(single_piece,cor) && pawnPromoting(single_attack,cor);
                 Boolean flags_are_respected = !only_captures || jogada.peca_capturada != Empty;
                 if (flags_are_respected && isPseudoValidMove(game, &jogada, cor , single_attack)){
-                    if(jogada.especial == FLAG_ENPASSANT){
-                        jogada.peca_capturada = Pawn; // en passant come um peão fora da casa de destino
-                    }
                     if(is_promoting){
                         jogada.promocao = Queen;
                         jogadas[num_jogadas++] = jogada;

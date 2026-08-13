@@ -14,7 +14,7 @@ void softReset(GameStruct * game){
 //teste temporario do bot , temos de mudar eventualmente
 //&& game->turnoJogador == brancas
 void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event , Mix_Chunk * sfxarray[]){
-    CorPiece turno_j = brancas;
+    CorPiece turno_j = pretas;
     if(game->turnoJogador == pretas){
         GameStruct game_aux = *game;
         game_aux.indx_lastmoves = 0;
@@ -33,7 +33,6 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
             settings->screen = WinScreen;
         }
         notInCheck(game);
-        update_en_passant(game,&best_move,pretas);
         game->promoted.pawnPromoted = 0;
         updateScore(game,&best_move,brancas);
         if(best_move.peca_capturada != Empty) capturepiece_sfx(sfxarray);
@@ -64,7 +63,6 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
             settings->screen = WinScreen;
         }
         notInCheck(game);
-        update_en_passant(game,&best_move,brancas);
         game->promoted.pawnPromoted = 0;
         updateScore(game,&best_move,pretas);
         if(best_move.peca_capturada != Empty) capturepiece_sfx(sfxarray);

@@ -93,7 +93,8 @@ void undoMove(GameStruct * game , Jogada * jogada , CorPiece turn){
         uint64_bit captured_pos = 1ULL<<jogada->destino;
         undoPieceComida(game,cor_oposta,captured_pos,op_turn,jogada->peca_capturada);
     }
+    int pos_passant = jogada->prev_enpassant;
     game->estadoJogo.canCastle[turn][Short] = jogada->prev_castlerights[Short];
     game->estadoJogo.canCastle[turn][Long] = jogada->prev_castlerights[Long];
-    game->estadoJogo.enpassant = (1ULL<<jogada->prev_enpassant);
+    game->estadoJogo.enpassant = (pos_passant) ? (1ULL<<pos_passant) : 0;
 }

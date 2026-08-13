@@ -83,4 +83,5 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
         }
     }
     verifica_direito_castle(game,jogada,turno);
+    update_en_passant(game,jogada,turno);
 }

@@ -4,10 +4,10 @@
 
 
 void update_en_passant(GameStruct * game , Jogada * jogada , CorPiece turno){
+    if(jogada->peca_movida != Pawn) return;
     uint64_bit coords = 1ULL<<jogada->origem;
     uint64_bit click = 1ULL<<jogada->destino;
-    Pieces piece = jogada->peca_movida;
-    if(pawnFirstRank(coords,turno) && piece == Pawn){
+    if(pawnFirstRank(coords,turno)){
         if(turno==brancas && (click == (coords << 16))) game->estadoJogo.enpassant = (coords << 8);
         else if(turno==pretas && (click == (coords >> 16))) game->estadoJogo.enpassant = (coords >> 8);
     }
