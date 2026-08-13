@@ -62,6 +62,14 @@ void verifica_direito_castle(GameStruct * game , Jogada * jogada , CorPiece turn
             if(cur_pos == (1ULL<<A8)) game->estadoJogo.canCastle[turn][Long] = 0;
         }
     }
+    else if(turn == brancas){
+        if(jogada->destino == A8) game->estadoJogo.canCastle[pretas][Long] = 0;
+        else if(jogada->destino == H8) game->estadoJogo.canCastle[pretas][Short] = 0;
+    }
+    else if(turn == pretas){
+        if(jogada->destino == A1) game->estadoJogo.canCastle[brancas][Long] = 0;
+        else if(jogada->destino == H1) game->estadoJogo.canCastle[brancas][Short] = 0;
+    }
 }
 
 

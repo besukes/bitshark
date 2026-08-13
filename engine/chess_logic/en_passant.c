@@ -17,11 +17,10 @@ void update_en_passant(GameStruct * game , Jogada * jogada , CorPiece turno){
 
 
 Boolean can_en_passant(GameStruct * game , Jogada * j, CorPiece turn){
-    if(j->peca_movida == Empty || j->destino >= 64 || j->origem >= 64) return 0;
-    uint64_bit drop = 1ULL<<j->destino;
     Pieces piece = j->peca_movida;
+    if(piece != Pawn || game->estadoJogo.enpassant == 0 || j->destino >= 64 || j->origem >= 64) return 0;
+    uint64_bit drop = 1ULL<<j->destino;
     uint64_bit cur_pos = 1ULL<<j->origem;
-    if(piece != Pawn || game->estadoJogo.enpassant == 0) return 0;
     uint64_bit passant = game->estadoJogo.enpassant;
     int pos_tab_drop = posTabuleiro(drop) , pos_tab_piece = posTabuleiro(cur_pos);
     int pos_passant = posTabuleiro(passant) , pos1 = 0 , pos2 = 0;

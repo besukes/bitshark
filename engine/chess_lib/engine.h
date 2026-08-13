@@ -27,18 +27,17 @@ typedef unsigned long long uint64_bit;
 typedef uint64_bit (*ShiftFunction)(uint64_bit,int); //Tipo que define um endereço de memória de uma função que recebe um unsigned long long de 64 bits e um int normal
 
 
-// Estrutura leve para Bitboards (6 bytes)
-typedef struct {
-    uint8_t origem;
-    uint8_t destino;
-    uint8_t peca_movida;
-    uint8_t peca_capturada;
-    uint8_t promocao;
-    uint8_t especial;
-    int score;
-
-    int prev_in_check[2]; //Informa se o reis estão em check
-    int prev_castlerights[2][2]; //Matriz de possibilidades de dar castle
+// Estrutura leve para Bitboards para guardar jogadas (12 bytes)
+typedef struct Jogada{
+    uint8_t origem; // Guarda a posição de onde veio a peça movida
+    uint8_t destino; // Guarda a posição para onde foi a peça movida
+    uint8_t peca_movida; // Guarda a informação de qual peça foi movida
+    uint8_t peca_capturada; // Guarda a informação de qual peça foi capturada no square destino , caso tenha sido
+    uint8_t promocao; // Informa se está ou não a haver uma promoção com este move , e guarda a peça à qual está a ser promovido o peão
+    uint8_t especial; // Informa se o move é "especial" , ou seja , enpassant ou castle
+    int score; // Guarda o score desta jogada em termos de relevância teórica
+    uint8_t prev_enpassant; //Guarda o estado anterior do enpassant
+    uint8_t prev_castlerights[2]; //Matriz de possibilidades de dar castle
 } Jogada;
 
 extern Jogada killer_moves[MAX_DEPTH_SEARCH][2]; //Armazena os killer moves para cada profundidade de busca
@@ -144,14 +143,6 @@ typedef struct EstadoJogo{
 
 
 
-/*Linked List que guarda a piece que foi comida na jogada anterior , para depois desfazer a jogada , caso seja necessário*/
-typedef struct PecasComidas{
-    uint64_bit pos_de_piece;
-    Pieces tipo_piece;
-    CorPiece cor_piece;
-} PecaComida;
-
-
 /*Struct responsável por guardar as informações sobre os peões se estão ou não a ser promovidos , se o peão foi promovido de forma correta
 e o quadrado onde a promoção está a acontecer*/
 typedef struct PromotedInformation{
@@ -174,7 +165,6 @@ typedef struct GameStruct{
     CorPiece turnoJogador; //Guarda o turno do utilizador 
     TipoJogada jogada; //Guarda informacao sobre a jogada do utilizador
     int indx_lastmoves; //Guarda o número de pecas ja comidas no jogo
-    PecaComida lastmoves[30]; //Guarda a peça que foi comida na jogada anterior , para depois desfazer a jogpíxeisada , caso seja necessário
     PromotedInformation promoted; //Guarda informações sobre se uma promotion aconteceu e onde ela ocorreu
     ArrowsGame arrows; //Guarda informações sobre se existem ou não setas desenhadas pelo utilizador e onde elas se encontram desenhadas
     int score_game; //Guarda o score do jogo (diferenca de pecas comidas)

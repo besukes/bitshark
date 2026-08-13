@@ -180,8 +180,6 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
     Pieces piece = jogada->peca_movida;
     uint64_bit pos_mesma_cor = get_same_colour_bitboard(&(game->estadoJogo),cor);
     uint64_bit move = (~pos_mesma_cor & (pos_attacks & pos_dest));
-    int is_promoting = ( (jogada != 0) && (piece == Pawn) && pawnPromoting(pos_dest,cor) );
-    jogada->promocao = (is_promoting) ? Queen : 0;
     jogada->especial = piece == King  && is_castelling_king(game,cor,pos_dest);
     if(jogada->especial) jogada->especial = FLAG_CASTLE;
     else jogada->especial = 0;
@@ -195,9 +193,9 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
     uint64_bit * oposto = (cor==brancas) ? &(game->estadoJogo.bitboard_pretas) : &(game->estadoJogo.bitboard_brancas);
     CorPiece op_cor = (cor==brancas) ? pretas : brancas;
     int num_jogadas = 0;
-    uint64_bit prev_enpassant = game->estadoJogo.enpassant;
-    int prev_canCastleShort = game->estadoJogo.canCastle[cor][Short];
-    int prev_canCastleLong = game->estadoJogo.canCastle[cor][Long];
+    uint64_bit enpassant_pos = game->estadoJogo.enpassant;
+    int canCastleShort = game->estadoJogo.canCastle[cor][Short];
+    int canCastleLong = game->estadoJogo.canCastle[cor][Long];
     for (int i = NUMBER_PIECES - 1; i >= 0; i--) {
         Pieces piece = (Pieces)i;   
         uint64_bit bitboard = game->estadoJogo.tabuleirojogo[cor][piece];
@@ -209,12 +207,26 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
                 uint64_bit single_attack = attacks & (-attacks);
                 Pieces p_cap = comparePiece(&game->estadoJogo,op_cor,single_attack);
                 Jogada jogada = {.origem = (uint8_t)posTabuleiro(single_piece), .destino = (uint8_t)posTabuleiro(single_attack), .peca_movida = piece, 
-                                .peca_capturada = p_cap, .promocao = 0, .especial = 0 , .score = 0};
+                                .peca_capturada = p_cap, .promocao = 0, .especial = 0 , .score = 0 , 
+                                .prev_castlerights[Short] = canCastleShort , .prev_castlerights[Long] = canCastleLong ,
+                                .prev_enpassant = posTabuleiro(enpassant_pos)};
+                int is_promoting = (piece == Pawn) && pawnPromoting(single_attack,cor);
                 Boolean flags_are_respected = !only_captures || jogada.peca_capturada != Empty;
                 if ( flags_are_respected && isPseudoValidMove(game, &jogada, cor , single_attack) ){
                     if(jogada.especial == FLAG_ENPASSANT){
                         jogada.peca_capturada = Pawn; // en passant come um peão fora da casa de destino
                     }
+                    if(is_promoting){
+                        jogada.promocao = Queen;
+                        jogadas[num_jogadas++] = jogada;
+                        jogada.promocao = Horse;
+                        jogadas[num_jogadas++] = jogada;
+                        jogada.promocao = Bishop;
+                        jogadas[num_jogadas++] = jogada;
+                        jogada.promocao = Rook;
+                    }
+                    // Caso seja promocao , ou nao , temos sempre que adicionar mais uma jogada no final
+                    // Fica mais limpo o codigo assim
                     jogadas[num_jogadas++] = jogada;
                 }
                 attacks &= attacks - 1; // Remove esse bit
@@ -222,9 +234,6 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
             bitboard &= bitboard - 1; // Remove esse bit
         }
     }
-    game->estadoJogo.enpassant = prev_enpassant;
-    game->estadoJogo.canCastle[cor][Short] = prev_canCastleShort;
-    game->estadoJogo.canCastle[cor][Long] = prev_canCastleLong;
     return num_jogadas;
 }
 

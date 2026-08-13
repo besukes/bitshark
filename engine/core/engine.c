@@ -54,7 +54,9 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
     Jogada best_move = {.origem = 64, .destino = 64, .peca_movida = Empty, .peca_capturada = Empty, .promocao = 0, .especial = 0};
 
     int orig_alpha = alpha;
+    SDL_Event e;
     for (int i = 0; i < num_jogadas; i++) {
+        SDL_PollEvent(&e);
         Jogada * cur_move = pick_best_move(jogadas, num_jogadas, i);
         CorPiece op_turn = (turn == brancas) ? pretas : brancas;
         // Aplica a jogada nas Bitboards e atualiza a Avaliação Incremental (Delta)

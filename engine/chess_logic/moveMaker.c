@@ -81,5 +81,6 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
         if(jogada->promocao){
             promotePiece(game,Queen,click,turno);
         }
-    } 
+    }
+    verifica_direito_castle(game,jogada,turno);
 }

@@ -81,9 +81,6 @@ TipoJogada check_move(GameStruct * game, Jogada * jogada , CorPiece turno){
     else if( jogada->especial == FLAG_CASTLE && invalidCastle(game,jogada->destino,turno)){
         return Invalid;
     }
-    else{
-        verifica_direito_castle(game,jogada,turno);
-    }
 
     GameStruct game_aux = *game;
     game_aux.indx_lastmoves = 0;
