@@ -79,7 +79,7 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
                    * bit_global = &(game->estadoJogo.bitboard_todas_pieces);
         efetuaJogada(bit_piece,bit_global,1ULL<<jogada->origem,click,bitboard_cor_turno);
         if(jogada->promocao){
-            promotePiece(game,Queen,click,turno);
+            promotePiece(game,jogada->promocao,click,turno);
         }
     }
     verifica_direito_castle(game,jogada,turno);
