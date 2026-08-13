@@ -163,7 +163,7 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
     int attackers[2][NUMBER_PIECES] = {0};
     int captures_available = 0 , 
         end_see = 0; // For tests it could be turned to 1
-    uint64_bit occupied_sq = game->estadoJogo.bitboard_todas_pieces &= ~(pos_cap | (1ULL<<jogada->origem));
+    uint64_bit occupied_sq = game->estadoJogo.bitboard_todas_pieces & ~(pos_cap | (1ULL<<jogada->origem));
 
     while(!end_see){
         captures_available = 0;
