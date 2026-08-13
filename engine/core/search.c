@@ -80,7 +80,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     if(move_eval != 0) return move_eval;
     moveScoring(game,jogadas, num_jogadas, hash_move , depth , turn); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
     
-    int best_score = -VALOR_INFINITO - 1;
+    int best_score = -2*VALOR_INFINITO;
     Jogada best_move_found = jogadas[0];
     int legal_moves = 0;
     hash_key_stack[hash_stack_indx++] = key;

@@ -36,6 +36,9 @@ typedef struct {
     uint8_t promocao;
     uint8_t especial;
     int score;
+
+    int prev_in_check[2]; //Informa se o reis estão em check
+    int prev_castlerights[2][2]; //Matriz de possibilidades de dar castle
 } Jogada;
 
 extern Jogada killer_moves[MAX_DEPTH_SEARCH][2]; //Armazena os killer moves para cada profundidade de busca
