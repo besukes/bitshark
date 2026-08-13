@@ -165,6 +165,12 @@ uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , Cor
     }
 }
 
+int is7thRank(uint64_bit pos_piece , CorPiece turn){
+    int postab = posTabuleiro(pos_piece);
+    if(turn == brancas && 48 <= postab && postab<  56) return 1;
+    else if(turn == pretas && 8 <= postab && postab < 16) return 1;
+    return 0;
+}
 
 int pawnPromoting(uint64_bit pos,CorPiece cor){
    int posTab = posTabuleiro(pos);
@@ -210,7 +216,7 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
                                 .peca_capturada = p_cap, .promocao = 0, .especial = 0 , .score = 0 , 
                                 .prev_castlerights[Short] = canCastleShort , .prev_castlerights[Long] = canCastleLong ,
                                 .prev_enpassant = posTabuleiro(enpassant_pos)};
-                int is_promoting = (piece == Pawn) && pawnPromoting(single_attack,cor);
+                int is_promoting = (piece == Pawn) && is7thRank(single_piece,cor) && pawnPromoting(single_attack,cor);
                 Boolean flags_are_respected = !only_captures || jogada.peca_capturada != Empty;
                 if ( flags_are_respected && isPseudoValidMove(game, &jogada, cor , single_attack) ){
                     if(jogada.especial == FLAG_ENPASSANT){
