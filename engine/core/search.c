@@ -148,7 +148,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     //Se não tiverem sido executado moves nenhuns , então é porque os movimentos eram inválidos
     if(!legal_moves){
         if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
-            return (-VALOR_INFINITO + ply - mopup_eval(game,turn)); // Xeque-mate ,prioriza mates mais rápidos e com o rei nos cantos do tabuleiro
+            return (-VALOR_INFINITO + ply); // Xeque-mate ,prioriza mates mais rápidos
         }
         return 0; // Empate por afogamento
     }
