@@ -156,40 +156,42 @@ uint64_bit get_see_piece_attacks(uint64_bit single , Pieces piece , uint64_bit o
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
     CorPiece cur_turn = (turn==brancas) ? pretas : brancas;
     uint64_bit pos_cap = 1ULL<<jogada->destino;
-    int piece_taken_value = pieces_value[jogada->peca_capturada],
-        piece_taker_value = pieces_value[jogada->peca_movida];
-    int see = piece_taken_value;
-    uint64_bit pos_attks[2][NUMBER_PIECES] = {0};
-    int attackers[2][NUMBER_PIECES] = {0};
-    int captures_available = 0 , 
-        end_see = 0; // For tests it could be turned to 1
     uint64_bit occupied_sq = game->estadoJogo.bitboard_todas_pieces & ~(pos_cap | (1ULL<<jogada->origem));
+    int see[32]; see[0] = pieces_value[jogada->peca_capturada];
+    int indx = 0;
+    int current_piece_value = pieces_value[jogada->peca_movida];
+    int end_see = 0; // For tests it could be turned to 1
 
     while(!end_see){
-        captures_available = 0;
+        indx++;
+        see[indx] = current_piece_value - gain[indx-1];
+        uint64_bit attacker_bit = 0;
+        int attacker_type = 0;
         for(int i=1;i<NUMBER_PIECES;i++){
             uint64_bit positions_piece = game->estadoJogo.tabuleirojogo[cur_turn][i];
             int exist_attackers = attackers[cur_turn][i] > 0;
-            if(!exist_attackers){
-                while(positions_piece != 0){
-                    uint64_bit single_pos = positions_piece & (-positions_piece);
-                    pos_attks[cur_turn][i] |= (get_see_piece_attacks(single_pos,(Pieces)i,occupied_sq,cur_turn) & pos_cap);
-                    if(pos_attks[cur_turn][i] != 0) attackers[cur_turn][i]++;
-                    occupied_sq &= ~single_pos;
-                    positions_piece &= (positions_piece - 1); // Remove esse bit
+            while(positions_piece != 0){
+                uint64_bit single_pos = positions_piece & (-positions_piece);
+                if(get_see_piece_attacks(single_pos,(Pieces)i,occupied_sq,cur_turn) & pos_cap){
+                    attacker_type = i;
+                    attacker_bit = single_pos;
                 }
-            }
-            int exist_captures = exist_attackers || (pos_attks[cur_turn][i] != 0);
-            if(exist_captures){
-                see = (cur_turn != turn) ? (see - piece_taker_value) : (see + piece_taker_value);
-                piece_taker_value = pieces_value[i];
-                attackers[cur_turn][i] -= (exist_attackers) ? 1 : 0;
-                captures_available = 1;
-                break;
+                positions_piece &= (positions_piece - 1); // Remove esse bit
+                if(attacker_bit) break;
             }
         }
-        cur_turn = (turn==brancas) ? pretas : brancas;
-        if(!captures_available || ( see < 0 && cur_turn != turn)) end_see = 1;
+        if(!attacker_bit) end_see = 1;
+        else{
+            occupied_sq &= ~attacker_bit;
+            current_piece_value = pieces_value[attacker_type];
+            cur_turn = (cur_turn==brancas) ? pretas : brancas;
+        }
     }
-    return see;
+    // Minimax backpropagation (standing pat option)
+    while (--d > 0) {
+        if (see[d - 1] < -see[d]) {
+            see[d - 1] = -see[d];
+        }
+    }
+    return see[0];
 }
