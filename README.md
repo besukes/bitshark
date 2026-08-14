@@ -70,7 +70,7 @@ Para abrir o programa basta executar o comando
 ```
 ./bshark
 ```
-Pode também executar o comando , para verificar os NPS da engine , em posições pré-calculadas , tal como a depth que ela atinge , em média , em cada fase do jogo.
+Pode também executar o seguinte comando , para verificar os NPS da engine , em posições pré-calculadas , tal como a depth que ela atinge , em média , em cada fase do jogo.
 
 ```
 make bench
