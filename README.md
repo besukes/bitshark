@@ -37,7 +37,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
   * Opening Book (Under Work)
   * Killer Moves
   * Move Heuristics
-* Magic Bitboards (Under Work)
+* Magic Bitboards
 
 
 ## Estrutura do Projeto
