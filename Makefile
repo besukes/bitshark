@@ -48,6 +48,37 @@ clean:
 	rm -rf build
 	rm bshark
 
+
+bench: bench_nps
+	./bench_nps
+
+cleanb:
+	rm bench_nps
+ 
+BENCH_SRC = engine/chess_logic/castle_logic.c \
+		engine/chess_logic/checkAndCheckmate.c \
+		engine/chess_logic/chess_important.c \
+		engine/chess_logic/en_passant.c \
+		engine/chess_logic/moveMaker.c \
+		engine/chess_logic/possibleMoves.c \
+		engine/chess_logic/undoMove.c \
+		engine/core/engine.c \
+		engine/core/evaluation.c \
+		engine/core/moves.c \
+		engine/core/search.c \
+		engine/core/transposition.c \
+		engine/core/initLT.c \
+		gui/initialization/initTabuleiro.c \
+		gui/interface/corefunctions.c \
+		benchmarks/bench_nps.c \
+		benchmarks/bench_globals.c
+ 
+# Benchmark de nodes/segundo, isolado do GUI (nao precisa de SDL_image/mixer/ttf/assets).
+# Usa o mesmo orcamento de tempo por jogada (3s) que o motor usa em jogo real.
+bench_nps: $(BENCH_SRC)
+	$(CC) -Wall -O3 -flto -DNDEBUG -I. -Iengine/chess_lib $(BENCH_SRC) -o $@ -lSDL2 -lm
+
+
 check:
 	@command -v gcc >/dev/null 2>&1 || { echo "gcc not installed"; exit 1; }
 	@command -v make >/dev/null 2>&1 || { echo "make not installed"; exit 1; }
