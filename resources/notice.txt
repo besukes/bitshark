@@ -1,0 +1,4 @@
+
+
+I still havent implemented Book moves onto the chess engine , nor have I created my own magic numbers , tho i did implement
+magic moves generation and am now testing it to see the ammount of performance the program actually gained

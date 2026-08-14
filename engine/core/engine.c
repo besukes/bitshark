@@ -123,6 +123,7 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
     double initial_time = SDL_GetTicks();
     int reached_depth = 0;
     jogadabot best_jogada = {0};
+    total_nodes_searched = 0;
     if(is_interative_deepening){
         best_jogada = iterative_deepening(game,turn,&reached_depth);
     }

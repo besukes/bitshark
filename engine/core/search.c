@@ -9,6 +9,7 @@
 
 int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorPiece turn , int q_depth , int init_time , int max_time){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+    total_nodes_searched++;
     int stc_eval = quiescence_eval; // Avaliação estática da posição atual
     //Como depth agora é 0  , é seguro usar mopup evaluation aqui , pois assim não ha inflação de valores
     //Est_eval nunca é usada para além de verificações
@@ -37,25 +38,27 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
 
     for (int i = 0; i < num_jogadas; i++){
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
-        int delta = applyDeltaMove(game,best_move,turn,op_turn);
-        if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
-            int eval = -quiescence(game, -beta, -alpha, quiescence_eval + delta, op_turn , q_depth + 1 , init_time , max_time);
-            undoMove(game,best_move,turn);
-            if(eval > best_eval){
-                best_eval = eval;
-                best_move_found = *best_move;
+        if(1){ //Deveria ser if(best_move->score >= 0) mas contem bugs
+            int delta = applyDeltaMove(game,best_move,turn,op_turn);
+            if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
+                int eval = -quiescence(game, -beta, -alpha, quiescence_eval + delta, op_turn , q_depth + 1 , init_time , max_time);
+                undoMove(game,best_move,turn);
+                if((-eval) == FLAG_TIMEOUT) {
+                    return FLAG_TIMEOUT;
+                }
+                if(eval > best_eval){
+                    best_eval = eval;
+                    best_move_found = *best_move;
+                }
+                if (eval >= beta){
+                    history_table[jogadas[i].peca_movida][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
+                    tt_store(key, 0 , beta, TT_LOWERBOUND, *best_move);
+                    return beta;
+                }
+                alpha = (eval > alpha) ? eval : alpha;
             }
-            if (eval >= beta){
-                history_table[jogadas[i].peca_movida][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
-                tt_store(key, 0 , beta, TT_LOWERBOUND, *best_move);
-                return beta;
-            }
-            if((-eval) == FLAG_TIMEOUT) {
-                return FLAG_TIMEOUT;
-            }
-            alpha = (eval > alpha) ? eval : alpha;
+            else undoMove(game,best_move,turn);
         }
-        else undoMove(game,best_move,turn);
     }
     TTFlag flag = (best_eval > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
     tt_store(key, 0 , alpha, flag, best_move_found);
@@ -66,6 +69,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
 
 // A função Search usando Negamax + Alpha-Beta
 int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply){
+    total_nodes_searched++;
     if (SDL_GetTicks() - initial_time >= time_limit) {
         return FLAG_TIMEOUT;
     }

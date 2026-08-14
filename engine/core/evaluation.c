@@ -59,7 +59,7 @@ int is_defended_piece(uint64_bit pos , Pieces type , CorPiece turn , GameStruct 
         uint64_bit tab = game->estadoJogo.tabuleirojogo[turn][i];
         while(tab){
             uint64_bit single = tab & (-tab); // isola o bit mais baixo
-            uint64_bit atks = get_piece_attacks(single,(Pieces)i,game,turn,1);
+            uint64_bit atks = get_magic_piece_attacks(single,(Pieces)i,game,turn,1);
             if((atks&pos) != 0) return 1;
             tab &= tab - 1; // remove esse bit
         }
@@ -245,26 +245,21 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
     uint64_bit pieces_checked[2][NUMBER_PIECES] = {0};
     int indx = 0;
     int current_piece_value = pieces_value[jogada->peca_movida];
-    int king_has_taken = 0 , end_see = 0; // For tests it could be turned to 1
+    int king_has_taken = 0 , end_see = 0; // For tests it could be turned to 12
 
     while(!end_see){
-        indx++;
-        see[indx] = current_piece_value - see[indx-1];
         uint64_bit attacker_bit = 0;
         int attacker_type = 0;
         for(int i=1;i<NUMBER_PIECES;i++){
-            uint64_bit positions_piece = game->estadoJogo.tabuleirojogo[cur_turn][i];
+            uint64_bit positions_piece = game->estadoJogo.tabuleirojogo[cur_turn][i] & (~pieces_checked[cur_turn][i]);
             while(positions_piece != 0){
                 uint64_bit single_pos = positions_piece & (-positions_piece);
-                if(!(single_pos & pieces_checked[cur_turn][i])){
-                    pieces_checked[cur_turn][i] |= single_pos;
-                    if(get_SEE_ray(single_pos,(Pieces)i,occupied_sq,cur_turn,pos_cap) & pos_cap){
-                        attacker_type = i;
-                        attacker_bit = single_pos;
-                    }
+                if(get_magic_piece_attacks(single_pos,(Pieces)i,game,turn,0) & pos_cap){
+                    attacker_type = i;
+                    attacker_bit = single_pos;
+                    break;
                 }
                 positions_piece &= (positions_piece - 1); // Remove esse bit
-                if(attacker_bit) break;
             }
             if(attacker_bit) break;
         }
@@ -279,6 +274,9 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
             end_see = 1;
         }
         else{
+            indx++;
+            see[indx] = current_piece_value - see[indx-1];
+            pieces_checked[cur_turn][attacker_type] |= attacker_bit;
             occupied_sq &= ~attacker_bit;
             current_piece_value = pieces_value[attacker_type];
             cur_turn = (cur_turn==brancas) ? pretas : brancas;
@@ -288,9 +286,9 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
     /* This works by checking if (indx-1) player will rather recapture on each instance or not , as if -see[indx] is inferior too see[indx-1] , 
     that would mean that player (indx-1) is losing material in that capture , because see[indx] would then be greater than see[indx-1] , indicating
     material win.*/
-    while (--indx > 0) {
-        if (-see[indx] < see[indx - 1]) {
-            see[indx - 1] = -see[indx];
+    for(int i=indx; i > 0 ; i--){
+        if (-see[i] < see[i - 1]) {
+            see[i - 1] = -see[i];
         }
     }
     return see[0];

@@ -42,11 +42,13 @@ void moveScoringCaptures(GameStruct * game ,Jogada * jogadas , int num_jogadas ,
                     moved, captured, atual->destino);
             }
             else{
-                atual->score = mvv_lva_table[captured][moved];
-                atual->score += history_table[moved][atual->destino];
                 int see = static_exchange_eval(game,atual,turn);
-                if(see<0) atual->score -= 100000;
-                else atual->score += see;
+                if(see<0) atual->score = see;
+                else{
+                    atual->score = mvv_lva_table[captured][moved];
+                    atual->score += history_table[moved][atual->destino];
+                    atual->score += see;
+                }
             }
         }
     }

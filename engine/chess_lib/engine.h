@@ -53,6 +53,8 @@ extern uint64_bit hash_key_stack[2048];
 
 extern int lmr_lt[MAX_DEPTH_SEARCH][256];
 
+extern unsigned long total_nodes_searched;
+
 typedef int Boolean; //Forma mais intuitiva de perceber quando as variáveis são usadas como valores lógicos.
 
 typedef struct Coordenadas{
@@ -289,9 +291,11 @@ uint64_bit get_sliding_attacks(uint64_bit piece_pos, uint64_bit pos_limites);
 uint64_bit get_cross_attacks(uint64_bit piece_pos , uint64_bit pos_limites);
 uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game,CorPiece cor_turno , int only_captures);
 uint64_bit get_king_moves(uint64_bit pos);
+uint64_bit get_possible_pawn_moves(uint64_bit pos,uint64_bit bitboard_pieces,CorPiece turno,uint64_bit (*func)(uint64_bit,int),GameStruct * game);
 void king_line_dependant_moves(uint64_bit * atk ,uint64_bit (*func)(uint64_bit,int),uint64_bit pos_rei , uint64_bit colunaA , uint64_bit colunaH);
 int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int only_captures);
 void get_attacks(int max , uint64_bit (*func)(uint64_bit,int),uint64_bit pos_limites,uint64_bit pos_piece,int shift ,uint64_bit * atk);
+uint64_bit get_castle_moves(uint64_bit pos , uint64_bit bb_pieces , GameStruct * game , CorPiece turn);
 
 
 
@@ -420,3 +424,8 @@ TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * bet
 /// LookUp Table init //////////////////////
 
 void init_lmrLT_table();
+
+/// MAGIC MOVES //////////////////////////
+
+void initMagicMoveGeneration(void);
+uint64_bit get_magic_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , CorPiece cor_turno , int only_captures);

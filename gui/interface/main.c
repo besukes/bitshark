@@ -19,6 +19,7 @@ uint64_bit hash_key_stack[2048];
 
 int lmr_lt[MAX_DEPTH_SEARCH][256];
 
+unsigned long total_nodes_searched = 0;
 
 void interfaceCChess(GameStruct * game ,GUISettings * settings , Mix_Chunk * sfxarray[]){
     SDL_Event event;
@@ -68,6 +69,7 @@ int main(void){
     init_lmrLT_table();
     game.cur_pos_key = compute_zobrist(&game,brancas);
     hash_key_stack[hash_stack_indx++] = game.cur_pos_key;
+    initMagicMoveGeneration();
     interfaceCChess(&game,&settings , sfxarray);
     free_allocated_memory(&game,&settings , sfxarray);
     return 0;

@@ -12,6 +12,7 @@ SRC =	engine/chess_logic/castle_logic.c \
 		engine/chess_logic/moveMaker.c \
 		engine/chess_logic/possibleMoves.c \
 		engine/chess_logic/undoMove.c \
+		engine/chess_logic/magicMoves.c \
 		engine/core/engine.c \
 		engine/core/evaluation.c \
 		engine/core/moves.c \
@@ -70,8 +71,8 @@ BENCH_SRC = engine/chess_logic/castle_logic.c \
 		engine/core/initLT.c \
 		gui/initialization/initTabuleiro.c \
 		gui/interface/corefunctions.c \
-		benchmarks/bench_nps.c \
-		benchmarks/bench_globals.c
+		resources/benchmarks/bench_nps.c \
+		resources/benchmarks/bench_globals.c
  
 # Benchmark de nodes/segundo, isolado do GUI (nao precisa de SDL_image/mixer/ttf/assets).
 # Usa o mesmo orcamento de tempo por jogada (3s) que o motor usa em jogo real.

@@ -219,7 +219,7 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
         uint64_bit bitboard = game->estadoJogo.tabuleirojogo[cor][piece];
         while (bitboard) {
             uint64_bit single_piece = bitboard & (-bitboard); // Isola o bit mais baixo
-            uint64_bit attacks = get_piece_attacks(single_piece, piece,game, cor,only_captures);
+            uint64_bit attacks = get_magic_piece_attacks(single_piece, piece,game, cor,only_captures);
             if(only_captures) attacks &= *oposto; // Se for apenas capturas, filtra os ataques para incluir apenas as peças do oponente{
             while (attacks) {
                 uint64_bit single_attack = attacks & (-attacks);

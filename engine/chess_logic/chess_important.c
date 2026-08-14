@@ -59,8 +59,8 @@ uint64_bit get_selected_piece_attacks(GameStruct * game , uint64_bit click , Pie
     uint64_bit atk = 0;
     uint64_bit passant = game->estadoJogo.enpassant;
     Jogada j = {.origem = (-1) , .peca_movida = piece};
-    if(can_en_passant(game,&j,turno)) atk = passant | get_piece_attacks(click,piece,game,turno,1);
-    else atk = get_piece_attacks(click,piece,game,turno,1);
+    if(can_en_passant(game,&j,turno)) atk = passant | get_magic_piece_attacks(click,piece,game,turno,1);
+    else atk = get_magic_piece_attacks(click,piece,game,turno,1);
     atk = ~get_same_colour_bitboard(&game->estadoJogo,turno) & atk;
     return atk;
 }
@@ -71,7 +71,7 @@ int is_attacked_piece(uint64_bit is_attacked , Pieces attacked_piece , CorPiece 
     for(int i=0;i<NUMBER_PIECES;i++){
         uint64_bit attacker = game->estadoJogo.tabuleirojogo[turn][i];
         if(attacker!=0 && pieces_value[i] < piece_score){
-            uint64_bit atks = get_piece_attacks(attacker,attacked_piece,game,turn,1);
+            uint64_bit atks = get_magic_piece_attacks(attacker,attacked_piece,game,turn,1);
             if((atks & attacker)!=0) return 1;
         }
     }
