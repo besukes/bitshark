@@ -5,12 +5,12 @@
 #define MAX_ROOK_ATTACKS 4096 // 2^12
 #define MAX_BISHOP_ATTACKS 512 // 2^9
 
-// Precomputed tables stored in memory
+// Precomputed attack tables stored in memory
 uint64_bit rook_attack_table[64][MAX_ROOK_ATTACKS];
 uint64_bit bishop_attack_table[64][MAX_BISHOP_ATTACKS];
 uint64_bit knight_attack_table[64];
 
-// Arrays holding your precomputed magic numbers and masks for each square (0..63)
+// Arrays holding precomputed masks for each square (0..63)
 uint64_bit rook_masks[64];
 uint64_bit bishop_masks[64];
 
@@ -25,9 +25,9 @@ void init_sliding_attack_table(void) {
         // Loop through all 2^n occupancy subsets (Carry-Rippler)
         do {
             // 1. Calculate actual attacks using classical ray-casting
-            uint64_bit attacks = (get_sliding_attacks)(1ULL<<sq,occ);
+            uint64_bit attacks = get_sliding_attacks(1ULL<<sq,occ);
             // 2. Compute the magic index for this specific occupancy
-            int index = (int)((occ * BishopMagics[sq]) >> BishopShifts[sq]);
+            unsigned int index = (unsigned int)((occ * BishopMagics[sq]) >> BishopShifts[sq]);
             // 3. Store the attack bitboard into the lookup table
             bishop_attack_table[sq][index] = attacks;
             // Next occupancy subset
@@ -44,9 +44,9 @@ void init_cross_attack_table(void) {
         // Loop through all 2^n occupancy subsets (Carry-Rippler)
         do {
             // 1. Calculate actual attacks using classical ray-casting
-            uint64_bit attacks = (get_cross_attacks)(1ULL<<sq,occ);
+            uint64_bit attacks = get_cross_attacks(1ULL<<sq,occ);
             // 2. Compute the magic index for this specific occupancy
-            int index = (int)((occ * RookMagics[sq]) >> RookShifts[sq]);
+            unsigned int index = (unsigned int)((occ * RookMagics[sq]) >> RookShifts[sq]);
             // 3. Store the attack bitboard into the lookup table
             rook_attack_table[sq][index] = attacks;
             // Next occupancy subset
@@ -98,14 +98,14 @@ void init_SlidingNdCross_Masks(void){
 
 uint64_bit get_magic_cross_attacks(int square, uint64_bit occupancy){
     uint64_bit occ = occupancy & rook_masks[square];
-    int index = (occ * RookMagics[square]) >> (RookShifts[square]);
+    unsigned int index = (unsigned int)((occ * RookMagics[square]) >> (RookShifts[square]));
     return (rook_attack_table[square][index]);
 }
 
 
 uint64_bit get_magic_sliding_attacks(int square , uint64_bit occupancy){
     uint64_bit occ = occupancy & bishop_masks[square];
-    int index = (occ * BishopMagics[square]) >> (BishopShifts[square]);
+    unsigned int index = (unsigned int)((occ * BishopMagics[square]) >> (BishopShifts[square]));
     return (bishop_attack_table[square][index]);
 }
 
