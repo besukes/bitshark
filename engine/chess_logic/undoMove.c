@@ -96,5 +96,5 @@ void undoMove(GameStruct * game , Jogada * jogada , CorPiece turn){
     int pos_passant = jogada->prev_enpassant;
     game->estadoJogo.canCastle[turn][Short] = jogada->prev_castlerights[Short];
     game->estadoJogo.canCastle[turn][Long] = jogada->prev_castlerights[Long];
-    game->estadoJogo.enpassant = (pos_passant) ? (1ULL<<pos_passant) : 0;
+    game->estadoJogo.enpassant = (pos_passant != 255) ? (1ULL<<pos_passant) : 0;
 }

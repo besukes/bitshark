@@ -146,51 +146,151 @@ int evaluate(GameStruct * game , CorPiece turno){
     return eval;
 }
 
-//Needs to be done
-uint64_bit get_see_piece_attacks(uint64_bit single , Pieces piece , uint64_bit occupied , CorPiece turn){
+
+/*  Basically casts an ray from position single to target , according to the piece type , while also having in mind occupied squares , all in order to 
+check whether a piece can take that square , in a way cheaper than casting all the possible rays for the piece.
+    Whether this currently works or not is not totally understood by me yet , but tests are being ran.*/
+uint64_bit get_SEE_ray(uint64_bit single , Pieces piece , uint64_bit occupied , CorPiece turn , uint64_bit target){
     uint64_bit piece_attks = 0;
+    int target_indx = posTabuleiro(target),
+        single_indx = posTabuleiro(single);
+    
+    int ln_target = target_indx / 8 , col_target = target_indx % 8,
+        ln_single = single_indx / 8 , col_single = single_indx % 8;
+    int maxDist = 0,
+        shift = 0;
+    uint64_bit (*shifter)(uint64_bit,int) = &shiftl;
+
+    if(piece == Pawn){
+        return get_pawn_attacks(single,turn);
+    }
+    else if(piece == Horse){
+        return get_knight_attacks(single);
+    }
+    else{ //We now check what ray are we actually casting for improved efficiency
+        //Points North
+        if(ln_target > ln_single){
+            //Points NorthEast
+            if(col_target > col_single){shift = 9;maxDist = minimum(7-ln_single,7-col_single);}
+            //Points North
+            else if(col_target == col_single){shift = 8;maxDist = 7-ln_single;}
+            //Points NorthWest
+            else{shift = 7;maxDist = minimum(7-ln_single,col_single);}
+        }
+        //Points either West or East
+        else if(ln_target == ln_single){
+            shift = 1;
+            //Points East
+            if(col_target > col_single) maxDist = 7-col_single;
+            //Invalid pointing
+            else if(col_target == col_single) return 0;
+            //Points West
+            else{maxDist = col_single;shifter = &shiftr;}
+        }
+        //Points South
+        else{
+            shifter = &shiftr;
+            //Points SouthEast
+            if(col_target > col_single){shift = 7;maxDist = minimum(ln_single,7-col_single);}
+            //Points South
+            else if(col_target == col_single){shift = 8;maxDist = ln_single;}
+            //Points SouthWest
+            else{shift = 9;maxDist = minimum(ln_single,col_single);}
+        }
+    //If shift doesnt match rook or bishop movements , we dont even need to cast an ray , it wont reach target
+        if(piece == Bishop){
+           if(shift == 7 || shift == 9) get_attacks(maxDist,shifter,occupied,single,shift,&piece_attks);
+        }
+        if(piece == Rook){
+            if(shift == 8 || shift == 1) get_attacks(maxDist,shifter,occupied,single,shift,&piece_attks);
+        }
+        if(piece == Queen){
+            get_attacks(maxDist,shifter,occupied,single,shift,&piece_attks);
+        }
+    }
     return piece_attks;
 }
 
 
+/* Verifies whether the king can take a certain square without being capture by another piece.
+    This Function assumes that no piece can take the *cur turn KING* except the other king , so it only
+checks if the *opposite turn king* can take *cur_turn KING* at *pos_cap* */
+int is_king_last_capture(EstadoJogo * estado , CorPiece cur_turn , uint64_bit pos_cap){
+    uint64_bit king_pos = estado->tabuleirojogo[cur_turn][King];
+    uint64_bit king_moves = get_king_moves(king_pos);
+    if(king_moves & pos_cap){
+        int op_turn = (cur_turn == brancas) ? pretas : brancas;
+        int hipotetical_king_indx = posTabuleiro(pos_cap),
+            op_turn_king_indx = posTabuleiro(estado->tabuleirojogo[op_turn][King]);
+        int x1 = hipotetical_king_indx % 8 , x2 = op_turn_king_indx % 8 ,
+            y1 = hipotetical_king_indx / 8 , y2 = op_turn_king_indx / 8;
+        int dx = (x1-x2) , dy = (y1-y2);
+        dx = (dx<0) ? -dx : dx;
+        dy = (dy<0) ? -dy : dy;
+        return (!(dx <= 1 && dy <= 1));
+    }
+    return 0;
+}
+
+
+/*  This function works by checking 1 by 1 every piece from Pawn to Queen whether they can or not take a certain square and whether that may or may not
+be a good trade.
+    This Works by calculating the relative pieces value throughout a series of madeup captures to check how favorable is this sequence for *TURN*.
+    We then check from indx to 1 the possible captures and how favorable are them.*/
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
     CorPiece cur_turn = (turn==brancas) ? pretas : brancas;
     uint64_bit pos_cap = 1ULL<<jogada->destino;
     uint64_bit occupied_sq = game->estadoJogo.bitboard_todas_pieces & ~(pos_cap | (1ULL<<jogada->origem));
     int see[32]; see[0] = pieces_value[jogada->peca_capturada];
+    uint64_bit pieces_checked[2][NUMBER_PIECES] = {0};
     int indx = 0;
     int current_piece_value = pieces_value[jogada->peca_movida];
-    int end_see = 0; // For tests it could be turned to 1
+    int king_has_taken = 0 , end_see = 0; // For tests it could be turned to 1
 
     while(!end_see){
         indx++;
-        see[indx] = current_piece_value - gain[indx-1];
+        see[indx] = current_piece_value - see[indx-1];
         uint64_bit attacker_bit = 0;
         int attacker_type = 0;
         for(int i=1;i<NUMBER_PIECES;i++){
             uint64_bit positions_piece = game->estadoJogo.tabuleirojogo[cur_turn][i];
-            int exist_attackers = attackers[cur_turn][i] > 0;
             while(positions_piece != 0){
                 uint64_bit single_pos = positions_piece & (-positions_piece);
-                if(get_see_piece_attacks(single_pos,(Pieces)i,occupied_sq,cur_turn) & pos_cap){
-                    attacker_type = i;
-                    attacker_bit = single_pos;
+                if(!(single_pos & pieces_checked[cur_turn][i])){
+                    pieces_checked[cur_turn][i] |= single_pos;
+                    if(get_SEE_ray(single_pos,(Pieces)i,occupied_sq,cur_turn,pos_cap) & pos_cap){
+                        attacker_type = i;
+                        attacker_bit = single_pos;
+                    }
                 }
                 positions_piece &= (positions_piece - 1); // Remove esse bit
                 if(attacker_bit) break;
             }
+            if(attacker_bit) break;
         }
-        if(!attacker_bit) end_see = 1;
+        if(!attacker_bit){
+            //At this point we know there's no piece from cur_turn that can take
+            //We need to check if we can take with the king and still be safe
+            if(is_king_last_capture(&game->estadoJogo,cur_turn,pos_cap) && !king_has_taken){
+                indx++;
+                see[indx] = current_piece_value - see[indx-1];
+                king_has_taken = 1;
+            }
+            end_see = 1;
+        }
         else{
             occupied_sq &= ~attacker_bit;
             current_piece_value = pieces_value[attacker_type];
             cur_turn = (cur_turn==brancas) ? pretas : brancas;
         }
     }
-    // Minimax backpropagation (standing pat option)
-    while (--d > 0) {
-        if (see[d - 1] < -see[d]) {
-            see[d - 1] = -see[d];
+    // NegaMax backpropagation (standing pat option)
+    /* This works by checking if (indx-1) player will rather recapture on each instance or not , as if -see[indx] is inferior too see[indx-1] , 
+    that would mean that player (indx-1) is losing material in that capture , because see[indx] would then be greater than see[indx-1] , indicating
+    material win.*/
+    while (--indx > 0) {
+        if (-see[indx] < see[indx - 1]) {
+            see[indx - 1] = -see[indx];
         }
     }
     return see[0];

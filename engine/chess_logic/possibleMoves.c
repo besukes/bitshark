@@ -122,8 +122,12 @@ uint64_bit get_king_moves(uint64_bit pos){
 }
 
 
-uint64_bit get_enpassant_move(uint64_bit pawn_atks , uint64_bit pos_enpassant){
-    return (pawn_atks & pos_enpassant);
+uint64_bit get_enpassant_move(uint64_bit pawn_atks , uint64_bit pos_enpassant , CorPiece turn , int tab_indx){
+    if(turn == brancas && 40 <= tab_indx && tab_indx < 48)
+        return (pawn_atks & pos_enpassant);
+    else if(turn == pretas && 16 <= tab_indx && tab_indx < 24)
+        return (pawn_atks & pos_enpassant);
+    return 0;
 }
 
 
@@ -136,7 +140,7 @@ uint64_bit get_possible_pawn_moves(uint64_bit pos,uint64_bit bitboard_pieces,Cor
         return ( fst_step | snd_step | ( pawn_attacks & oposto));
     }
     else{
-        return ( fst_step | ( pawn_attacks & oposto) | get_enpassant_move(pawn_attacks,game->estadoJogo.enpassant));
+        return ( fst_step | ( pawn_attacks & oposto) | get_enpassant_move(pawn_attacks,game->estadoJogo.enpassant,turno,posTabuleiro(pos)));
     }
 }
 
@@ -194,7 +198,7 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
     jogada->especial = piece == King  && is_castelling_king(game,cor,pos_dest);
     if(jogada->especial) jogada->especial = FLAG_CASTLE;
     else jogada->especial = 0;
-    int enpassant = ((pos_dest & game->estadoJogo.enpassant) && (piece == Pawn));
+    int enpassant = (piece == Pawn) && (pos_dest & game->estadoJogo.enpassant);
     if(enpassant){
         jogada->especial = FLAG_ENPASSANT;
         jogada->peca_capturada = Pawn;

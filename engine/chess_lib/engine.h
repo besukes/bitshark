@@ -291,6 +291,7 @@ uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game,CorPi
 uint64_bit get_king_moves(uint64_bit pos);
 void king_line_dependant_moves(uint64_bit * atk ,uint64_bit (*func)(uint64_bit,int),uint64_bit pos_rei , uint64_bit colunaA , uint64_bit colunaH);
 int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int only_captures);
+void get_attacks(int max , uint64_bit (*func)(uint64_bit,int),uint64_bit pos_limites,uint64_bit pos_piece,int shift ,uint64_bit * atk);
 
 
 
