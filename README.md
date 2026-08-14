@@ -70,6 +70,21 @@ Para abrir o programa basta executar o comando
 ```
 ./bshark
 ```
+Pode também executar o comando , para verificar os NPS da engine , em posições pré-calculadas , tal como a depth que ela atinge , em média , em cada fase do jogo.
+
+```
+make bench
+```
+Para limpar o executável do **make bench** basta executar o comando :
+
+```
+make cleanb
+```
+Para limpar o executável **bshark** , tal como a pasta **build** , basta executar o comando :
+
+```
+make clean
+```
 
 
 ## Créditos
