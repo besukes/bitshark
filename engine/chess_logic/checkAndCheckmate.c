@@ -4,6 +4,7 @@
 
 
 Boolean is_in_check(EstadoJogo * estado , uint64_bit kingpos , CorPiece cor){
+    int indx_king = posTabuleiro(kingpos);
     uint64_bit todas_pieces =  estado->bitboard_todas_pieces;
     CorPiece oponente = (cor==brancas) ? pretas : brancas;
     uint64_bit op_knight = estado->tabuleirojogo[oponente][Horse],
@@ -12,10 +13,10 @@ Boolean is_in_check(EstadoJogo * estado , uint64_bit kingpos , CorPiece cor){
                op_bishops = estado->tabuleirojogo[oponente][Bishop],
                op_queen = estado->tabuleirojogo[oponente][Queen],
                op_king = estado->tabuleirojogo[oponente][King];
-    uint64_bit check_knights = get_knight_attacks(kingpos) & op_knight,
+    uint64_bit check_knights = get_magic_knight_attacks(indx_king) & op_knight,
                check_pawns = get_pawn_attacks(kingpos,cor) & op_pawns,
-               check_diagonals = get_sliding_attacks(kingpos,todas_pieces) & (op_bishops | op_queen),
-               check_cross = get_cross_attacks(kingpos,todas_pieces) & (op_rooks | op_queen),
+               check_diagonals = get_magic_sliding_attacks(indx_king,todas_pieces) & (op_bishops | op_queen),
+               check_cross = get_magic_cross_attacks(indx_king,todas_pieces) & (op_rooks | op_queen),
                check_king = get_king_moves(kingpos) & op_king;
     return ( (check_knights | check_pawns | check_diagonals | check_cross | check_king) != 0);
 }

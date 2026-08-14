@@ -63,6 +63,7 @@ BENCH_SRC = engine/chess_logic/castle_logic.c \
 		engine/chess_logic/moveMaker.c \
 		engine/chess_logic/possibleMoves.c \
 		engine/chess_logic/undoMove.c \
+		engine/chess_logic/magicMoves.c \
 		engine/core/engine.c \
 		engine/core/evaluation.c \
 		engine/core/moves.c \

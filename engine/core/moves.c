@@ -109,7 +109,8 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
     int new_moved_eval = evaluate_piece(destino_bit, peca_movida, turn, game);
 
     int who2Move = (turn == brancas) ? 1 : -1;
-    return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value));
+    int castleBonus = (jogada->especial == FLAG_CASTLE) ? 100 : 0;
+    return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + castleBonus));
 }
 
 

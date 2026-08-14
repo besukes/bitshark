@@ -429,3 +429,6 @@ void init_lmrLT_table();
 
 void initMagicMoveGeneration(void);
 uint64_bit get_magic_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , CorPiece cor_turno , int only_captures);
+uint64_bit get_magic_knight_attacks(int square);
+uint64_bit get_magic_sliding_attacks(int square , uint64_bit occupancy);
+uint64_bit get_magic_cross_attacks(int square, uint64_bit occupancy);

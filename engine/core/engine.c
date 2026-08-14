@@ -103,6 +103,7 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
         game->indx_lastmoves = start_indx_lastmoves;
         double elapsed = SDL_GetTicks() - initial_time;
         if(elapsed >= time_budget) break;
+        else if(elapsed > 2500) depth++;
         jogadabot result = engine_search(game, turn, depth, initial_time, time_budget);
         if(result.completed){
             best_so_far = result;

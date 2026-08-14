@@ -5,6 +5,9 @@
 #define MAX_ROOK_ATTACKS 4096 // 2^12
 #define MAX_BISHOP_ATTACKS 512 // 2^9
 
+#define LINHA_1 0x00000000000000FFULL
+#define LINHA_8 0xFF00000000000000ULL
+
 // Precomputed attack tables stored in memory
 uint64_bit rook_attack_table[64][MAX_ROOK_ATTACKS];
 uint64_bit bishop_attack_table[64][MAX_BISHOP_ATTACKS];
@@ -69,11 +72,21 @@ void init_AttacksLookUpTable(void){
     init_Knight_table();
 }
 
+uint64_bit get_cross_mask(int pos){
+    int line = pos / 8 , col = pos % 8;
+    uint64_bit limits = chess_border;
+    if(col == 0) limits &= ~COLUNA_A;
+    else if(col == 7) limits &= ~COLUNA_H;
+    if(line == 0) limits &= ~LINHA_1;
+    else if(line == 7) limits &= ~LINHA_8;
+    return (get_cross_attacks(1ULL<<pos,0) & ~limits);
+}
+
 
 uint64_bit generate_mask(Pieces piece , casas_board sq){
     if(piece == Rook){
-        uint64_bit possible_moves = get_cross_attacks(1ULL<<sq,0);
-        return (possible_moves & ~chess_border);
+        uint64_bit possible_moves = get_cross_mask(sq);
+        return (possible_moves);
     }
     else if(piece == Bishop){
         uint64_bit possible_moves = get_sliding_attacks(1ULL<<sq,0);
@@ -109,6 +122,9 @@ uint64_bit get_magic_sliding_attacks(int square , uint64_bit occupancy){
     return (bishop_attack_table[square][index]);
 }
 
+uint64_bit get_magic_knight_attacks(int square){
+    return (knight_attack_table[square]);
+}
 
 
 uint64_bit get_magic_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , CorPiece cor_turno , int only_captures){

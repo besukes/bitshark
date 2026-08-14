@@ -31,7 +31,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
   * Piece Square Tables
   * Incremental evaluation
   * Move repetition penalization
-  * Static Exchange Evaluation (Under Work)
+  * Static Exchange Evaluation
 * Memorization
   * Transposition Tables
   * Opening Book (Under Work)
