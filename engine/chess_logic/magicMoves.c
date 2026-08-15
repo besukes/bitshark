@@ -73,20 +73,25 @@ void init_AttacksLookUpTable(void){
 }
 
 uint64_bit get_cross_mask(int pos){
-    int line = pos / 8 , col = pos % 8;
-    uint64_bit limits = chess_border;
-    if(col == 0) limits &= ~COLUNA_A;
-    else if(col == 7) limits &= ~COLUNA_H;
-    if(line == 0) limits &= ~LINHA_1;
-    else if(line == 7) limits &= ~LINHA_8;
-    return (get_cross_attacks(1ULL<<pos,0) & ~limits);
+    int linha = pos/8 , coluna = pos % 8,
+        maxDistNorte = 6-linha,
+        maxDistSul= linha - 1,
+        maxDistOeste = coluna - 1,
+        maxDistEste = 6-coluna;
+    uint64_bit atkN,atkS,atkO,atkE ,atk= 0;
+    uint64_bit piece_pos = 1ULL<<pos;
+    get_attacks(maxDistNorte,&shiftl,0,piece_pos,8,&atkN);
+    get_attacks(maxDistSul,&shiftr,0,piece_pos,8,&atkS);
+    get_attacks(maxDistOeste,&shiftr,0,piece_pos,1,&atkO);
+    get_attacks(maxDistEste,&shiftl,0,piece_pos,1,&atkE);
+    atk = atkN | atkS | atkO | atkE;
+    return atk;
 }
 
 
 uint64_bit generate_mask(Pieces piece , casas_board sq){
     if(piece == Rook){
-        uint64_bit possible_moves = get_cross_mask(sq);
-        return (possible_moves);
+        return (get_cross_mask(sq));
     }
     else if(piece == Bishop){
         uint64_bit possible_moves = get_sliding_attacks(1ULL<<sq,0);
