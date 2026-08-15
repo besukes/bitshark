@@ -174,7 +174,7 @@ uint64_bit get_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , Cor
     }
 }
 
-int is7thRank(uint64_bit pos_piece , CorPiece turn){
+int isPromotionRank(uint64_bit pos_piece , CorPiece turn){
     int postab = posTabuleiro(pos_piece);
     if(turn == brancas && 48 <= postab && postab<  56) return 1;
     else if(turn == pretas && 8 <= postab && postab < 16) return 1;
@@ -229,7 +229,7 @@ int gerar_jogadas_legais(GameStruct* game, Jogada* jogadas , CorPiece cor , int 
                                 .peca_capturada = p_cap, .promocao = 0, .especial = 0 , .score = 0 , 
                                 .prev_castlerights[Short] = canCastleShort , .prev_castlerights[Long] = canCastleLong ,
                                 .prev_enpassant = posTabuleiro(enpassant_pos)};
-                int is_promoting = (piece == Pawn) && is7thRank(single_piece,cor) && pawnPromoting(single_attack,cor);
+                int is_promoting = (piece == Pawn) && isPromotionRank(single_piece,cor) && pawnPromoting(single_attack,cor);
                 Boolean flags_are_respected = !only_captures || jogada.peca_capturada != Empty;
                 if (flags_are_respected && isPseudoValidMove(game, &jogada, cor , single_attack)){
                     if(is_promoting){
@@ -240,10 +240,9 @@ int gerar_jogadas_legais(GameStruct* game, Jogada* jogadas , CorPiece cor , int 
                         jogada.promocao = Bishop;
                         jogadas[num_jogadas++] = jogada;
                         jogada.promocao = Rook;
+                        jogadas[num_jogadas++] = jogada;
                     }
-                    // Caso seja promocao , ou nao , temos sempre que adicionar mais uma jogada no final
-                    // Fica mais limpo o codigo assim
-                    jogadas[num_jogadas++] = jogada;
+                    else jogadas[num_jogadas++] = jogada;
                 }
                 attacks &= attacks - 1; // Remove esse bit
             }

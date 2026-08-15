@@ -71,7 +71,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         uint64_bit key = compute_zobrist(game,brancas);
         hash_key_stack[hash_stack_indx++] = key;
     }
-    else if(event.type == SDL_MOUSEBUTTONDOWN && game->turnoJogador == turno_j){
+    else if(event.type == SDL_MOUSEBUTTONDOWN && game->turnoJogador == turno_j){ // && game->turnoJogador == turno_j
         if(event.button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown ==0){
             game->isKeyPressedDown = 1;
             cleanArrowEvent(game);

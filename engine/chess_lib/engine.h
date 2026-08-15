@@ -295,6 +295,7 @@ void king_line_dependant_moves(uint64_bit * atk ,uint64_bit (*func)(uint64_bit,i
 int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int only_captures);
 void get_attacks(int max , uint64_bit (*func)(uint64_bit,int),uint64_bit pos_limites,uint64_bit pos_piece,int shift ,uint64_bit * atk);
 uint64_bit get_castle_moves(uint64_bit pos , uint64_bit bb_pieces , GameStruct * game , CorPiece turn);
+int isPromotionRank(uint64_bit pos_piece , CorPiece turn);
 
 
 
