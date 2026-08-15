@@ -183,9 +183,11 @@ be a good trade.
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
     CorPiece cur_turn = (turn==brancas) ? pretas : brancas;
     uint64_bit pos_cap = 1ULL<<jogada->destino;
-    uint64_bit occupied = game->estadoJogo.bitboard_todas_pieces & ~(pos_cap | (1ULL<<jogada->origem));
+    uint64_bit origem_bit = 1ULL<<jogada->origem;
+    uint64_bit occupied = game->estadoJogo.bitboard_todas_pieces & ~(pos_cap | origem_bit);
     int see[32]; see[0] = pieces_value[jogada->peca_capturada];
     uint64_bit pieces_checked[2][NUMBER_PIECES] = {0};
+    pieces_checked[turn][jogada->peca_movida] |= origem_bit;
     int indx = 0;
     int current_piece_value = pieces_value[jogada->peca_movida];
     int king_has_taken = 0 , end_see = 0; // For tests it could be turned to 1
