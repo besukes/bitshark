@@ -21,9 +21,9 @@ void desenhaBitshark(float eval , GUISettings * settings){
     roundedBoxRGBA(settings->gameRenderer,180,100,220,800,0,0,0,0, 200);
 
     int eval_size = eval + 0.5;
-    if(eval <= (-850.0)) eval_size = -8;
-    else if(eval >= 850.0) eval_size = 8;
-    int starting_white_y = 450 - 44*eval_size;
+    if(eval <= (-850.0)) eval_size = -12;
+    else if(eval >= 850.0) eval_size = 12;
+    int starting_white_y = 450 - 29*eval_size;
     starting_white_y = (starting_white_y <= 100) ? 105 : starting_white_y;
     starting_white_y = (starting_white_y > 800) ? 800 : starting_white_y;
     roundedBoxRGBA(settings->gameRenderer,180, starting_white_y ,220,800,0,255,255,255, 200);
