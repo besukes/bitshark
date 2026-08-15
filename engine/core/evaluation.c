@@ -165,12 +165,13 @@ uint64_bit get_SEE_captures(GameStruct * game ,uint64_bit single , Pieces piece 
 
 /*  Verifies whether the king can take a certain square without being capture by another piece.
     This is important , as he can be the last one to take on SEE but not if he can be captured after.*/
-int is_king_last_capture(GameStruct * game , CorPiece cur_turn , uint64_bit pos_cap){
+int is_king_last_capture(GameStruct * game , CorPiece cur_turn , uint64_bit pos_cap , uint64_bit occupancy){
     uint64_bit king_pos = game->estadoJogo.tabuleirojogo[cur_turn][King];
     uint64_bit king_moves = get_king_moves(king_pos);
     if(king_moves & pos_cap){
         int op_turn = (cur_turn == brancas) ? pretas : brancas;
-        return (!is_attacked_square(pos_cap,op_turn,game));
+        occupancy = (occupancy & ~king_pos) | pos_cap;
+        return (!is_attacked_square(pos_cap,op_turn,game,occupancy));
     }
     return 0;
 }
@@ -211,7 +212,7 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
         if(!attacker_bit){
             //At this point we know there's no piece from cur_turn that can take
             //We need to check if we can take with the king and still be safe
-            if(is_king_last_capture(game,cur_turn,pos_cap) && !king_has_taken){
+            if(is_king_last_capture(game,cur_turn,pos_cap,occupied) && !king_has_taken){
                 indx++;
                 see[indx] = current_piece_value - see[indx-1];
                 king_has_taken = 1;
