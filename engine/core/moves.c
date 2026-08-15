@@ -68,8 +68,8 @@ void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada 
             int captured = atual->peca_capturada;
             int moved = atual->peca_movida;
             int see = static_exchange_eval(game,atual,turn);
-            if(see<0) atual->score -= 100000;
-            else atual->score += 1000000 + mvv_lva_table[captured][moved] + see;
+            if(see<0) atual->score = see;
+            else atual->score = 1000000 + mvv_lva_table[captured][moved] + see;
         }
         else if(matches_killer_move(depth,atual,1)){
             atual->score = 900000;

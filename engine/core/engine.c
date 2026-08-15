@@ -92,7 +92,7 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
 
 jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_depth){
     double initial_time = SDL_GetTicks();
-    const double time_budget = 2000; // orçamento total para a jogada, partilhado por todas as profundidades
+    const double time_budget = 1500; // orçamento total para a jogada, partilhado por todas as profundidades
     jogadabot best_so_far = {0};
     int start_hash_indx = hash_stack_indx;
     hash_key_stack[hash_stack_indx++] = compute_zobrist(game,turn);

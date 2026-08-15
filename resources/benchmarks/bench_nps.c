@@ -20,7 +20,7 @@ void place(EstadoJogo * e, CorPiece cor, Pieces piece, int square){
 
 GameStruct base_game(void){
     GameStruct g; memset(&g,0,sizeof(GameStruct));
-    g.estadoJogo = empty_state(); g.turnoJogador = brancas; g.indx_lastmoves = 0;
+    g.estadoJogo = empty_state(); g.turnoJogador = brancas;
     for(int i=0;i<2;i++){ g.estadoJogo.canCastle[i][0]=0; g.estadoJogo.canCastle[i][1]=0; }
     return g;
 }

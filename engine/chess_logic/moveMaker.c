@@ -6,8 +6,9 @@
 
 void promotePiece(GameStruct * game , Pieces piece, uint64_bit promotion_square , CorPiece turno){
     uint64_bit * bitboard_pawns = &(game->estadoJogo.tabuleirojogo[turno][Pawn]);
-    uint64_bit * bitboard_nova_piece = &(game->estadoJogo.tabuleirojogo[turno][piece]);
     *bitboard_pawns &= ~promotion_square;
+
+    uint64_bit * bitboard_nova_piece = &(game->estadoJogo.tabuleirojogo[turno][piece]);
     *bitboard_nova_piece |= promotion_square;
 }
 

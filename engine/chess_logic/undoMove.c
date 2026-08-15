@@ -85,7 +85,7 @@ void undoMove(GameStruct * game , Jogada * jogada , CorPiece turn){
         op_turn = brancas;
     }
     if(jogada->promocao){
-        game->estadoJogo.tabuleirojogo[turn][jogada->promocao] &= ~(1ULL<<jogada->destino);
+        game->estadoJogo.tabuleirojogo[turn][jogada->promocao] &= ~(1ULL<<(jogada->destino));
     }
     undoPiece_move(game,mesma_cor,cor_oposta,jogada->destino,jogada->origem,jogada->especial
                     ,(Pieces)(jogada->peca_movida),turn);
