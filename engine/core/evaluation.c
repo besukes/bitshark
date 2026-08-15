@@ -1,6 +1,7 @@
 #include "engine/chess_lib/engine.h"
 #include <engine/chess_lib/evals.h>
 
+
 //Evals are now looking better but still a bit shy to a strong engine
 //Evaluation functions need to do a incremental evaluation to only check the new piece moved evaluation and compare it
 //Changing alpha and beta depending to that comparation
@@ -131,73 +132,39 @@ int evaluate(GameStruct * game , CorPiece turno){
 }
 
 
-/*  Basically casts an ray from position single to target , according to the piece type , while also having in mind occupied squares , all in order to 
-check whether a piece can take that square , in a way cheaper than casting all the possible rays for the piece.
-    Whether this currently works or not is not totally understood by me yet , but tests are being ran.*/
-uint64_bit get_SEE_ray(uint64_bit single , Pieces piece , uint64_bit occupied , CorPiece turn , uint64_bit target){
-    uint64_bit piece_attks = 0;
-    int target_indx = posTabuleiro(target),
-        single_indx = posTabuleiro(single);
-    
-    int ln_target = target_indx / 8 , col_target = target_indx % 8,
-        ln_single = single_indx / 8 , col_single = single_indx % 8;
-    int maxDist = 0,
-        shift = 0;
-    uint64_bit (*shifter)(uint64_bit,int) = &shiftl;
-
-    if(piece == Pawn){
-        return get_pawn_attacks(single,turn);
+/*  This function is responsible for getting each piece attacks for SEE logic.
+    Still needs to be done.*/
+uint64_bit get_SEE_captures(GameStruct * game ,uint64_bit single , Pieces piece , uint64_bit occupied , CorPiece turn){
+    int pos_tab = posTabuleiro(single);
+    if(pos_tab == (-1)) return 0;
+    switch(piece){
+        case Pawn :
+            return (get_pawn_attacks(single,turn));
+        break;
+        case Rook :
+            return (get_magic_cross_attacks(pos_tab,occupied));
+        break;
+        case Horse :
+            return (get_magic_knight_attacks(pos_tab));
+        break;
+        case Bishop :
+            return (get_magic_sliding_attacks(pos_tab,occupied));
+        break;
+        case Queen :
+            return (get_magic_sliding_attacks(pos_tab,occupied) | get_magic_cross_attacks(pos_tab,occupied));
+        break;
+        case King :
+            return (get_king_moves(single));
+        break;
+        default :
+            return 0ULL;
+        break;
     }
-    else if(piece == Horse){
-        return get_knight_attacks(single);
-    }
-    else{ //We now check what ray are we actually casting for improved efficiency
-        //Points North
-        if(ln_target > ln_single){
-            //Points NorthEast
-            if(col_target > col_single){shift = 9;maxDist = minimum(7-ln_single,7-col_single);}
-            //Points North
-            else if(col_target == col_single){shift = 8;maxDist = 7-ln_single;}
-            //Points NorthWest
-            else{shift = 7;maxDist = minimum(7-ln_single,col_single);}
-        }
-        //Points either West or East
-        else if(ln_target == ln_single){
-            shift = 1;
-            //Points East
-            if(col_target > col_single) maxDist = 7-col_single;
-            //Invalid pointing
-            else if(col_target == col_single) return 0;
-            //Points West
-            else{maxDist = col_single;shifter = &shiftr;}
-        }
-        //Points South
-        else{
-            shifter = &shiftr;
-            //Points SouthEast
-            if(col_target > col_single){shift = 7;maxDist = minimum(ln_single,7-col_single);}
-            //Points South
-            else if(col_target == col_single){shift = 8;maxDist = ln_single;}
-            //Points SouthWest
-            else{shift = 9;maxDist = minimum(ln_single,col_single);}
-        }
-    //If shift doesnt match rook or bishop movements , we dont even need to cast an ray , it wont reach target
-        if(piece == Bishop){
-           if(shift == 7 || shift == 9) get_attacks(maxDist,shifter,occupied,single,shift,&piece_attks);
-        }
-        if(piece == Rook){
-            if(shift == 8 || shift == 1) get_attacks(maxDist,shifter,occupied,single,shift,&piece_attks);
-        }
-        if(piece == Queen){
-            get_attacks(maxDist,shifter,occupied,single,shift,&piece_attks);
-        }
-    }
-    return piece_attks;
 }
 
 
-/* Verifies whether the king can take a certain square without being capture by another piece.
-    This Function needs to be fixed!! */
+/*  Verifies whether the king can take a certain square without being capture by another piece.
+    This is important , as he can be the last one to take on SEE but not if he can be captured after.*/
 int is_king_last_capture(GameStruct * game , CorPiece cur_turn , uint64_bit pos_cap){
     uint64_bit king_pos = game->estadoJogo.tabuleirojogo[cur_turn][King];
     uint64_bit king_moves = get_king_moves(king_pos);
@@ -230,7 +197,7 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
             uint64_bit positions_piece = game->estadoJogo.tabuleirojogo[cur_turn][i] & (~pieces_checked[cur_turn][i]);
             while(positions_piece != 0){
                 uint64_bit single_pos = positions_piece & (-positions_piece);
-                if(get_magic_piece_attacks(single_pos,(Pieces)i,game,cur_turn,0,occupied) & pos_cap){
+                if(get_SEE_captures(game,single_pos,(Pieces)i,occupied,cur_turn) & pos_cap){
                     attacker_type = i;
                     attacker_bit = single_pos;
                     break;
