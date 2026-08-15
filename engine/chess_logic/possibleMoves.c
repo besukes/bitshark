@@ -259,3 +259,18 @@ int jogo_terminou(EstadoJogo *estado) {
     }
     return 0; // O jogo não terminou
 }
+
+
+
+int is_attacked_square(uint64_bit pos , CorPiece turn , GameStruct * game){
+    for(int i=0;i<NUMBER_PIECES;i++){
+        uint64_bit tab = game->estadoJogo.tabuleirojogo[turn][i];
+        while(tab){
+            uint64_bit single = tab & (-tab); // isola o bit mais baixo
+            uint64_bit atks = get_magic_piece_attacks(single,(Pieces)i,game,turn,1,game->estadoJogo.bitboard_todas_pieces);
+            if((atks&pos) != 0) return 1;
+            tab &= tab - 1; // remove esse bit
+        }
+    }
+    return 0;
+}

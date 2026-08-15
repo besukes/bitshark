@@ -54,22 +54,6 @@ int mopup_eval(GameStruct * game , CorPiece op_turn){
 
 
 
-int is_defended_piece(uint64_bit pos , Pieces type , CorPiece turn , GameStruct * game , int piece_score){
-    for(int i=0;i<NUMBER_PIECES;i++){
-        uint64_bit tab = game->estadoJogo.tabuleirojogo[turn][i];
-        while(tab){
-            uint64_bit single = tab & (-tab); // isola o bit mais baixo
-            uint64_bit atks = get_magic_piece_attacks(single,(Pieces)i,game,turn,1,game->estadoJogo.bitboard_todas_pieces);
-            if((atks&pos) != 0) return 1;
-            tab &= tab - 1; // remove esse bit
-        }
-    }
-    return 0;
-}
-
-
-
-
 int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , GameStruct * game){
     //piece evaluation is based on the position of the piece , its mobility , what pieces it attacks
     //and how it coordinates with other pieces
@@ -214,19 +198,12 @@ uint64_bit get_SEE_ray(uint64_bit single , Pieces piece , uint64_bit occupied , 
 
 /* Verifies whether the king can take a certain square without being capture by another piece.
     This Function needs to be fixed!! */
-int is_king_last_capture(EstadoJogo * estado , CorPiece cur_turn , uint64_bit pos_cap){
-    uint64_bit king_pos = estado->tabuleirojogo[cur_turn][King];
+int is_king_last_capture(GameStruct * game , CorPiece cur_turn , uint64_bit pos_cap){
+    uint64_bit king_pos = game->estadoJogo.tabuleirojogo[cur_turn][King];
     uint64_bit king_moves = get_king_moves(king_pos);
     if(king_moves & pos_cap){
         int op_turn = (cur_turn == brancas) ? pretas : brancas;
-        int hipotetical_king_indx = posTabuleiro(pos_cap),
-            op_turn_king_indx = posTabuleiro(estado->tabuleirojogo[op_turn][King]);
-        int x1 = hipotetical_king_indx % 8 , x2 = op_turn_king_indx % 8 ,
-            y1 = hipotetical_king_indx / 8 , y2 = op_turn_king_indx / 8;
-        int dx = (x1-x2) , dy = (y1-y2);
-        dx = (dx<0) ? -dx : dx;
-        dy = (dy<0) ? -dy : dy;
-        return (!(dx <= 1 && dy <= 1));
+        return (!is_attacked_square(pos_cap,op_turn,game));
     }
     return 0;
 }
@@ -265,7 +242,7 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
         if(!attacker_bit){
             //At this point we know there's no piece from cur_turn that can take
             //We need to check if we can take with the king and still be safe
-            if(is_king_last_capture(&game->estadoJogo,cur_turn,pos_cap) && !king_has_taken){
+            if(is_king_last_capture(game,cur_turn,pos_cap) && !king_has_taken){
                 indx++;
                 see[indx] = current_piece_value - see[indx-1];
                 king_has_taken = 1;

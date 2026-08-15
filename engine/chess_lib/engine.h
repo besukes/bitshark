@@ -297,6 +297,7 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
 void get_attacks(int max , uint64_bit (*func)(uint64_bit,int),uint64_bit pos_limites,uint64_bit pos_piece,int shift ,uint64_bit * atk);
 uint64_bit get_castle_moves(uint64_bit pos , uint64_bit bb_pieces , GameStruct * game , CorPiece turn);
 int isPromotionRank(uint64_bit pos_piece , CorPiece turn);
+int is_attacked_square(uint64_bit pos , CorPiece turn , GameStruct * game);
 
 
 
@@ -337,7 +338,6 @@ uint64_bit get_same_colour_bitboard(EstadoJogo * estado , CorPiece cor);
 uint64_bit initQuadrado(void);
 uint64_bit get_opposing_colour_bitboard(EstadoJogo * estado , CorPiece cor);
 uint64_bit get_selected_piece_attacks(GameStruct * game , uint64_bit click , Pieces piece , CorPiece turno);
-int is_attacked_piece(uint64_bit is_attacked , Pieces attacked_piece , CorPiece turn , GameStruct * game , int piece_score);
 
 
 
@@ -389,6 +389,8 @@ void checkmate_sfx (Mix_Chunk * sfxarray[]);
 
 int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply);
 
+
+
 /// evaluation //////////////////////////////
 
 int evaluate(GameStruct * game , CorPiece turno);
@@ -398,9 +400,12 @@ int mopup_eval(GameStruct * game , CorPiece op_turn);
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn);
 
 
+
 /// engine /////////////////////////////////
 
 Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening);
+
+
 
 /// moves /////////////////////////////////
 
@@ -412,6 +417,8 @@ int matches_killer_move(int depth, Jogada * jogada, int index);
 int calculate_extension_depth(GameStruct * game , int depth , CorPiece op_turn);
 int is_repeated_position(uint64_bit key);
 
+
+
 /// transposition /////////////////////////
 
 uint64_bit xorshift64(uint64_bit *state);
@@ -422,9 +429,13 @@ TTEntry * tt_probe(uint64_bit key);
 void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move);
 TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move);
 
+
+
 /// LookUp Table init //////////////////////
 
 void init_lmrLT_table();
+
+
 
 /// MAGIC MOVES //////////////////////////
 
