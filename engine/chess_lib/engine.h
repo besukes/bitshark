@@ -172,6 +172,7 @@ typedef struct GameStruct{
     int turns; //Guarda os turnos ja jogados no jogo
     Boolean trying_to_leave; //Informa se o utilizador clicou no botao de sair
     uint64_bit cur_pos_key; //Current zobrist key da posicao
+    float position_eval; //Curent position evaluation for evaluation bar
 }GameStruct;
 
 /*Guarda as texturas que o jogo utiliza no seu decorrer , tal como o tema das peças*/

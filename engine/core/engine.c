@@ -92,7 +92,7 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
 
 jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_depth){
     double initial_time = SDL_GetTicks();
-    const double time_budget = 1500; // orçamento total para a jogada, partilhado por todas as profundidades
+    const double time_budget = 2000; // orçamento total para a jogada, partilhado por todas as profundidades
     jogadabot best_so_far = {0};
     int start_hash_indx = hash_stack_indx;
     hash_key_stack[hash_stack_indx++] = compute_zobrist(game,turn);
@@ -101,7 +101,7 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
         hash_stack_indx = start_hash_indx;
         double elapsed = SDL_GetTicks() - initial_time;
         if(elapsed >= time_budget) break;
-        jogadabot result = engine_search(game, turn, depth, initial_time, time_budget);
+        jogadabot result = engine_search(game, turn, depth , initial_time, time_budget);
         if(result.completed){
             best_so_far = result;
             *reached_depth = depth;
@@ -130,9 +130,11 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
         best_jogada = engine_search(game,turn,5,initial_time,3000);
     }
     int who2Move = (turn==brancas) ? 1 : (-1);
+    float evaluation = (float)(best_jogada.move_eval*who2Move) / (float)(100);
+    game->position_eval = evaluation;
     printf("[engine] get_best_move: piece %d from %d to %d , depth alcancada %d/%d , took %d ms with an eval of %f\n", best_jogada.best_move.peca_movida, 
                 (int)best_jogada.best_move.origem, (int)best_jogada.best_move.destino, reached_depth, MAX_DEPTH_SEARCH,
-                (int)(SDL_GetTicks() - initial_time), (float)(best_jogada.move_eval*who2Move) / 100);
+                (int)(SDL_GetTicks() - initial_time), evaluation);
     return (best_jogada.best_move);
 }
 

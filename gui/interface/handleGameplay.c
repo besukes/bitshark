@@ -15,7 +15,7 @@ void softReset(GameStruct * game){
 //&& game->turnoJogador == brancas
 void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event , Mix_Chunk * sfxarray[]){
     CorPiece turno_j = brancas;
-    if(game->turnoJogador == pretas){
+   if(game->turnoJogador == pretas){
         GameStruct game_aux = *game;
         //depois substituir por game_aux
         Jogada best_move = get_best_move(&game_aux,pretas,ITERATIVE_DEEPENING);
@@ -24,9 +24,6 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
             return;
         }
         atualizaJogada(game,&best_move,pretas);
-        if(best_move.promocao){
-            promotePiece(game,Queen,1ULL<<best_move.destino,pretas);
-        }
         TipoJogada t = check_move(game,&best_move,pretas);
         if(t == Checkmate ){
             settings->screen = WinScreen;
@@ -42,6 +39,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->moved_to_square = best_move.destino;
         uint64_bit key = compute_zobrist(game,pretas);
         hash_key_stack[hash_stack_indx++] = key;
+        game->position_eval = game_aux.position_eval;
     }
     else if(game->turnoJogador == brancas){
         GameStruct game_aux = *game;
@@ -52,9 +50,6 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
             return;
         }
         atualizaJogada(game,&best_move,brancas);
-        if(best_move.promocao){
-            promotePiece(game,Queen,1ULL<<best_move.destino,brancas);
-        }
         TipoJogada t = check_move(game,&best_move,brancas);
         if(t == Checkmate ){
             settings->screen = WinScreen;
@@ -70,7 +65,9 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->moved_to_square = best_move.destino;
         uint64_bit key = compute_zobrist(game,brancas);
         hash_key_stack[hash_stack_indx++] = key;
+        game->position_eval = game_aux.position_eval;
     }
+    if(0){}
     else if(event.type == SDL_MOUSEBUTTONDOWN && game->turnoJogador == turno_j){ // && game->turnoJogador == turno_j
         if(event.button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown ==0){
             game->isKeyPressedDown = 1;

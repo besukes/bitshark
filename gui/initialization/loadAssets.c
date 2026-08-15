@@ -21,7 +21,7 @@ void loadTexturasPieces(SDL_Texture * chessPieces[12],SDL_Renderer * sdl_rendere
 
 void loadAssets(GUISettings * settings , SDL_Renderer * sdl_renderer){
     loadTexturasPieces(settings->textures.chessPieces,sdl_renderer);
-    settings->textures.logo = IMG_LoadTexture(sdl_renderer,"assets/logo/bitshark");
+    settings->textures.logo = IMG_LoadTexture(sdl_renderer,"assets/logo/icon_bot.png");
     settings->textures.tabTexture = IMG_LoadTexture(sdl_renderer,"assets/tabuleiro/tab_2.png");
     settings->textures.arrow[0] = IMG_LoadTexture(sdl_renderer,"assets/misc/arrow_texture.png");
     settings->textures.arrow[1] = IMG_LoadTexture(sdl_renderer,"assets/misc/triangle_orange.png");

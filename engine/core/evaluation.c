@@ -32,22 +32,22 @@ int mopup_eval(GameStruct * game , CorPiece op_turn){
             op_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[op_turn][King]);
         if(op_turn_king_pos < 0 || turn_king_pos < 0) return 0; // segurança: sem rei (não deve acontecer)
 
-        // Distância de Chebyshev (linha/coluna) ao centro do tabuleiro
+        // King Manhattan Distance (linha/coluna) ao centro do tabuleiro
         int op_rank = op_turn_king_pos / 8, op_file = op_turn_king_pos % 8;
         int dist_rank = (op_rank <= 3) ? (3 - op_rank) : (op_rank - 4);
         int dist_file = (op_file <= 3) ? (3 - op_file) : (op_file - 4);
-        int op_king_dist_to_center = (dist_rank > dist_file) ? dist_rank : dist_file;
+        int op_king_manhattan_dist_to_center = dist_rank + dist_file;
 
         // Distância entre os dois reis: sem aproximar o próprio rei do rei adversário, a torre
         // sozinha não consegue fechar o mate (precisa do apoio do rei para cortar as casas de
         // fuga) — sem este termo, o motor "empurra" o rei adversário para a borda mas nunca
         // convergir para o fechar, ficando a oscilar indefinidamente perto do mate sem o concluir.
-        int mr = turn_king_pos/8, mf = turn_king_pos%8;
-        int dr = mr>op_rank ? mr-op_rank : op_rank-mr;
-        int df = mf>op_file ? mf-op_file : op_file-mf;
-        int kings_distance = (dr > df) ? dr : df;
+        int my_rank = turn_king_pos/8, my_file = turn_king_pos%8;
+        int dr = (my_rank > op_rank) ? (my_rank - op_rank) : (op_rank - my_rank);
+        int df = (my_file > op_file) ? (my_file - op_file) : (op_file - my_file);
+        int kings_chebyshev = (dr > df) ? dr : df;
  
-        return 65*op_king_dist_to_center + 25*(7 - kings_distance);
+        return 65*op_king_manhattan_dist_to_center + 25*(7 - kings_chebyshev);
     }
     return 0;
 }

@@ -64,6 +64,7 @@ GameStruct initGameStruct(void){
     game.turns=0;
     game.trying_to_leave = 0;
     game.cur_pos_key = 0;
+    game.position_eval = 0;
     initArrowsStruct(&game);
     return game;
 }
@@ -86,6 +87,7 @@ void initializeGame(GameStruct * game){
     game->turns=0;
     game->trying_to_leave = 0;
     game->cur_pos_key = 0;
+    game->position_eval = 0;
     initArrowsStruct(game);
 }
 

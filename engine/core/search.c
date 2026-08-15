@@ -13,7 +13,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     int stc_eval = quiescence_eval; // Avaliação estática da posição atual
     //Como depth agora é 0  , é seguro usar mopup evaluation aqui , pois assim não ha inflação de valores
     //Est_eval nunca é usada para além de verificações
-    if(is_end_game(&game->estadoJogo)) stc_eval += mopup_eval(game,op_turn);
+    stc_eval += mopup_eval(game,op_turn);
     stc_eval = (turn==brancas) ? stc_eval : -stc_eval;
 
 
