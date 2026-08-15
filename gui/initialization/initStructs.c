@@ -56,7 +56,6 @@ GameStruct initGameStruct(void){
     game.turnoJogador = brancas;
     game.pieceCoords = 0;
     game.moved_to_square = (-1);
-    game.indx_lastmoves = 0;
     game.promoted.pawnPromoted = 0;
     game.promoted.promotedSucessfully = 0;
     game.selected_piece_attacks = 0;
@@ -80,7 +79,6 @@ void initializeGame(GameStruct * game){
     game->turnoJogador = brancas;
     game->pieceCoords = 0;
     game->moved_to_square = (-1);
-    game->indx_lastmoves = 0;
     game->promoted.pawnPromoted = 0;
     game->selected_piece_attacks = 0;
     game->promoted.promoted_square = 0;

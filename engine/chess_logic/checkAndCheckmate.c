@@ -32,7 +32,6 @@ void notInCheck(GameStruct * game){
 void initgame_aux(GameStruct * game_aux , CorPiece cor_pieces_teste , Pieces piece_atual ,uint64_bit pos_piece){
     game_aux->turnoJogador = cor_pieces_teste;
     game_aux->pieceSelecionada = piece_atual;
-    game_aux->indx_lastmoves = 0;
     game_aux->pieceCoords = pos_piece;
 }
 
@@ -84,7 +83,6 @@ TipoJogada check_move(GameStruct * game, Jogada * jogada , CorPiece turno){
     }
 
     GameStruct game_aux = *game;
-    game_aux.indx_lastmoves = 0;
     Boolean cant_move_opp_king = isCheckMate(&game_aux,turno_op);
     if(is_in_check(&(game->estadoJogo),pos_king_op,turno_op)){
         if(cant_move_opp_king){

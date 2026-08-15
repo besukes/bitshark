@@ -254,7 +254,7 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
             uint64_bit positions_piece = game->estadoJogo.tabuleirojogo[cur_turn][i] & (~pieces_checked[cur_turn][i]);
             while(positions_piece != 0){
                 uint64_bit single_pos = positions_piece & (-positions_piece);
-                if(get_magic_piece_attacks(single_pos,(Pieces)i,game,turn,0) & pos_cap){
+                if(get_magic_piece_attacks(single_pos,(Pieces)i,game,cur_turn,0) & pos_cap){
                     attacker_type = i;
                     attacker_bit = single_pos;
                     break;

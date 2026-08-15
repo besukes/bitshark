@@ -6,6 +6,7 @@
 #define NO_FLAGS 0
 #define FLAG_ONLY_CAPTURES 1
 
+#define FLAG_CUTOFF 500000 //O score nunca conseguirá atingir 500000 , daí ser safe
 
 int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorPiece turn , int q_depth , int init_time , int max_time){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
@@ -13,7 +14,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     int stc_eval = quiescence_eval; // Avaliação estática da posição atual
     //Como depth agora é 0  , é seguro usar mopup evaluation aqui , pois assim não ha inflação de valores
     //Est_eval nunca é usada para além de verificações
-    stc_eval += mopup_eval(game,op_turn);
+    if(is_end_game(&game->estadoJogo)) stc_eval += mopup_eval(game,op_turn);
     stc_eval = (turn==brancas) ? stc_eval : -stc_eval;
 
 
@@ -27,7 +28,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     Jogada * hash_move = NULL; int move_eval = 0;
     uint64_bit key = compute_zobrist(game,turn);
     getPositionTTMove(key,0,&alpha,&beta,&move_eval,&hash_move);
-    if(move_eval != 0) return move_eval;
+    if(alpha >= beta) return move_eval;
 
     Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas, turn, FLAG_ONLY_CAPTURES); // idealmente só capturas aqui
@@ -38,7 +39,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
 
     for (int i = 0; i < num_jogadas; i++){
         Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
-        if(1){ //Deveria ser if(best_move->score >= 0) mas contem bugs
+        if(best_move->score >= 0){
             int delta = applyDeltaMove(game,best_move,turn,op_turn);
             if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
                 int eval = -quiescence(game, -beta, -alpha, quiescence_eval + delta, op_turn , q_depth + 1 , init_time , max_time);
@@ -85,7 +86,8 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     uint64_bit key = compute_zobrist(game,turn);
     getPositionTTMove(key,depth,&alpha,&beta,&hash_move_eval,&hash_move);
     if(is_repeated_position(key)) return 0;
-    if(hash_move_eval != 0) return (hash_move_eval);
+    // Transposition table showed us its a alpha beta cutoff
+    if(alpha >= beta) return (hash_move_eval);
     moveScoring(game,jogadas, num_jogadas, hash_move , depth , turn); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
     
     int best_score = -2*VALOR_INFINITO;
