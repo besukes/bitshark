@@ -166,7 +166,6 @@ typedef struct GameStruct{
     uint64_bit moved_to_square; //Guarda o square para o qual foi movida a piece
     CorPiece turnoJogador; //Guarda o turno do utilizador 
     TipoJogada jogada; //Guarda informacao sobre a jogada do utilizador
-    int indx_lastmoves; //Guarda o número de pecas ja comidas no jogo
     PromotedInformation promoted; //Guarda informações sobre se uma promotion aconteceu e onde ela ocorreu
     ArrowsGame arrows; //Guarda informações sobre se existem ou não setas desenhadas pelo utilizador e onde elas se encontram desenhadas
     int score_game; //Guarda o score do jogo (diferenca de pecas comidas)

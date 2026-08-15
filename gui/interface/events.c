@@ -173,7 +173,7 @@ void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event e
                 }
                 else {
                     updateScore(game,&jogada,op_turn);
-                    if(game->indx_lastmoves > 0) capturepiece_sfx(sfxarray);
+                    if(jogada.peca_capturada != Empty) capturepiece_sfx(sfxarray);
                     else if(game->estadoJogo.king_in_check[(game->turnoJogador == brancas) ? pretas : brancas]) check_sfx(sfxarray);
                     else movepiece_sfx(sfxarray);
                 }
@@ -183,7 +183,6 @@ void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event e
         game->jogada = Invalid;
     }
     game->selected_piece_attacks = 0;
-    game->indx_lastmoves = 0;
 }
 
 

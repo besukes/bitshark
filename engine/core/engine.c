@@ -92,18 +92,15 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
 
 jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_depth){
     double initial_time = SDL_GetTicks();
-    const double time_budget = 3000; // orçamento total para a jogada, partilhado por todas as profundidades
+    const double time_budget = 2000; // orçamento total para a jogada, partilhado por todas as profundidades
     jogadabot best_so_far = {0};
     int start_hash_indx = hash_stack_indx;
-    int start_indx_lastmoves = game->indx_lastmoves;
     hash_key_stack[hash_stack_indx++] = compute_zobrist(game,turn);
     // Iterative deepening: pesquisa profundidade 1, depois 2, 3... até MAX_DEPTH_SEARCH
     for(int depth = 1; depth <= MAX_DEPTH_SEARCH; depth++){
         hash_stack_indx = start_hash_indx;
-        game->indx_lastmoves = start_indx_lastmoves;
         double elapsed = SDL_GetTicks() - initial_time;
         if(elapsed >= time_budget) break;
-        else if(elapsed > 2500) depth++;
         jogadabot result = engine_search(game, turn, depth, initial_time, time_budget);
         if(result.completed){
             best_so_far = result;
