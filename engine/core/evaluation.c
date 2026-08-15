@@ -59,7 +59,7 @@ int is_defended_piece(uint64_bit pos , Pieces type , CorPiece turn , GameStruct 
         uint64_bit tab = game->estadoJogo.tabuleirojogo[turn][i];
         while(tab){
             uint64_bit single = tab & (-tab); // isola o bit mais baixo
-            uint64_bit atks = get_magic_piece_attacks(single,(Pieces)i,game,turn,1);
+            uint64_bit atks = get_magic_piece_attacks(single,(Pieces)i,game,turn,1,game->estadoJogo.bitboard_todas_pieces);
             if((atks&pos) != 0) return 1;
             tab &= tab - 1; // remove esse bit
         }
@@ -213,8 +213,7 @@ uint64_bit get_SEE_ray(uint64_bit single , Pieces piece , uint64_bit occupied , 
 
 
 /* Verifies whether the king can take a certain square without being capture by another piece.
-    This Function assumes that no piece can take the *cur turn KING* except the other king , so it only
-checks if the *opposite turn king* can take *cur_turn KING* at *pos_cap* */
+    This Function needs to be fixed!! */
 int is_king_last_capture(EstadoJogo * estado , CorPiece cur_turn , uint64_bit pos_cap){
     uint64_bit king_pos = estado->tabuleirojogo[cur_turn][King];
     uint64_bit king_moves = get_king_moves(king_pos);
@@ -240,12 +239,12 @@ be a good trade.
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
     CorPiece cur_turn = (turn==brancas) ? pretas : brancas;
     uint64_bit pos_cap = 1ULL<<jogada->destino;
-    uint64_bit occupied_sq = game->estadoJogo.bitboard_todas_pieces & ~(pos_cap | (1ULL<<jogada->origem));
+    uint64_bit occupied = game->estadoJogo.bitboard_todas_pieces & ~(pos_cap | (1ULL<<jogada->origem));
     int see[32]; see[0] = pieces_value[jogada->peca_capturada];
     uint64_bit pieces_checked[2][NUMBER_PIECES] = {0};
     int indx = 0;
     int current_piece_value = pieces_value[jogada->peca_movida];
-    int king_has_taken = 0 , end_see = 0; // For tests it could be turned to 12
+    int king_has_taken = 0 , end_see = 0; // For tests it could be turned to 1
 
     while(!end_see){
         uint64_bit attacker_bit = 0;
@@ -254,7 +253,7 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
             uint64_bit positions_piece = game->estadoJogo.tabuleirojogo[cur_turn][i] & (~pieces_checked[cur_turn][i]);
             while(positions_piece != 0){
                 uint64_bit single_pos = positions_piece & (-positions_piece);
-                if(get_magic_piece_attacks(single_pos,(Pieces)i,game,cur_turn,0) & pos_cap){
+                if(get_magic_piece_attacks(single_pos,(Pieces)i,game,cur_turn,0,occupied) & pos_cap){
                     attacker_type = i;
                     attacker_bit = single_pos;
                     break;
@@ -277,7 +276,7 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn){
             indx++;
             see[indx] = current_piece_value - see[indx-1];
             pieces_checked[cur_turn][attacker_type] |= attacker_bit;
-            occupied_sq &= ~attacker_bit;
+            occupied &= ~attacker_bit;
             current_piece_value = pieces_value[attacker_type];
             cur_turn = (cur_turn==brancas) ? pretas : brancas;
         }

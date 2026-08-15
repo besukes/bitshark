@@ -207,7 +207,8 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
 }
 
 
-int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int only_captures){
+int gerar_jogadas_legais(GameStruct* game, Jogada* jogadas , CorPiece cor , int only_captures){
+    uint64_bit occupied = game->estadoJogo.bitboard_todas_pieces;
     uint64_bit * oposto = (cor==brancas) ? &(game->estadoJogo.bitboard_pretas) : &(game->estadoJogo.bitboard_brancas);
     CorPiece op_cor = (cor==brancas) ? pretas : brancas;
     int num_jogadas = 0;
@@ -219,7 +220,7 @@ int gerar_jogadas_legais(GameStruct *game, Jogada * jogadas , CorPiece cor , int
         uint64_bit bitboard = game->estadoJogo.tabuleirojogo[cor][piece];
         while (bitboard) {
             uint64_bit single_piece = bitboard & (-bitboard); // Isola o bit mais baixo
-            uint64_bit attacks = get_magic_piece_attacks(single_piece, piece,game, cor,only_captures);
+            uint64_bit attacks = get_magic_piece_attacks(single_piece, piece,game, cor,only_captures,occupied);
             if(only_captures) attacks &= *oposto; // Se for apenas capturas, filtra os ataques para incluir apenas as peças do oponente{
             while (attacks) {
                 uint64_bit single_attack = attacks & (-attacks);

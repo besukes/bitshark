@@ -132,8 +132,7 @@ uint64_bit get_magic_knight_attacks(int square){
 }
 
 
-uint64_bit get_magic_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , CorPiece cor_turno , int only_captures){
-    uint64_bit bitboardPieces = game->estadoJogo.bitboard_todas_pieces;
+uint64_bit get_magic_piece_attacks(uint64_bit pos,Pieces piece,GameStruct * game , CorPiece cor_turno , int only_captures , uint64_bit bitboardPieces){
     int pos_tab = posTabuleiro(pos);
     if(pos_tab == (-1)) return 0;
     switch(piece){

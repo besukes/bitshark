@@ -6,7 +6,6 @@
 #define NO_FLAGS 0
 #define FLAG_ONLY_CAPTURES 1
 
-#define FLAG_CUTOFF 500000 //O score nunca conseguirá atingir 500000 , daí ser safe
 
 int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorPiece turn , int q_depth , int init_time , int max_time){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
@@ -28,6 +27,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     Jogada * hash_move = NULL; int move_eval = 0;
     uint64_bit key = compute_zobrist(game,turn);
     getPositionTTMove(key,0,&alpha,&beta,&move_eval,&hash_move);
+    // Transposition table showed us its a alpha beta cutoff
     if(alpha >= beta) return move_eval;
 
     Jogada jogadas[MAX_NUMBER_MOVES];
@@ -61,8 +61,10 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
             else undoMove(game,best_move,turn);
         }
     }
-    TTFlag flag = (best_eval > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
-    tt_store(key, 0 , alpha, flag, best_move_found);
+    if(num_jogadas>0){
+        TTFlag flag = (best_eval > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
+        tt_store(key, 0 , alpha, flag, best_move_found);
+    }
     return alpha;
 }
 
