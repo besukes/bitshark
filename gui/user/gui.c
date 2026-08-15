@@ -9,14 +9,17 @@
 
 
 
-void desenhaBitshark(float eval , GUISettings * settings){
+void desenhaBitshark(GUISettings * settings){
     roundedBoxRGBA(settings->gameRenderer,250,8,820,95,5,0,0,0, 200);
     SDL_Rect logo = {264,16,70,70};
     SDL_RenderCopy(settings->gameRenderer,settings->textures.logo,NULL,&logo);
     SDL_Color white = {.r = 255 , .b = 255 , .g = 255 ,.a = 255};
     renderTextoCentradoSombra(settings->gameRenderer,settings->fonteJogoTitles,"Bitshark",white,435,6,1.5);
     renderTextoCentradoBasico(settings->gameRenderer,settings->fonteJogoSmallerTitles , "2100 elo" , white , 394 , 60 , 0.55);
+}
 
+
+void desenhaEvalBar(float eval , GUISettings * settings){
     //Evaluation Bar
     roundedBoxRGBA(settings->gameRenderer,180,100,220,800,0,0,0,0, 200);
 
@@ -28,6 +31,7 @@ void desenhaBitshark(float eval , GUISettings * settings){
     starting_white_y = (starting_white_y > 800) ? 800 : starting_white_y;
     roundedBoxRGBA(settings->gameRenderer,180, starting_white_y ,220,800,0,255,255,255, 200);
 }
+
 
 void desenhaMoved(GameStruct * game,GUISettings * settings){
     int sq = game->moved_to_square;
@@ -50,7 +54,8 @@ void desenhaInterfaceJogo(GameStruct * game ,GUISettings * settings){
         desenharPieceAttacks(settings,game->estadoJogo.enpassant, game->selected_piece_attacks , op);
     }
 
-    desenhaBitshark(game->position_eval,settings);
+    //desenhaBitshark(settings);
+    desenhaEvalBar(game->position_eval,settings);
     desenhaMoved(game,settings);
     desenhaCheck(game,settings);
 

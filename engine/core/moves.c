@@ -48,7 +48,7 @@ void moveScoringCaptures(GameStruct * game ,Jogada * jogadas , int num_jogadas ,
                     atual->score = mvv_lva_table[captured][moved];
                     atual->score += history_table[moved][atual->destino];
                     atual->score += see;
-                    if(atual->promocao) atual->score += atual->promocao;
+                    if(atual->promocao) atual->score += 100*pieces_value[atual->promocao];
                 }
             }
         }
@@ -80,7 +80,7 @@ void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada 
         }
         else{
             atual->score = history_table[atual->peca_movida][atual->destino];
-            if(atual->promocao) atual->score += atual->promocao;
+            if(atual->promocao) atual->score += 100*pieces_value[atual->promocao];
         }
     }
 }

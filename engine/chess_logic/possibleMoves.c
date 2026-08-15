@@ -206,6 +206,10 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
     return (move != 0 || jogada->especial == FLAG_CASTLE || jogada->especial == FLAG_ENPASSANT);
 }
 
+void adicionaPromotion(Jogada* jogadas , int indx , Pieces piece , Jogada j){
+    j.promocao = piece;
+    jogadas[indx] = j;
+}
 
 int gerar_jogadas_legais(GameStruct* game, Jogada* jogadas , CorPiece cor , int only_captures){
     uint64_bit occupied = game->estadoJogo.bitboard_todas_pieces;
@@ -233,14 +237,14 @@ int gerar_jogadas_legais(GameStruct* game, Jogada* jogadas , CorPiece cor , int 
                 Boolean flags_are_respected = !only_captures || jogada.peca_capturada != Empty;
                 if (flags_are_respected && isPseudoValidMove(game, &jogada, cor , single_attack)){
                     if(is_promoting){
-                        jogada.promocao = Queen;
-                        jogadas[num_jogadas++] = jogada;
-                        jogada.promocao = Horse;
-                        jogadas[num_jogadas++] = jogada;
-                        jogada.promocao = Bishop;
-                        jogadas[num_jogadas++] = jogada;
-                        jogada.promocao = Rook;
-                        jogadas[num_jogadas++] = jogada;
+                        adicionaPromotion(jogadas,num_jogadas,Queen,jogada);
+                        num_jogadas++;
+                        adicionaPromotion(jogadas,num_jogadas,Horse,jogada);
+                        num_jogadas++;
+                        adicionaPromotion(jogadas,num_jogadas,Rook,jogada);
+                        num_jogadas++;
+                        adicionaPromotion(jogadas,num_jogadas,Bishop,jogada);
+                        num_jogadas++;
                     }
                     else jogadas[num_jogadas++] = jogada;
                 }
