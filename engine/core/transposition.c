@@ -1,9 +1,10 @@
 #include <engine/chess_lib/engine.h>
-
 #include <stdlib.h>
 #include <string.h>
 
+#define MATE_SCORE_THRESHOLD (VALOR_INFINITO - 1000)
  
+
 TTEntry * transposition_table = NULL;
  
 // Gerador xorshift64 simples e determinístico (não depende de rand() global,
@@ -74,38 +75,54 @@ TTEntry * tt_probe(uint64_bit key){
     if(entry->flag != TT_EMPTY && entry->key == key) return entry;
     return NULL; // slot vazio, ou colisão de índice com outra posição (entrada substituída)
 }
+
+int score_to_tt(int score, int ply){
+    if(score >= MATE_SCORE_THRESHOLD) return score + ply;
+    if(score <= -MATE_SCORE_THRESHOLD) return score - ply;
+    return score;
+}
+ 
+int score_from_tt(int score, int ply){
+    if(score >= MATE_SCORE_THRESHOLD) return score - ply;
+    if(score <= -MATE_SCORE_THRESHOLD) return score + ply;
+    return score;
+}
  
 
-void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move){
+
+void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move , int ply){
     TTEntry * entry = &transposition_table[key % TT_SIZE];
     // Política de substituição simples: só substitui se a nova entrada tem profundidade
     // igual ou maior (mais fiável), ou se o slot pertence a outra posição.
     if(entry->key != key || depth >= entry->depth){
         entry->key = key;
         entry->depth = depth;
-        entry->score = score;
+        entry->score = score_to_tt(score,ply);
         entry->flag = flag;
         entry->best_move = best_move;
     }
 }
 
 
-TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move){
+
+
+TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move , int ply){
     TTEntry * entry = tt_probe(key);
     if(entry!=NULL){
         *hash_move = &entry->best_move;
         if(entry->depth >= depth){
+            int adjusted_score = score_from_tt(entry->score, ply);
             if(entry->flag == TT_EXACT){
-                *move_eval = entry->score;
+                *move_eval = adjusted_score;
             }
-            else if(entry->flag == TT_LOWERBOUND && entry->score > *alpha){
+            else if(entry->flag == TT_LOWERBOUND && adjusted_score > *alpha){
                 *alpha = entry->score;
             }
-            else if(entry->flag == TT_UPPERBOUND && entry->score < *beta){
+            else if(entry->flag == TT_UPPERBOUND && adjusted_score < *beta){
                 *beta = entry->score;
             }
             if(*alpha >= *beta){
-                *move_eval = entry->score;
+                *move_eval = adjusted_score;
             }
         }
     }

@@ -271,7 +271,8 @@ int is_attacked_square(uint64_bit pos , CorPiece turn , GameStruct * game , uint
         uint64_bit tab = game->estadoJogo.tabuleirojogo[turn][i];
         while(tab){
             uint64_bit single = tab & (-tab); // isola o bit mais baixo
-            uint64_bit atks = get_magic_piece_attacks(single,(Pieces)i,game,turn,1,occupancy);
+            uint64_bit atks = (i == Pawn) ? get_pawn_attacks(single,turn)
+                                          : get_magic_piece_attacks(single,(Pieces)i,game,turn,1,occupancy);
             if((atks&pos) != 0) return 1;
             tab &= tab - 1; // remove esse bit
         }

@@ -398,6 +398,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
 int is_end_game(EstadoJogo * estado);
 int mopup_eval(GameStruct * game , CorPiece op_turn);
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn);
+int has_non_pawn_material(GameStruct * game, CorPiece turn);
 
 
 
@@ -426,8 +427,8 @@ void init_zobrist(void);
 void tt_init(void);
 uint64_bit compute_zobrist(GameStruct * game, CorPiece turn);
 TTEntry * tt_probe(uint64_bit key);
-void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move);
-TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move);
+void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move , int ply);
+TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move , int ply);
 
 
 

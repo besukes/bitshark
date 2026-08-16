@@ -63,8 +63,11 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
         int delta = applyDeltaMove(game,cur_move,turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
+            int pvs_beta = (i==0) ? beta : (alpha + 1);
             // Chamada recursiva do NEGAMAX:
-            int eval = -search(game, depth - 1 , -beta, -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn,0);
+            int eval = -search(game, depth - 1 , -pvs_beta, -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn,1);
+            if(eval > alpha && eval < beta && i > 0)
+                eval = -search(game, depth - 1, -beta, -alpha, eval_wb_inicial + delta, initial_time, budget, op_turn, 1);
             undoMove(game,cur_move,turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if((-eval) == FLAG_TIMEOUT) {
@@ -83,7 +86,7 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
     int completed = best_move.origem != 64;
     if(completed){
         TTFlag flag = (melhor_eval > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
-        tt_store(hash_key, depth, melhor_eval, flag, best_move);
+        tt_store(hash_key, depth, melhor_eval, flag, best_move,0);
     }
     jogadabot result = {.best_move = best_move,.move_eval = alpha ,.move_time = SDL_GetTicks() - initial_time , .completed = completed};
     return result;

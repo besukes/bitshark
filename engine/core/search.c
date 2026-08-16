@@ -26,7 +26,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     int orig_alpha = alpha;
     Jogada * hash_move = NULL; int move_eval = 0;
     uint64_bit key = compute_zobrist(game,turn);
-    getPositionTTMove(key,0,&alpha,&beta,&move_eval,&hash_move);
+    getPositionTTMove(key,0,&alpha,&beta,&move_eval,&hash_move,0);
     // Transposition table showed us its a alpha beta cutoff
     if(alpha >= beta) return move_eval;
 
@@ -53,7 +53,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
                 }
                 if (eval >= beta){
                     history_table[jogadas[i].peca_movida][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
-                    tt_store(key, 0 , beta, TT_LOWERBOUND, *best_move);
+                    tt_store(key, 0 , beta, TT_LOWERBOUND, *best_move,0);
                     return beta;
                 }
                 alpha = (eval > alpha) ? eval : alpha;
@@ -63,14 +63,36 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     }
     if(num_jogadas>0){
         TTFlag flag = (best_eval > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
-        tt_store(key, 0 , alpha, flag, best_move_found);
+        tt_store(key, 0 , alpha, flag, best_move_found,0);
     }
     return alpha;
 }
 
 
+int nullmovepruning(GameStruct * game , int in_check , int depth ,int beta, int ply , int wb_eval , int timeI , int budget , CorPiece turn , CorPiece op_turn , int* prunes){
+    if(depth >= 3 && !in_check && ply > 0 && has_non_pawn_material(game,turn)){
+        int R = (depth > 6) ? 3 : 2; // Redução: quanto maior a profundidade, mais confiamos na poda
+        int null_depth = depth - 1 - R;
+        if(null_depth < 0) null_depth = 0;
+        int null_eval = -search(game, null_depth, -beta, -beta+1, wb_eval, timeI , budget, op_turn, ply+1);
+        if(null_eval == FLAG_TIMEOUT){
+            *prunes = 1;
+            return FLAG_TIMEOUT;
+        }
+        if(null_eval >= beta){
+            *prunes = 1;
+            return beta;
+        }
+    }
+    return 0;
+}
 
-// A função Search usando Negamax + Alpha-Beta
+
+/* A função Search usando Negamax + Alpha-Beta , com outras técnicas como :
+    ->Principal Variation Search - Procura os moves depois do primeiro melhor com uma janela reduzida [alpha,alpha+1];
+    ->Late Move Reductions - Reduz a profundidade de moves mais tardios por serem considerados inferiores;
+    ->Null Move Pruning - Passa a sua vez um turno e verifica se a posição continua muito superior , se sim não vale a pena continuar a pesquisar;
+*/
 int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply){
     total_nodes_searched++;
     if (SDL_GetTicks() - initial_time >= time_limit) {
@@ -86,18 +108,23 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     Jogada * hash_move = NULL; 
     int hash_move_eval = 0;
     uint64_bit key = compute_zobrist(game,turn);
-    getPositionTTMove(key,depth,&alpha,&beta,&hash_move_eval,&hash_move);
+    getPositionTTMove(key,depth,&alpha,&beta,&hash_move_eval,&hash_move,ply);
     if(is_repeated_position(key)) return 0;
     // Transposition table showed us its a alpha beta cutoff
     if(alpha >= beta) return (hash_move_eval);
+    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+    int king_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
+
+    //Null move pruning to better optimize search
+    int safe2prune = 0;
+    int nmp = nullmovepruning(game,king_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune);
+    if(safe2prune) return nmp;
+
     moveScoring(game,jogadas, num_jogadas, hash_move , depth , turn); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
-    
     int best_score = -2*VALOR_INFINITO;
     Jogada best_move_found = jogadas[0];
     int legal_moves = 0;
     hash_key_stack[hash_stack_indx++] = key;
-    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
-
 
     for (int i = 0; i < num_jogadas; i++) {
         // 0. Incremental Sort & Incremental evaluation , depois de ordenados os moves , começamos por escolher o melhor deles e aplicar uma
@@ -108,7 +135,8 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         if(!in_check){ // Verifica se a jogada é válida (rei atual não fica em check)
             // 1. Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
             int can_apply_lmr = i >= 3 && depth >= 3 , 
-                isnt_important_move = !best_move->promocao && best_move->peca_capturada == Empty;
+                isnt_important_move = !best_move->promocao && (best_move->peca_capturada == Empty || best_move->score < 0)
+                                     && !is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[op_turn][King],op_turn);
             int applied_reduction = (can_apply_lmr && isnt_important_move) ? lmr_lt[depth][i] : 0;
             int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) : (depth - 1);
 
@@ -144,7 +172,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
                     history_table[best_move->peca_movida][best_move->destino] += depth * depth; // Atualiza a tabela de histórico
                 }
                 // Guardamos um move na transposition table como um LOWERBOUND (causou beta pruning antes)
-                tt_store(key, depth, beta, TT_LOWERBOUND, *best_move);
+                tt_store(key, depth, beta, TT_LOWERBOUND, *best_move , ply);
                 hash_stack_indx--;
                 return beta;
             }
@@ -155,13 +183,13 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     hash_stack_indx--;
     //Se não tiverem sido executado moves nenhuns , então é porque os movimentos eram inválidos
     if(!legal_moves){
-        if (is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
+        if(king_in_check){
             return (-VALOR_INFINITO + ply); // Xeque-mate ,prioriza mates mais rápidos
         }
         return 0; // Empate por afogamento
     }
     //Se best_score > orig_alpha , entao encontramos uma jogada melhor , caso contrario esta jogada piora a posicao (fail)
     TTFlag flag = (best_score > orig_alpha) ? TT_EXACT : TT_UPPERBOUND;
-    tt_store(key, depth, alpha, flag, best_move_found);
+    tt_store(key, depth, alpha, flag, best_move_found , ply);
     return alpha;
 }

@@ -2,6 +2,15 @@
 #include <engine/chess_lib/evals.h>
 
 
+// Usada pelo Null Move Pruning: evita aplicar a poda em finais so com reis e peoes,
+// onde o risco de zugzwang (em que "passar a vez" seria de facto a melhor jogada) e alto
+// e a poda pode causar erros de avaliacao graves.
+int has_non_pawn_material(GameStruct * game, CorPiece turn){
+    return (game->estadoJogo.tabuleirojogo[turn][Horse] || game->estadoJogo.tabuleirojogo[turn][Bishop] ||
+            game->estadoJogo.tabuleirojogo[turn][Rook]  || game->estadoJogo.tabuleirojogo[turn][Queen]);
+}
+
+
 //Evals are now looking better but still a bit shy to a strong engine
 //Evaluation functions need to do a incremental evaluation to only check the new piece moved evaluation and compare it
 //Changing alpha and beta depending to that comparation
