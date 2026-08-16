@@ -57,11 +57,8 @@ uint64_bit get_opposing_colour_bitboard(EstadoJogo * estado , CorPiece cor){
 
 uint64_bit get_selected_piece_attacks(GameStruct * game , uint64_bit click , Pieces piece , CorPiece turno){
     uint64_bit atk = 0;
-    uint64_bit passant = game->estadoJogo.enpassant;
-    Jogada j = {.origem = (-1) , .peca_movida = piece};
-    if(can_en_passant(game,&j,turno)) atk = passant | get_magic_piece_attacks(click,piece,game,turno,1,game->estadoJogo.bitboard_todas_pieces);
-    else atk = get_magic_piece_attacks(click,piece,game,turno,1,game->estadoJogo.bitboard_todas_pieces);
-    atk = ~get_same_colour_bitboard(&game->estadoJogo,turno) & atk;
+    atk = get_magic_piece_attacks(click,piece,game,turno,0,game->estadoJogo.bitboard_todas_pieces);
+    atk &= ~get_same_colour_bitboard(&game->estadoJogo,turno);
     return atk;
 }
 

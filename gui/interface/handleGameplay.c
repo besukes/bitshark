@@ -15,7 +15,7 @@ void softReset(GameStruct * game){
 //&& game->turnoJogador == brancas
 void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event , Mix_Chunk * sfxarray[]){
     CorPiece turno_j = brancas;
-   if(game->turnoJogador == pretas){
+    if(game->turnoJogador == pretas){
         GameStruct game_aux = *game;
         //depois substituir por game_aux
         Jogada best_move = get_best_move(&game_aux,pretas,ITERATIVE_DEEPENING);
@@ -68,7 +68,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->position_eval = game_aux.position_eval;
     }
     if(0){}
-    else if(event.type == SDL_MOUSEBUTTONDOWN && game->turnoJogador == turno_j){ // && game->turnoJogador == turno_j
+    else if(event.type == SDL_MOUSEBUTTONDOWN ){ // && game->turnoJogador == turno_j
         if(event.button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown ==0){
             game->isKeyPressedDown = 1;
             cleanArrowEvent(game);
@@ -79,7 +79,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
             efetuaEventoClickArrows(game,event);
         }
     }
-    else if(event.type == SDL_MOUSEBUTTONUP && game->turnoJogador == turno_j){
+    else if(event.type == SDL_MOUSEBUTTONUP ){
         if(event.button.button == SDL_BUTTON_LEFT){
             game->isKeyPressedDown = 0;
             efetuaEventoSoltar(game,settings,event,sfxarray);

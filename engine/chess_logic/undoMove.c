@@ -44,7 +44,6 @@ void undoPiece_move(GameStruct * game , uint64_bit * sameCor,uint64_bit * opCor,
     else{
         *piece_tab = ((*piece_tab & ~nova_pos) | antiga_pos);
         *sameCor = ((*sameCor & ~nova_pos) | antiga_pos);
-        if(special == FLAG_ENPASSANT) *opCor |= (turn==brancas) ? (antiga_pos>>8) : (antiga_pos<<8);
     }
     game->estadoJogo.bitboard_todas_pieces = *sameCor | *opCor;
 }
@@ -89,8 +88,10 @@ void undoMove(GameStruct * game , Jogada * jogada , CorPiece turn){
     }
     undoPiece_move(game,mesma_cor,cor_oposta,jogada->destino,jogada->origem,jogada->especial
                     ,(Pieces)(jogada->peca_movida),turn);
-    if(jogada->peca_capturada != Empty && jogada->especial != FLAG_ENPASSANT){
-        uint64_bit captured_pos = 1ULL<<jogada->destino;
+    if(jogada->peca_capturada != Empty){
+         uint64_bit captured_pos = (jogada->especial == FLAG_ENPASSANT)
+            ? ((turn==brancas) ? (1ULL<<jogada->destino)>>8 : (1ULL<<jogada->destino)<<8)
+            : (1ULL<<jogada->destino);
         undoPieceComida(game,cor_oposta,captured_pos,op_turn,jogada->peca_capturada);
     }
     int pos_passant = jogada->prev_enpassant;

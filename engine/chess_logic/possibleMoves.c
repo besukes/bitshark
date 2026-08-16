@@ -198,10 +198,14 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
     jogada->especial = piece == King  && is_castelling_king(game,cor,pos_dest);
     if(jogada->especial) jogada->especial = FLAG_CASTLE;
     else jogada->especial = 0;
-    int enpassant = (piece == Pawn) && (pos_dest & game->estadoJogo.enpassant);
-    if(enpassant){
-        jogada->especial = FLAG_ENPASSANT;
-        jogada->peca_capturada = Pawn;
+    int tries_to_enpassant = (piece == Pawn) && (pos_dest & game->estadoJogo.enpassant);
+    int can_enpassant = can_en_passant(game,jogada,cor);
+    if(tries_to_enpassant){
+        if(can_enpassant){
+            jogada->especial = FLAG_ENPASSANT;
+            jogada->peca_capturada = Pawn;
+        }
+        else return 0;
     }
     return (move != 0 || jogada->especial == FLAG_CASTLE || jogada->especial == FLAG_ENPASSANT);
 }
