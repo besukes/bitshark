@@ -124,7 +124,7 @@ int calculate_extension_depth(GameStruct * game , int depth , CorPiece op_turn){
     int extension = 0;
     if(depth < MAX_DEPTH_SEARCH + 2){
         if(is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[op_turn][King],op_turn))
-            extension+=2;
+            extension++;
     }
     return extension;
 }

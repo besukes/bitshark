@@ -122,6 +122,7 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
 
 Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening){
     memset(history_table, 0, sizeof(int) * (NUMBER_PIECES*2) * NUM_SQUARES);
+    memset(killer_moves , 0 , sizeof(Jogada) * MAX_DEPTH_SEARCH * 2);
     double initial_time = SDL_GetTicks();
     int reached_depth = 0;
     jogadabot best_jogada = {0};

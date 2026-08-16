@@ -28,7 +28,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         if(t == Checkmate ){
             settings->screen = WinScreen;
         }
-        notInCheck(game);
+        game->estadoJogo.king_in_check[pretas] = 0;
         game->promoted.pawnPromoted = 0;
         updateScore(game,&best_move,brancas);
         if(best_move.peca_capturada != Empty) capturepiece_sfx(sfxarray);
@@ -38,7 +38,11 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->turns++;
         game->moved_to_square = best_move.destino;
         uint64_bit key = compute_zobrist(game,pretas);
-        hash_key_stack[hash_stack_indx++] = key;
+        hash_stack_indx++;
+        if(hash_stack_indx > 2048) settings->screen = WinScreen;
+        else{
+            hash_key_stack[hash_stack_indx] = key;
+        }
         game->position_eval = game_aux.position_eval;
     }
     else if(game->turnoJogador == brancas){
@@ -54,7 +58,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         if(t == Checkmate ){
             settings->screen = WinScreen;
         }
-        notInCheck(game);
+        game->estadoJogo.king_in_check[brancas] = 0;
         game->promoted.pawnPromoted = 0;
         updateScore(game,&best_move,pretas);
         if(best_move.peca_capturada != Empty) capturepiece_sfx(sfxarray);
@@ -64,7 +68,11 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->turns++;
         game->moved_to_square = best_move.destino;
         uint64_bit key = compute_zobrist(game,brancas);
-        hash_key_stack[hash_stack_indx++] = key;
+        hash_stack_indx++;
+        if(hash_stack_indx > 2048) settings->screen = WinScreen;
+        else{
+            hash_key_stack[hash_stack_indx] = key;
+        }
         game->position_eval = game_aux.position_eval;
     }
     if(0){}
