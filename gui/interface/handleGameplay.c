@@ -68,7 +68,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
         game->position_eval = game_aux.position_eval;
     }
     if(0){}
-    else if(event.type == SDL_MOUSEBUTTONDOWN ){ // && game->turnoJogador == turno_j
+    else if(event.type == SDL_MOUSEBUTTONDOWN && game->turnoJogador == turno_j){ // && game->turnoJogador == turno_j
         if(event.button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown ==0){
             game->isKeyPressedDown = 1;
             cleanArrowEvent(game);
@@ -79,7 +79,7 @@ void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event
             efetuaEventoClickArrows(game,event);
         }
     }
-    else if(event.type == SDL_MOUSEBUTTONUP ){
+    else if(event.type == SDL_MOUSEBUTTONUP && game->turnoJogador == turno_j){
         if(event.button.button == SDL_BUTTON_LEFT){
             game->isKeyPressedDown = 0;
             efetuaEventoSoltar(game,settings,event,sfxarray);

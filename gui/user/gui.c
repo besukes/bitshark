@@ -15,7 +15,7 @@ void desenhaBitshark(GUISettings * settings){
     SDL_RenderCopy(settings->gameRenderer,settings->textures.logo,NULL,&logo);
     SDL_Color white = {.r = 255 , .b = 255 , .g = 255 ,.a = 255};
     renderTextoCentradoSombra(settings->gameRenderer,settings->fonteJogoTitles,"Bitshark",white,435,6,1.5);
-    renderTextoCentradoBasico(settings->gameRenderer,settings->fonteJogoSmallerTitles , "2100 elo" , white , 394 , 60 , 0.55);
+    renderTextoCentradoBasico(settings->gameRenderer,settings->fonteJogoSmallerTitles , "2500 elo" , white , 394 , 60 , 0.55);
 }
 
 
@@ -54,7 +54,7 @@ void desenhaInterfaceJogo(GameStruct * game ,GUISettings * settings){
         desenharPieceAttacks(settings,game->estadoJogo.enpassant, game->selected_piece_attacks , op);
     }
 
-    //desenhaBitshark(settings);
+    desenhaBitshark(settings);
     desenhaEvalBar(game->position_eval,settings);
     desenhaMoved(game,settings);
     desenhaCheck(game,settings);
