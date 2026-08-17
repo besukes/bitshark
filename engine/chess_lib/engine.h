@@ -417,7 +417,7 @@ void pick_best_move(Jogada * jogadas, int num_jogadas, int start_index);
 void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada * hash_move , int depth , CorPiece turn);
 void moveScoringCaptures(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada * hash_move , CorPiece turn);
 int matches_killer_move(int depth, Jogada * jogada, int index);
-int calculate_extension_depth(GameStruct * game , int depth , CorPiece op_turn);
+int calculate_extension_depth(int op_king_in_check, int depth , CorPiece op_turn);
 int is_repeated_position(uint64_bit key);
 
 
