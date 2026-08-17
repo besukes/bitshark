@@ -74,6 +74,9 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
     }
     else if( (click & *bitboard_cor_oposta) != 0){
         fetch_change_board(game,click,bitboard_cor_turno,bitboard_cor_oposta,jogada,turno);
+        if(jogada->promocao){
+            promotePiece(game,jogada->promocao,click,turno);
+        }
     }
     else{
         uint64_bit * bit_piece = &(game->estadoJogo.tabuleirojogo[turno][jogada->peca_movida]),
@@ -85,4 +88,5 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
     }
     verifica_direito_castle(game,jogada,turno);
     update_en_passant(game,jogada,turno);
+    game->is_end_game = is_end_game(&game->estadoJogo);
 }

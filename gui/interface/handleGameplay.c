@@ -7,8 +7,9 @@
 #define BOT_PLAYS_BLACK 1
 #define BOT_PLAYS_WHITE 1
 
-void softReset(GameStruct *game)
-{
+
+
+void softReset(GameStruct *game){
     game->pieceCoords = 0;
     game->pieceSelecionada = Empty;
     game->selected_piece_attacks = 0;
@@ -19,16 +20,15 @@ void playBotMove(GameStruct *game, GUISettings *settings, Mix_Chunk *sfxarray[],
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
     // depois substituir por game_aux
     Jogada best_move = get_best_move(&game_aux, turn , ITERATIVE_DEEPENING);
-    if (best_move.peca_movida == Empty || best_move.destino >= 64 || best_move.origem >= 64)
-    {
+    if (best_move.peca_movida == Empty || best_move.destino >= 64 || best_move.origem >= 64){
         game->turnoJogador = op_turn;
         return;
     }
     atualizaJogada(game, &best_move, turn);
     TipoJogada t = check_move(game, &best_move, turn);
-    if (t == Checkmate)
-    {
+    if (t == Checkmate){
         settings->screen = WinScreen;
+        game->estadoJogo.checkMate = 1;
     }
     game->estadoJogo.king_in_check[turn] = 0;
     game->promoted.pawnPromoted = 0;
@@ -43,12 +43,9 @@ void playBotMove(GameStruct *game, GUISettings *settings, Mix_Chunk *sfxarray[],
     game->turns++;
     game->moved_to_square = best_move.destino;
     uint64_bit key = compute_zobrist(game, turn);
-    if (hash_stack_indx >= 2048)
+    if (hash_stack_indx >= 2000)
         settings->screen = WinScreen;
-    else
-    {
-        hash_key_stack[hash_stack_indx++] = key;
-    }
+    else hash_key_stack[hash_stack_indx++] = key;
     game->position_eval = game_aux.position_eval;
 }
 

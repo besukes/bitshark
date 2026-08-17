@@ -108,16 +108,23 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
     if(jogada->especial == FLAG_ENPASSANT) captured_bit = (turn == brancas) ? (destino_bit >> 8) : (destino_bit << 8);
     int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(captured_bit, peca_capturada, op_turn, game) : 0;
     
+    int old_rook_bonus = rookOpenFilesBonus(&game->estadoJogo,turn);
+
     atualizaJogada(game, jogada, turn);
     int promote_value = (jogada->promocao) ? (pieces_value[jogada->promocao] - 100) : 0;
+
+    int new_rook_bonus = rookOpenFilesBonus(&game->estadoJogo,turn);
+    int delta_rook_bonus = new_rook_bonus - old_rook_bonus;
 
     int new_moved_eval = evaluate_piece(destino_bit, peca_movida, turn, game);
 
     int who2Move = (turn == brancas) ? 1 : -1;
     int castleBonus = (jogada->especial == FLAG_CASTLE) ? 50 : 0;
 
-    game->is_end_game = is_end_game(&game->estadoJogo);
-    return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + castleBonus));
+    return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + castleBonus
+                        + delta_rook_bonus
+                       )
+            );
 }
 
 

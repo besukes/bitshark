@@ -39,7 +39,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
 
     for (int i = 0; i < num_jogadas; i++){
         pick_best_move(jogadas, num_jogadas, i);
-        if(&jogadas[i].score >= 0){
+        if(jogadas[i].score >= 0){
             int delta = applyDeltaMove(game,&jogadas[i],turn,op_turn);
             if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
                 int eval = -quiescence(game, -beta, -alpha, quiescence_eval + delta, op_turn , q_depth + 1 , init_time , max_time);
@@ -101,17 +101,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     // Quando atinge a profundidade 0 ou o jogo acaba, lê a avaliação incremental atual
     if (depth == 0) return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , initial_time , time_limit);
 
-    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
-    int king_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
-
-    //Null move pruning to better optimize search
-    int safe2prune = 0;
-    int nmp = nullmovepruning(game,king_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune);
-    if(safe2prune) return nmp;
-
-    Jogada jogadas[MAX_NUMBER_MOVES];
-    int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
-    
+    // Acessar à tranposition table para ver qual move ela dá para esta posição
     int orig_alpha = alpha;
     Jogada * hash_move = NULL; 
     int hash_move_eval = 0;
@@ -121,7 +111,19 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     // Transposition table showed us its a alpha beta cutoff
     if(alpha >= beta) return (hash_move_eval);
 
+    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+    int king_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
+
+    //Null move pruning to better optimize search
+    int safe2prune = 0;
+    int nmp = nullmovepruning(game,king_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune);
+    if(safe2prune) return nmp;
+
+    //Get all legal moves
+    Jogada jogadas[MAX_NUMBER_MOVES];
+    int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     moveScoring(game,jogadas, num_jogadas, hash_move , depth , turn); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
+
     int best_score = -2*VALOR_INFINITO;
     Jogada best_move_found = jogadas[0];
     int legal_moves = 0;

@@ -1,6 +1,6 @@
 #include "engine/chess_lib/engine.h"
 #include <engine/chess_lib/evals.h>
-
+#include <engine/chess_lib/PreComputed_files.h>
 
 // Usada pelo Null Move Pruning: evita aplicar a poda em finais so com reis e peoes,
 // onde o risco de zugzwang (em que "passar a vez" seria de facto a melhor jogada) e alto
@@ -62,6 +62,18 @@ int mopup_eval(GameStruct * game , CorPiece op_turn){
     return 0;
 }
 
+
+int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn){
+    int bonus = 0;
+    uint64_bit rooks = state->tabuleirojogo[turn][Rook];
+    while(rooks != 0){
+        uint64_bit single = rooks & (-rooks);
+        int column = posTabuleiro(single) % 8;
+        if(!(rook_files[column] & state->bitboard_todas_pieces)) bonus += 15;
+        rooks &= (rooks - 1);
+    }
+    return bonus;
+}
 
 
 int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , GameStruct * game){

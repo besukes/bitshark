@@ -400,6 +400,7 @@ int is_end_game(EstadoJogo * estado);
 int mopup_eval(GameStruct * game , CorPiece op_turn);
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn);
 int has_non_pawn_material(GameStruct * game, CorPiece turn);
+int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn);
 
 
 
