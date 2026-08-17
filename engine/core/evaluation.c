@@ -31,7 +31,10 @@ int is_end_game(EstadoJogo * estado){
     Boolean white_ok = (white_queens == 0 && white_minors <= 1) || (white_minors <= 1 && white_rooks == 0);
     Boolean black_ok = (black_queens == 0 && black_minors <= 1) || (black_minors <= 1 && black_rooks == 0);
 
-    return (white_ok && black_ok);
+    Boolean white_low = (white_minors <= 1 && white_rooks == 0 && white_queens == 0);
+    Boolean black_low = (black_minors <= 1 && black_rooks == 0 && black_queens == 0);
+
+    return ((white_ok && black_ok) || white_low || black_low);
 }
 
 
