@@ -112,11 +112,11 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     if(alpha >= beta) return (hash_move_eval);
 
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
-    int king_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
+    int starts_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
 
     //Null move pruning to better optimize search
     int safe2prune = 0;
-    int nmp = nullmovepruning(game,king_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune);
+    int nmp = nullmovepruning(game,starts_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune);
     if(safe2prune) return nmp;
 
     //Get all legal moves
@@ -140,7 +140,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             // 1. Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
             int can_apply_lmr = i >= 3 && depth >= 3 , 
                 isnt_important_move = !jogadas[i].promocao && (jogadas[i].peca_capturada == Empty || jogadas[i].score < 0)
-                                     && !op_king_in_check;
+                                     && !op_king_in_check && !starts_in_check;
             int applied_reduction = (can_apply_lmr && isnt_important_move) ? lmr_lt[depth][i] : 0;
             int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) : (depth - 1);
 
@@ -187,7 +187,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     hash_stack_indx--;
     //Se não tiverem sido executado moves nenhuns , então é porque os movimentos eram inválidos
     if(!legal_moves){
-        if(king_in_check){
+        if(starts_in_check){
             return (-VALOR_INFINITO + ply); // Xeque-mate ,prioriza mates mais rápidos
         }
         return 0; // Empate por afogamento

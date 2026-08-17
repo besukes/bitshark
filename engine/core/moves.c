@@ -128,10 +128,10 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
 }
 
 
-int calculate_extension_depth(GameStruct * game , int depth , CorPiece op_turn){
+int calculate_extension_depth(int op_king_in_check, int depth , CorPiece op_turn){
     int extension = 0;
-    if(depth < MAX_DEPTH_SEARCH + 2){
-        if(is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[op_turn][King],op_turn))
+    if(depth < 5){
+        if(op_king_in_check)
             extension++;
     }
     return extension;
