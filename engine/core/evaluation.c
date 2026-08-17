@@ -36,7 +36,7 @@ int is_end_game(EstadoJogo * estado){
 
 
 int mopup_eval(GameStruct * game , CorPiece op_turn){
-    if(is_end_game(&game->estadoJogo)){
+    if(game->is_end_game){
         CorPiece turn = (op_turn == brancas) ? pretas : brancas;
         int turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[turn][King]),
             op_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[op_turn][King]);
@@ -77,7 +77,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
     int line = pos/8 , column = pos%8 , indx = (turn==brancas) ? ((7-line)*8 + column) : pos;
     switch(piece_type){
         case Pawn :
-            if(is_end_game(&game->estadoJogo)){
+            if(game->is_end_game){
                 position_score = pawn_evals_black_endgame[indx];
             }
             else position_score = pawn_evals_black[indx];
@@ -95,7 +95,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
             position_score = black_queen_evals[indx];
         break;
         case King:
-            if(is_end_game(&game->estadoJogo)){
+            if(game->is_end_game){
                 position_score = black_king_endGame_evals[indx];
             }
             else position_score = black_king_middleGame_evals[indx];

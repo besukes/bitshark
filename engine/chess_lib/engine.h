@@ -173,6 +173,7 @@ typedef struct GameStruct{
     Boolean trying_to_leave; //Informa se o utilizador clicou no botao de sair
     uint64_bit cur_pos_key; //Current zobrist key da posicao
     float position_eval; //Curent position evaluation for evaluation bar
+    int is_end_game; //Informa se o jogo já está em endgame ou não
 }GameStruct;
 
 /*Guarda as texturas que o jogo utiliza no seu decorrer , tal como o tema das peças*/
@@ -411,7 +412,7 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
 /// moves /////////////////////////////////
 
 int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiece op_turn);
-Jogada * pick_best_move(Jogada * jogadas, int num_jogadas, int start_index);
+void pick_best_move(Jogada * jogadas, int num_jogadas, int start_index);
 void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada * hash_move , int depth , CorPiece turn);
 void moveScoringCaptures(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada * hash_move , CorPiece turn);
 int matches_killer_move(int depth, Jogada * jogada, int index);

@@ -18,17 +18,17 @@ typedef struct jogadabot{
 jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[MAX_NUMBER_MOVES] , CorPiece turn , int n , int eval){
     jogadabot move = {.move_time = 5000 , .completed = 0};
     for(int i=0;i<n;i++){
-        Jogada * cur_move = pick_best_move(jogadas, n, i);
+        pick_best_move(jogadas, n, i);
         CorPiece op_turn = (turn == brancas) ? pretas : brancas;
-        int delta = applyDeltaMove(game,cur_move,turn,op_turn);
+        int delta = applyDeltaMove(game,&jogadas[i],turn,op_turn);
         if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
             eval += delta;
             move.move_eval = eval;
             move.best_move = jogadas[i];
-            undoMove(game,cur_move,turn);
+            undoMove(game,&jogadas[i],turn);
             return move;
         }
-        else undoMove(game,cur_move,turn);
+        else undoMove(game,&jogadas[i],turn);
     }
     Jogada invalid = {.destino = 64 , .origem = 64 , .peca_capturada = Empty , .peca_movida = Empty,
                       .especial = 0 , .promocao = 0 , .score = 0};
@@ -57,10 +57,10 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
     SDL_Event e;
     for (int i = 0; i < num_jogadas; i++) {
         SDL_PollEvent(&e);
-        Jogada * cur_move = pick_best_move(jogadas, num_jogadas, i);
+        pick_best_move(jogadas, num_jogadas, i);
         CorPiece op_turn = (turn == brancas) ? pretas : brancas;
         // Aplica a jogada nas Bitboards e atualiza a Avaliação Incremental (Delta)
-        int delta = applyDeltaMove(game,cur_move,turn,op_turn);
+        int delta = applyDeltaMove(game,&jogadas[i],turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             int pvs_beta = (i==0) ? beta : (alpha + 1);
@@ -68,7 +68,7 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
             int eval = -search(game, depth - 1 , -pvs_beta, -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn,1);
             if(eval > alpha && eval < beta && i > 0)
                 eval = -search(game, depth - 1, -beta, -alpha, eval_wb_inicial + delta, initial_time, budget, op_turn, 1);
-            undoMove(game,cur_move,turn);
+            undoMove(game,&jogadas[i],turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if((-eval) == FLAG_TIMEOUT) {
                 printf("[engine] engine_search: timeout reached during search\n");
@@ -77,11 +77,11 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
             // Guarda a melhor pontuação encontrada para o jogador atual
             if(eval > melhor_eval) {
                 melhor_eval = eval;
-                best_move = *cur_move;
+                best_move = jogadas[i];
             }
             alpha = (melhor_eval > alpha) ? melhor_eval : alpha;
         }
-        else undoMove(game,cur_move,turn);
+        else undoMove(game,&jogadas[i],turn);
     }
     int completed = best_move.origem != 64;
     if(completed){

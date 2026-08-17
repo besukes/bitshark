@@ -110,7 +110,7 @@ void updateScore(GameStruct * game , Jogada* jogada,CorPiece turn){
     if(jogada->peca_capturada != Empty){
         Pieces p = jogada->peca_capturada;
         int mult = 1;
-        if(turn == brancas) mult = (-1);
+        if(turn == pretas) mult = (-1);
         switch(p){
             case 0:
                 game->score_game+=1*mult;

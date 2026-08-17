@@ -2,7 +2,7 @@
 #include <engine/chess_lib/evals.h>
 
 
-Jogada * pick_best_move(Jogada * jogadas, int num_jogadas, int start_index) {
+void pick_best_move(Jogada * jogadas, int num_jogadas, int start_index){
     int best_indx = start_index;
     for (int i = start_index + 1; i < num_jogadas; i++) {
         if (jogadas[i].score > jogadas[best_indx].score) {
@@ -12,7 +12,6 @@ Jogada * pick_best_move(Jogada * jogadas, int num_jogadas, int start_index) {
     Jogada temp = jogadas[start_index];
     jogadas[start_index] = jogadas[best_indx];
     jogadas[best_indx] = temp;
-    return &jogadas[start_index];
 }
 
 
@@ -116,6 +115,8 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
 
     int who2Move = (turn == brancas) ? 1 : -1;
     int castleBonus = (jogada->especial == FLAG_CASTLE) ? 50 : 0;
+
+    game->is_end_game = is_end_game(&game->estadoJogo);
     return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + castleBonus));
 }
 

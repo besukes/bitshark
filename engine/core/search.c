@@ -38,27 +38,27 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     Jogada best_move_found = jogadas[0];
 
     for (int i = 0; i < num_jogadas; i++){
-        Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
-        if(best_move->score >= 0){
-            int delta = applyDeltaMove(game,best_move,turn,op_turn);
+        pick_best_move(jogadas, num_jogadas, i);
+        if(&jogadas[i].score >= 0){
+            int delta = applyDeltaMove(game,&jogadas[i],turn,op_turn);
             if(!is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn)){
                 int eval = -quiescence(game, -beta, -alpha, quiescence_eval + delta, op_turn , q_depth + 1 , init_time , max_time);
-                undoMove(game,best_move,turn);
+                undoMove(game,&jogadas[i],turn);
                 if((-eval) == FLAG_TIMEOUT) {
                     return FLAG_TIMEOUT;
                 }
                 if(eval > best_eval){
                     best_eval = eval;
-                    best_move_found = *best_move;
+                    best_move_found = jogadas[i];
                 }
                 if (eval >= beta){
                     history_table[jogadas[i].peca_movida][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
-                    tt_store(key, 0 , beta, TT_LOWERBOUND, *best_move,0);
+                    tt_store(key, 0 , beta, TT_LOWERBOUND, jogadas[i],0);
                     return beta;
                 }
                 alpha = (eval > alpha) ? eval : alpha;
             }
-            else undoMove(game,best_move,turn);
+            else undoMove(game,&jogadas[i],turn);
         }
     }
     if(num_jogadas>0){
@@ -101,6 +101,14 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     // Quando atinge a profundidade 0 ou o jogo acaba, lê a avaliação incremental atual
     if (depth == 0) return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , initial_time , time_limit);
 
+    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+    int king_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
+
+    //Null move pruning to better optimize search
+    int safe2prune = 0;
+    int nmp = nullmovepruning(game,king_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune);
+    if(safe2prune) return nmp;
+
     Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     
@@ -112,13 +120,6 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     if(is_repeated_position(key)) return 0;
     // Transposition table showed us its a alpha beta cutoff
     if(alpha >= beta) return (hash_move_eval);
-    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
-    int king_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
-
-    //Null move pruning to better optimize search
-    int safe2prune = 0;
-    int nmp = nullmovepruning(game,king_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune);
-    if(safe2prune) return nmp;
 
     moveScoring(game,jogadas, num_jogadas, hash_move , depth , turn); // Ordena as jogadas para melhorar a poda alpha-beta , ainda nao existe hash_moves
     int best_score = -2*VALOR_INFINITO;
@@ -129,14 +130,14 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     for (int i = 0; i < num_jogadas; i++) {
         // 0. Incremental Sort & Incremental evaluation , depois de ordenados os moves , começamos por escolher o melhor deles e aplicar uma
         // incremental evaluation ao move atual , de modo a não ter de recalcular a evaluation em todas as folhas da search tree
-        Jogada * best_move = pick_best_move(jogadas, num_jogadas, i);
-        int delta = applyDeltaMove(game,best_move,turn,op_turn);
+        pick_best_move(jogadas, num_jogadas, i); //This function sets jogadas[i] to be the best move in terms of score
+        int delta = applyDeltaMove(game,&jogadas[i],turn,op_turn);
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){ // Verifica se a jogada é válida (rei atual não fica em check)
             int op_king_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[op_turn][King],op_turn);
             // 1. Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
             int can_apply_lmr = i >= 3 && depth >= 3 , 
-                isnt_important_move = !best_move->promocao && (best_move->peca_capturada == Empty || best_move->score < 0)
+                isnt_important_move = !jogadas[i].promocao && (jogadas[i].peca_capturada == Empty || jogadas[i].score < 0)
                                      && !op_king_in_check;
             int applied_reduction = (can_apply_lmr && isnt_important_move) ? lmr_lt[depth][i] : 0;
             int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) : (depth - 1);
@@ -154,32 +155,32 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             // Re-pesquisa na profundidade normal com JANELA CHEIA
             if (eval > alpha && eval < beta && i > 0)
                 eval = -search(game, depth - 1, -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn , ply + 1);
-            undoMove(game,best_move,turn);
+            undoMove(game,&jogadas[i],turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if ((-eval) == FLAG_TIMEOUT) {
                 hash_stack_indx--;
                 return FLAG_TIMEOUT;
             }
             // Se a nova eval for melhor do que a ultima que tinhamos arranjado , entao
-            if(eval > best_score){best_score = eval;best_move_found = *best_move;}
+            if(eval > best_score){best_score = eval;best_move_found = jogadas[i];}
             // 4. PODA ALPHA-BETA (Pruning):
             // Se a avaliação atual ultrapassa o Beta do adversário, ele nunca deixará esta posição acontecer.
             if (eval >= beta) {
-                if(best_move->peca_capturada == Empty) {
+                if(jogadas[i].peca_capturada == Empty) {
                     // Se não for uma captura, registra como um killer move
                     killer_moves[depth][1] = killer_moves[depth][0];
-                    killer_moves[depth][0] = *best_move;
+                    killer_moves[depth][0] = jogadas[i];
 
-                    history_table[best_move->peca_movida][best_move->destino] += depth * depth; // Atualiza a tabela de histórico
+                    history_table[jogadas[i].peca_movida][jogadas[i].destino] += depth * depth; // Atualiza a tabela de histórico
                 }
                 // Guardamos um move na transposition table como um LOWERBOUND (causou beta pruning antes)
-                tt_store(key, depth, beta, TT_LOWERBOUND, *best_move , ply);
+                tt_store(key, depth, beta, TT_LOWERBOUND, jogadas[i] , ply);
                 hash_stack_indx--;
                 return beta;
             }
             alpha = (eval > alpha) ? eval : alpha; // Atualiza o Alpha se a avaliação atual for melhor
         }
-        else undoMove(game,best_move,turn);
+        else undoMove(game,&jogadas[i],turn);
     }
     hash_stack_indx--;
     //Se não tiverem sido executado moves nenhuns , então é porque os movimentos eram inválidos
