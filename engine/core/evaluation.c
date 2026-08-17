@@ -69,7 +69,8 @@ int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn){
     while(rooks != 0){
         uint64_bit single = rooks & (-rooks);
         int column = posTabuleiro(single) % 8;
-        if(!(rook_files[column] & state->bitboard_todas_pieces)) bonus += 15;
+        if(!(rook_files[column] & (state->bitboard_todas_pieces & ~single)))
+            bonus += 15;
         rooks &= (rooks - 1);
     }
     return bonus;
