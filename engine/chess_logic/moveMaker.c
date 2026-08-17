@@ -68,6 +68,7 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
     uint64_bit click = 1ULL<<jogada->destino;
     if(jogada->especial == FLAG_CASTLE){
         castle_King(game,click,square,bitboard_cor_turno,turno);
+        game->estadoJogo.is_castled[turno] = 1;
     }
     else if(jogada->especial == FLAG_ENPASSANT){
         enpassant_move(game,bitboard_cor_oposta,bitboard_cor_turno,ep,turno,1ULL<<jogada->origem);

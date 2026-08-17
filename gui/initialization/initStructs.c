@@ -29,6 +29,8 @@ EstadoJogo initEstadoJogo(void){
     es.king_in_check[pretas] = 0;
     es.enpassant = 0;
     es.stalemate = 0;
+    es.is_castled[0] = 0;
+    es.is_castled[1] = 0;
     for(int i=0;i<2;i++){
         es.canCastle[i][0] = 1;
         es.canCastle[i][1] = 1;

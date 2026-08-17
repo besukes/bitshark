@@ -136,6 +136,7 @@ typedef struct EstadoJogo{
     int stalemate; //Informa se o jogo acabou em staleMate
     int king_in_check[2]; //Informa se o reis estão em check
     int canCastle[2][2]; //Matriz de possibilidades de dar castle
+    int is_castled[2]; //Informa se o rei estão castled
     uint64_bit enpassant; //Guarda a posição possível de se fazer enpassant
     uint64_bit tabuleirojogo[2][6]; //Guarda as informações do tabuleiro das peças regulares de xadrez
     uint64_bit bitboard_brancas; // Bitboard das peças brancas

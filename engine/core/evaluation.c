@@ -80,6 +80,19 @@ int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn){
 }
 
 
+int mobilityScore(GameStruct * game , Pieces piece , uint64_bit piece_pos , CorPiece turn){
+    int pawn_structure_bonus = 10;
+    uint64_bit attks = get_magic_piece_attacks(piece_pos,piece,game,turn,0,game->estadoJogo.bitboard_todas_pieces);
+    int number_attks = __builtin_popcountll(attks);
+    if(piece == Bishop || piece == Rook) return (number_attks*2); // Really good to have active bishops and rooks
+    else if(piece == Queen) return (number_attks/2); // How many squares a queen see is not as relevant
+    else if(piece == Horse) return (number_attks); // An active knight is good
+    else if(piece == Pawn && (attks & game->estadoJogo.tabuleirojogo[turn][Pawn])) 
+        return (pawn_structure_bonus); // Benefit pawn structures
+    return 0; // King mobility score will have to be implemented later with deeper thought
+}
+
+
 int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , GameStruct * game){
     //piece evaluation is based on the position of the piece , its mobility , what pieces it attacks
     //and how it coordinates with other pieces
@@ -87,7 +100,6 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
         piece_eval = piece_score + position_score + mobility_score;
     */
     int position_score = 0 , piece_score = pieces_value[piece_type];
-    //int mobility_score = 0;
     int pos = posTabuleiro(piece_pos);
     if(pos==(-1)) return 0;
     int line = pos/8 , column = pos%8 , indx = (turn==brancas) ? ((7-line)*8 + column) : pos;
@@ -118,8 +130,8 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
         break;
         default:break;
     }
-    ///mobility_score = get_mobility_score_piece(piece_type,piece_pos,turn,game,piece_score);
-    return (piece_score + position_score);
+    int mobility_score = mobilityScore(game,piece_type,piece_pos,turn);
+    return (piece_score + position_score + mobility_score);
 }
 
 
@@ -130,11 +142,12 @@ int evaluate_piece_type(uint64_bit bitboard , Pieces piece_type, CorPiece turn, 
     while(bb){
         uint64_bit single = bb & (-bb); // isola o bit mais baixo
         score += evaluate_piece(single, piece_type, turn, game); // avalia só essa peça
+        if(piece_type == Rook) score += rookOpenFilesBonus(&game->estadoJogo,turn);
+        else if(piece_type == King && (!game->is_end_game && game->estadoJogo.is_castled[turn])) score+=50;
         bb &= bb - 1; // remove esse bit
     }
     return score;
 }
-
 
 
 
