@@ -2,6 +2,9 @@
 #include <engine/chess_lib/evals.h>
 #include <engine/chess_lib/PreComputed_files.h>
 
+extern unsigned long long passed_pawn_mask[2][64];
+
+
 // Usada pelo Null Move Pruning: evita aplicar a poda em finais so com reis e peoes,
 // onde o risco de zugzwang (em que "passar a vez" seria de facto a melhor jogada) e alto
 // e a poda pode causar erros de avaliacao graves.
@@ -11,9 +14,7 @@ int has_non_pawn_material(GameStruct * game, CorPiece turn){
 }
 
 
-//Evals are now looking better but still a bit shy to a strong engine
-//Evaluation functions need to do a incremental evaluation to only check the new piece moved evaluation and compare it
-//Changing alpha and beta depending to that comparation
+
 
 int is_end_game(EstadoJogo * estado){
     int white_queens = __builtin_popcountll(estado->tabuleirojogo[brancas][Queen]);
@@ -31,15 +32,32 @@ int is_end_game(EstadoJogo * estado){
     Boolean white_ok = (white_queens == 0 && white_minors <= 1) || (white_minors <= 1 && white_rooks == 0);
     Boolean black_ok = (black_queens == 0 && black_minors <= 1) || (black_minors <= 1 && black_rooks == 0);
 
-    Boolean white_low = (white_minors <= 1 && white_rooks == 0 && white_queens == 0);
-    Boolean black_low = (black_minors <= 1 && black_rooks == 0 && black_queens == 0);
+    return (white_ok && black_ok);
+}
 
-    return ((white_ok && black_ok) || white_low || black_low);
+
+
+int exists_strong_advantage(EstadoJogo * estado){
+    int white_queens = __builtin_popcountll(estado->tabuleirojogo[brancas][Queen]);
+    int black_queens = __builtin_popcountll(estado->tabuleirojogo[pretas][Queen]);
+
+    int white_minors = __builtin_popcountll(estado->tabuleirojogo[brancas][Horse])
+                      + __builtin_popcountll(estado->tabuleirojogo[brancas][Bishop]);
+    int black_minors = __builtin_popcountll(estado->tabuleirojogo[pretas][Horse])
+                      + __builtin_popcountll(estado->tabuleirojogo[pretas][Bishop]);
+
+    int white_rooks = __builtin_popcountll(estado->tabuleirojogo[brancas][Rook]);
+    int black_rooks = __builtin_popcountll(estado->tabuleirojogo[pretas][Rook]);
+
+    Boolean strong_adv_black = (white_minors <= 1 && white_rooks == 0 && white_queens == 0);
+    Boolean strong_adv_white = (black_minors <= 1 && black_rooks == 0 && black_queens == 0);
+
+    return (strong_adv_black || strong_adv_white);
 }
 
 
 int mopup_eval(GameStruct * game , CorPiece op_turn){
-    if(game->is_end_game){
+    if(game->is_end_game || exists_strong_advantage(&game->estadoJogo)){
         CorPiece turn = (op_turn == brancas) ? pretas : brancas;
         int turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[turn][King]),
             op_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[op_turn][King]);
@@ -93,6 +111,29 @@ int mobilityScore(GameStruct * game , Pieces piece , uint64_bit piece_pos , CorP
 }
 
 
+int passedPawnBonus(uint64_bit piece_pos , GameStruct * game , CorPiece turn){
+    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+    int pos_tab = posTabuleiro(piece_pos);
+    int bonus = 0;
+    //SE nao houver peoes da outra cor na passed_pawn_mask , entao o peao é um passed pawn
+    if(!(passed_pawn_mask[turn][pos_tab] & game->estadoJogo.tabuleirojogo[op_turn][Pawn]))
+        bonus += passed_pawn_bonus[pos_tab/8];
+    return bonus;
+}
+
+
+int kingSafetyBonus(int position , int line , int col , GameStruct* game , CorPiece turn){
+    int left_side = (col>0) ? (col - 1) : col;
+    int right_side = (col<7) ? (col + 1) : col;
+    uint64_bit (*shifts)(uint64_bit,int) = (turn ==  brancas) ? &shiftl : &shiftr;
+    uint64_bit mask = (shifts)(1ULL,8*line + left_side) | (shifts)(1ULL,8*line + col) | (shifts)(1ULL,8*line + right_side);
+    uint64_bit intersect = mask & game->estadoJogo.tabuleirojogo[turn][Pawn];
+    Boolean is_protected = game->estadoJogo.is_castled[turn] && (__builtin_popcountll(intersect) > 1);
+    if(is_protected) return 40;
+    return 0;
+}
+
+
 int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , GameStruct * game){
     //piece evaluation is based on the position of the piece , its mobility , what pieces it attacks
     //and how it coordinates with other pieces
@@ -106,7 +147,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
     switch(piece_type){
         case Pawn :
             if(game->is_end_game){
-                position_score = pawn_evals_black_endgame[indx];
+                position_score = pawn_evals_black_endgame[indx] + passedPawnBonus(piece_pos,game,turn);
             }
             else position_score = pawn_evals_black[indx];
         break;
@@ -126,7 +167,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
             if(game->is_end_game){
                 position_score = black_king_endGame_evals[indx];
             }
-            else position_score = black_king_middleGame_evals[indx];
+            else position_score = black_king_middleGame_evals[indx] + kingSafetyBonus(pos,line,column,game,turn);
         break;
         default:break;
     }

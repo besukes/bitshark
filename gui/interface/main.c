@@ -70,6 +70,7 @@ int main(void){
     game.cur_pos_key = compute_zobrist(&game,brancas);
     hash_key_stack[hash_stack_indx++] = game.cur_pos_key;
     initMagicMoveGeneration();
+    init_passedPawnsLT_table();
     interfaceCChess(&game,&settings , sfxarray);
     free_allocated_memory(&game,&settings , sfxarray);
     return 0;

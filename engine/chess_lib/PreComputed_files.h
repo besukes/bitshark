@@ -9,9 +9,21 @@
 #define COLUNA_H 0x8080808080808080ULL
 
 
-unsigned long long rook_files[] = {
+static const unsigned long long rook_files[] = {
     COLUNA_A,COLUNA_B,
     COLUNA_C,COLUNA_D,
     COLUNA_E,COLUNA_F,
     COLUNA_G,COLUNA_H
+};
+
+
+static const int passed_pawn_bonus[] = {
+    0, // Linha 0
+    5, // Linha 1
+    10, // Linha 2
+    15, // Linha 3
+    30, // Linha 4
+    70, // Linha 5
+    150, // Linha 6
+    200, // Linha 7 (em teoria nunca chega , mas para evitar bugs)
 };

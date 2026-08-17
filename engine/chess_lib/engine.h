@@ -438,6 +438,7 @@ TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * bet
 /// LookUp Table init //////////////////////
 
 void init_lmrLT_table();
+void init_passedPawnsLT_table();
 
 
 
