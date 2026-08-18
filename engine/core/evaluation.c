@@ -64,12 +64,12 @@ void calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * 
 }
 
 
-int mopup_eval(GameStruct * game , CorPiece op_turn){
+int mopup_eval(GameStruct * game){
     if(game->is_end_game){
         CorPiece weak , strong;
         calculate_stronger_side(&weak,&strong,&game->estadoJogo);
         int strong_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[strong][King]),
-            weak_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[op_turn][King]);
+            weak_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[weak][King]);
         if(weak_turn_king_pos < 0 || strong_king_pos < 0) return 0; // segurança: sem rei (não deve acontecer)
 
         // King Manhattan Distance (linha/coluna) ao centro do tabuleiro

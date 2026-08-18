@@ -42,6 +42,7 @@ int main(void){
     init_zobrist();
     tt_init();
     init_lmrLT_table();
+    initMagicMoveGeneration();
 
     // 1) Posicao inicial (abertura) -- monta o tabuleiro padrao diretamente (sem depender de assets/SDL).
     {
