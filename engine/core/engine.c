@@ -116,6 +116,7 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
             break;
         }
     }
+    hash_stack_indx = start_hash_indx;
     return best_so_far;
 }
 

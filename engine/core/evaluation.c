@@ -32,15 +32,12 @@ int is_end_game(EstadoJogo * estado){
     Boolean white_ok = (white_queens == 0 && white_minors <= 1) || (white_minors <= 1 && white_rooks == 0);
     Boolean black_ok = (black_queens == 0 && black_minors <= 1) || (black_minors <= 1 && black_rooks == 0);
 
-    Boolean white_checkmate_adv = (black_queens == 0 && black_minors <= 1 && black_rooks == 0);
-    Boolean black_checkmate_adv = (white_queens == 0 && white_minors <= 1 && white_rooks == 0);
-
-    return ((white_ok && black_ok) || white_checkmate_adv || black_checkmate_adv);
+    return (white_ok && black_ok);
 }
 
 
 
-void calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * estado){
+int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * estado){
     int white_queens = __builtin_popcountll(estado->tabuleirojogo[brancas][Queen]);
     int black_queens = __builtin_popcountll(estado->tabuleirojogo[pretas][Queen]);
 
@@ -55,17 +52,20 @@ void calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * 
     int white_material = white_queens*800 + white_minors*300 + white_rooks*500;
     int black_material = black_queens*800 + black_minors*300 + black_rooks*500;
 
-    if((black_material > white_material + 1000) || (black_material >= 500 && white_material <= 300)){
+    if((white_material > black_material + 1000) || (white_material >= 500 && black_material <= 300)) return 1;
+    else if((black_material > white_material + 1000) || (black_material >= 500 && white_material <= 300)){
         *weak = brancas;
         *strong = pretas;
+        return 1;
     }
+    return 0;
 }
 
 
 int mopup_eval(GameStruct * game){
-    if(game->is_end_game){
-        CorPiece weak = pretas, strong = brancas;
-        calculate_stronger_side(&weak,&strong,&game->estadoJogo);
+    CorPiece weak = pretas, strong = brancas;
+    int safe2apply_mopup = calculate_stronger_side(&weak,&strong,&game->estadoJogo);
+    if(safe2apply_mopup){
         int strong_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[strong][King]),
             weak_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[weak][King]);
         if(weak_turn_king_pos < 0 || strong_king_pos < 0) return 0; // segurança: sem rei (não deve acontecer)
@@ -85,7 +85,7 @@ int mopup_eval(GameStruct * game){
         int df = (strong_file > weak_file) ? (strong_file - weak_file) : (weak_file - strong_file);
         int kings_chebyshev = (dr > df) ? dr : df;
  
-        int mopup = 65*weak_king_manhattan_dist_to_center + 25*(7 - kings_chebyshev);
+        int mopup = 70*weak_king_manhattan_dist_to_center + 30*(7 - kings_chebyshev);
         return ((strong == brancas) ? mopup : -mopup);
     }
     return 0;
@@ -138,8 +138,11 @@ int kingSafetyBonus(int position , int line , int col , GameStruct* game , CorPi
     int right_side = (col<7) ? (col + 1) : col;
     uint64_bit mask = 1ULL<<(8*used_line + left_side) | 1ULL<<(8*used_line + col) | 1ULL<<(8*used_line + right_side);
     uint64_bit intersect = mask & game->estadoJogo.tabuleirojogo[turn][Pawn];
-    Boolean is_protected = game->estadoJogo.is_castled[turn] && (__builtin_popcountll(intersect) > 1);
-    if(is_protected) return 40;
+    int number_pawns = __builtin_popcountll(intersect);
+    Boolean is_castled = game->estadoJogo.is_castled[turn];
+    if(is_castled) return (-20 + number_pawns*10);
+    else if(!is_castled && !game->estadoJogo.canCastle[turn][Short] && !game->estadoJogo.canCastle[turn][Long])
+        return (-10); //Penalize king for not being able to castle early/middle game
     return 0;
 }
 

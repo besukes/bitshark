@@ -25,7 +25,8 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     
     int orig_alpha = alpha;
     Jogada * hash_move = NULL; int move_eval = 0;
-    uint64_bit key = compute_zobrist(game,turn);
+    //uint64_bit key = compute_zobrist(game,turn);
+    uint64_bit key = game->cur_pos_key;
     getPositionTTMove(key,0,&alpha,&beta,&move_eval,&hash_move,0);
     // Transposition table showed us its a alpha beta cutoff
     if(alpha >= beta) return move_eval;
