@@ -133,7 +133,8 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     int orig_alpha = alpha;
     Jogada * hash_move = NULL; 
     int hash_move_eval = 0;
-    uint64_bit key = compute_zobrist(game,turn);
+    //uint64_bit key = compute_zobrist(game,turn);
+    uint64_bit key = game->cur_pos_key;
     getPositionTTMove(key,depth,&alpha,&beta,&hash_move_eval,&hash_move,ply);
     if(is_repeated_position(key)) return 0;
     // Transposition table showed us its a alpha beta cutoff

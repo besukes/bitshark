@@ -42,7 +42,8 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     // Consulta a transposition table para obter uma "hash move" que ajuda a ordenar
     // melhor as jogadas logo desde a raiz.
-    uint64_bit hash_key = compute_zobrist(game, turn);
+    //uint64_bit hash_key = compute_zobrist(game, turn);
+    uint64_bit hash_key = game->cur_pos_key;
     TTEntry * tt_entry = tt_probe(hash_key);
     Jogada * hash_move = (tt_entry != NULL) ? &tt_entry->best_move : NULL;
 
@@ -98,7 +99,6 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
     const double time_budget = 2000; // orçamento total para a jogada, partilhado por todas as profundidades
     jogadabot best_so_far = {0};
     int start_hash_indx = hash_stack_indx;
-    hash_key_stack[hash_stack_indx++] = compute_zobrist(game,turn);
     // Iterative deepening: pesquisa profundidade 1, depois 2, 3... até MAX_DEPTH_SEARCH
     for(int depth = 1; depth <= MAX_DEPTH_SEARCH; depth++){
         hash_stack_indx = start_hash_indx;
@@ -127,6 +127,8 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
     int reached_depth = 0;
     jogadabot best_jogada = {0};
     total_nodes_searched = 0;
+    //hash_key_stack[hash_stack_indx++] = compute_zobrist(game,turn);
+    hash_key_stack[hash_stack_indx++] = game->cur_pos_key;
     if(is_interative_deepening){
         best_jogada = iterative_deepening(game,turn,&reached_depth);
     }

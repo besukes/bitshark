@@ -41,8 +41,6 @@ int is_end_game(EstadoJogo * estado){
 
 
 void calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * estado){
-    *weak = pretas;
-    *strong = brancas;
     int white_queens = __builtin_popcountll(estado->tabuleirojogo[brancas][Queen]);
     int black_queens = __builtin_popcountll(estado->tabuleirojogo[pretas][Queen]);
 
@@ -66,7 +64,7 @@ void calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * 
 
 int mopup_eval(GameStruct * game){
     if(game->is_end_game){
-        CorPiece weak , strong;
+        CorPiece weak = pretas, strong = brancas;
         calculate_stronger_side(&weak,&strong,&game->estadoJogo);
         int strong_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[strong][King]),
             weak_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[weak][King]);

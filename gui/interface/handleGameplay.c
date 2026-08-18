@@ -4,8 +4,8 @@
 #include <SDL2/SDL_mixer.h>
 
 #define ITERATIVE_DEEPENING 1
-#define BOT_PLAYS_BLACK 0
-#define BOT_PLAYS_WHITE 0
+#define BOT_PLAYS_BLACK 1
+#define BOT_PLAYS_WHITE 1
 
 
 
