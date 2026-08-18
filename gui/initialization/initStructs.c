@@ -89,7 +89,7 @@ void initializeGame(GameStruct * game){
     game->score_game = 0;
     game->turns=0;
     game->trying_to_leave = 0;
-    game->cur_pos_key = 0;
+    game->cur_pos_key = compute_zobrist(game,game->turnoJogador);
     game->position_eval = 0;
     game->is_end_game = 0;
     initArrowsStruct(game);

@@ -72,8 +72,10 @@ void undoMove(GameStruct * game , Jogada * jogada , CorPiece turn){
         undoPieceComida(game,cor_oposta,captured_pos,op_turn,jogada->peca_capturada);
     }
     int pos_passant = jogada->prev_enpassant;
-    game->estadoJogo.canCastle[turn][Short] = jogada->prev_castlerights[Short];
-    game->estadoJogo.canCastle[turn][Long] = jogada->prev_castlerights[Long];
+    game->estadoJogo.canCastle[brancas][Short] = jogada->prev_castlerights[brancas][Short];
+    game->estadoJogo.canCastle[brancas][Long] = jogada->prev_castlerights[brancas][Long];
+    game->estadoJogo.canCastle[pretas][Short] = jogada->prev_castlerights[pretas][Short];
+    game->estadoJogo.canCastle[pretas][Long] = jogada->prev_castlerights[pretas][Long];
     game->estadoJogo.enpassant = (pos_passant != 255) ? (1ULL<<pos_passant) : 0;
     game->is_end_game = is_end_game(&game->estadoJogo);
     if(jogada->especial == FLAG_CASTLE) game->estadoJogo.is_castled[turn] = 0;

@@ -158,6 +158,7 @@ void updateZobrist(GameStruct * game , Jogada * jogada ,CorPiece turn , CorPiece
     else h^=zobrist_pieces[turn][jogada->peca_movida][jogada->destino];
 
     h^=zobrist_pieces[turn][jogada->peca_movida][jogada->origem];
+    
     h^=zobrist_turn;
 
     if(jogada->prev_castlerights[turn][Short] != game->estadoJogo.canCastle[turn][Short])
