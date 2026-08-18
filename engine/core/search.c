@@ -69,12 +69,40 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
 }
 
 
+
+void undoNullMove(GameStruct * game , int passant){
+    uint64_bit h = game->cur_pos_key;
+    if(passant != (-1)){
+        h^=zobrist_ep[passant];
+        game->estadoJogo.enpassant = (1ULL<<passant);
+    }
+    h^=zobrist_turn;
+    game->cur_pos_key = h;
+}
+
+void applyNullMove(GameStruct * game , int prev_enpassant){
+    uint64_bit h = game->cur_pos_key;
+    if(prev_enpassant != (-1)){
+        h^=zobrist_ep[prev_enpassant];
+        game->estadoJogo.enpassant = 0;
+    }
+    h^=zobrist_turn;
+    game->cur_pos_key = h;
+}
+
+
 int nullmovepruning(GameStruct * game , int in_check , int depth ,int beta, int ply , int wb_eval , int timeI , int budget , CorPiece turn , CorPiece op_turn , int* prunes){
     if(depth >= 3 && !in_check && ply > 0 && has_non_pawn_material(game,turn)){
         int R = (depth > 6) ? 3 : 2; // Redução: quanto maior a profundidade, mais confiamos na poda
         int null_depth = depth - 1 - R;
         if(null_depth < 0) null_depth = 0;
+        int prev_enpassant = posTabuleiro(game->estadoJogo.enpassant);
+        //Apply null move
+        applyNullMove(game,prev_enpassant);
+        //Search with null move
         int null_eval = -search(game, null_depth, -beta, -beta+1, wb_eval, timeI , budget, op_turn, ply+1);
+        //Undo null move
+        undoNullMove(game,prev_enpassant);
         if(null_eval == FLAG_TIMEOUT){
             *prunes = 1;
             return FLAG_TIMEOUT;
