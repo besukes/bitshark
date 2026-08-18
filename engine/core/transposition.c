@@ -128,3 +128,55 @@ TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * bet
     }
     return entry;
 }
+
+
+
+void updateZobrist(GameStruct * game , Jogada * jogada ,CorPiece turn , CorPiece op_turn){
+    uint64_bit h = game->cur_pos_key;
+    if(jogada->especial == FLAG_CASTLE){
+        int dest_indx = jogada->destino % 8;
+        int castle_indx = (dest_indx >= 4) ? Short : Long;
+        int shortc = F1 , longc = D1 , before_sc = H1 , before_lc = A1;
+        if(turn == pretas){
+            shortc = F8;
+            longc = D8;
+            before_sc = H8;
+            before_lc = A8;
+        }
+        h^=(castle_indx == Short) ? zobrist_pieces[turn][Rook][shortc] : zobrist_pieces[turn][Rook][longc];
+        h^=(castle_indx == Short) ? zobrist_pieces[turn][Rook][before_sc] : zobrist_pieces[turn][Rook][before_lc];
+    }
+    else if(jogada->especial == FLAG_ENPASSANT){
+        int sq_taken = (turn == brancas) ? (jogada->destino - 8) : (jogada->destino + 8);
+        h^=zobrist_pieces[op_turn][Pawn][sq_taken];
+    }
+    else if(jogada->peca_capturada != Empty){
+        h^=zobrist_pieces[op_turn][jogada->peca_capturada][jogada->destino];
+    }
+
+    if(jogada->promocao) h^=zobrist_pieces[turn][jogada->promocao][jogada->destino];
+    else h^=zobrist_pieces[turn][jogada->peca_movida][jogada->destino];
+
+    h^=zobrist_pieces[turn][jogada->peca_movida][jogada->origem];
+    h^=zobrist_turn;
+
+    if(jogada->prev_castlerights[turn][Short] != game->estadoJogo.canCastle[turn][Short])
+        h^=zobrist_castle[turn][Short];
+
+    if(jogada->prev_castlerights[turn][Long] != game->estadoJogo.canCastle[turn][Long])
+        h^=zobrist_castle[turn][Long];
+
+    if(jogada->prev_castlerights[op_turn][Short] != game->estadoJogo.canCastle[op_turn][Short])
+        h^=zobrist_castle[op_turn][Short];
+
+    if(jogada->prev_castlerights[op_turn][Long] != game->estadoJogo.canCastle[op_turn][Long])
+        h^=zobrist_castle[op_turn][Long];
+    
+    if(jogada->prev_enpassant != 255){
+        h ^= zobrist_ep[jogada->prev_enpassant];
+    }
+    if(game->estadoJogo.enpassant != 0){
+        h ^= zobrist_ep[posTabuleiro(game->estadoJogo.enpassant)];
+    }
+    game->cur_pos_key = h;
+}

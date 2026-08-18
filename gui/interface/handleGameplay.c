@@ -4,8 +4,8 @@
 #include <SDL2/SDL_mixer.h>
 
 #define ITERATIVE_DEEPENING 1
-#define BOT_PLAYS_BLACK 1
-#define BOT_PLAYS_WHITE 1
+#define BOT_PLAYS_BLACK 0
+#define BOT_PLAYS_WHITE 0
 
 
 
@@ -76,6 +76,8 @@ void handleJogadaChess(GameStruct *game, GUISettings *settings, SDL_Event event,
                     game->turns++;
             }
             softReset(game);
+            uint64_bit key = compute_zobrist(game,game->turnoJogador);
+            printf("[DEBUG] Current key : %llu , Calculated key : %llu\n",game->cur_pos_key,key);
         }
         else if ((event.button.button == SDL_BUTTON_RIGHT) && game->arrows.is_drawing_arrows){
             efetuaEventoSoltarArrows(game, event);

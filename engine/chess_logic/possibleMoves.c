@@ -221,8 +221,10 @@ int gerar_jogadas_legais(GameStruct* game, Jogada* jogadas , CorPiece cor , int 
     CorPiece op_cor = (cor==brancas) ? pretas : brancas;
     int num_jogadas = 0;
     uint64_bit enpassant_pos = game->estadoJogo.enpassant;
-    int canCastleShort = game->estadoJogo.canCastle[cor][Short];
-    int canCastleLong = game->estadoJogo.canCastle[cor][Long];
+    int canCastleShortB = game->estadoJogo.canCastle[brancas][Short];
+    int canCastleLongB = game->estadoJogo.canCastle[brancas][Long];
+    int canCastleShortP = game->estadoJogo.canCastle[pretas][Short];
+    int canCastleLongP = game->estadoJogo.canCastle[pretas][Long];
     for (int i = NUMBER_PIECES - 1; i >= 0; i--) {
         Pieces piece = (Pieces)i;   
         uint64_bit bitboard = game->estadoJogo.tabuleirojogo[cor][piece];
@@ -235,7 +237,8 @@ int gerar_jogadas_legais(GameStruct* game, Jogada* jogadas , CorPiece cor , int 
                 Pieces p_cap = comparePiece(&game->estadoJogo,op_cor,single_attack);
                 Jogada jogada = {.origem = (uint8_t)posTabuleiro(single_piece), .destino = (uint8_t)posTabuleiro(single_attack), .peca_movida = piece, 
                                 .peca_capturada = p_cap, .promocao = 0, .especial = 0 , .score = 0 , 
-                                .prev_castlerights[Short] = canCastleShort , .prev_castlerights[Long] = canCastleLong ,
+                                .prev_castlerights[brancas][Short] = canCastleShortB , .prev_castlerights[brancas][Long] = canCastleLongB ,
+                                .prev_castlerights[pretas][Short] = canCastleShortP , .prev_castlerights[pretas][Long] = canCastleLongP ,
                                 .prev_enpassant = posTabuleiro(enpassant_pos)};
                 int is_promoting = (piece == Pawn) && isPromotionRank(single_piece,cor) && pawnPromoting(single_attack,cor);
                 Boolean flags_are_respected = !only_captures || jogada.peca_capturada != Empty;

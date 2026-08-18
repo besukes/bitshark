@@ -22,8 +22,7 @@ void efetuaJogada(uint64_bit * selected_piece , uint64_bit * todas_pieces , uint
 }
 
 
-void fetch_change_board(GameStruct * game,uint64_bit click,uint64_bit * mesmaCor , uint64_bit * corOposta, Jogada * jogada , CorPiece turno){
-    CorPiece cor_oposta = (turno == brancas) ? pretas : brancas;
+void fetch_change_board(GameStruct * game,uint64_bit click,uint64_bit * mesmaCor , uint64_bit * corOposta, Jogada * jogada , CorPiece turno , CorPiece cor_oposta){
     Pieces selected = jogada->peca_movida;
 
     //sem esta verificacao ha problemas e pecas tornam se duplicadas
@@ -60,11 +59,14 @@ void checkTurno(CorPiece turno , uint64_bit * * oposta , uint64_bit * * mesma_co
 }
 
 
+
+
 void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
     if(jogada->peca_movida == Empty) return;
     uint64_bit * bitboard_cor_oposta , * bitboard_cor_turno , (*ep)(uint64_bit,int);
     int square;
     checkTurno(turno,&bitboard_cor_oposta,&bitboard_cor_turno,&square,game,&ep);
+    CorPiece cor_oposta = (turno == brancas) ? pretas : brancas;
     uint64_bit click = 1ULL<<jogada->destino;
     if(jogada->especial == FLAG_CASTLE){
         castle_King(game,click,square,bitboard_cor_turno,turno);
@@ -74,7 +76,7 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
         enpassant_move(game,bitboard_cor_oposta,bitboard_cor_turno,ep,turno,1ULL<<jogada->origem);
     }
     else if( (click & *bitboard_cor_oposta) != 0){
-        fetch_change_board(game,click,bitboard_cor_turno,bitboard_cor_oposta,jogada,turno);
+        fetch_change_board(game,click,bitboard_cor_turno,bitboard_cor_oposta,jogada,turno,cor_oposta);
         if(jogada->promocao){
             promotePiece(game,jogada->promocao,click,turno);
         }
@@ -90,4 +92,5 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
     verifica_direito_castle(game,jogada,turno);
     update_en_passant(game,jogada,turno);
     game->is_end_game = is_end_game(&game->estadoJogo);
+    updateZobrist(game,jogada,turno,cor_oposta);
 }

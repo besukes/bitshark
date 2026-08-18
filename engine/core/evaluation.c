@@ -125,18 +125,20 @@ int passedPawnBonus(uint64_bit piece_pos , GameStruct * game , CorPiece turn){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
     int pos_tab = posTabuleiro(piece_pos);
     int bonus = 0;
+    int indx = (turn == brancas) ? pos_tab/8 : (7-pos_tab/8);
     //SE nao houver peoes da outra cor na passed_pawn_mask , entao o peao é um passed pawn
     if(!(passed_pawn_mask[turn][pos_tab] & game->estadoJogo.tabuleirojogo[op_turn][Pawn]))
-        bonus += passed_pawn_bonus[pos_tab/8];
+        bonus += passed_pawn_bonus[indx];
     return bonus;
 }
 
 
 int kingSafetyBonus(int position , int line , int col , GameStruct* game , CorPiece turn){
+    int used_line = (turn == brancas) ? (line + 1) : (line - 1);
+    if(line<0 || line > 7) return 0;
     int left_side = (col>0) ? (col - 1) : col;
     int right_side = (col<7) ? (col + 1) : col;
-    uint64_bit (*shifts)(uint64_bit,int) = (turn ==  brancas) ? &shiftl : &shiftr;
-    uint64_bit mask = (shifts)(1ULL,8*line + left_side) | (shifts)(1ULL,8*line + col) | (shifts)(1ULL,8*line + right_side);
+    uint64_bit mask = 1ULL<<(8*used_line + left_side) | 1ULL<<(8*used_line + col) | 1ULL<<(8*used_line + right_side);
     uint64_bit intersect = mask & game->estadoJogo.tabuleirojogo[turn][Pawn];
     Boolean is_protected = game->estadoJogo.is_castled[turn] && (__builtin_popcountll(intersect) > 1);
     if(is_protected) return 40;

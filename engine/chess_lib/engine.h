@@ -37,7 +37,7 @@ typedef struct Jogada{
     uint8_t especial; // Informa se o move é "especial" , ou seja , enpassant ou castle
     int score; // Guarda o score desta jogada em termos de relevância teórica
     uint8_t prev_enpassant; //Guarda o estado anterior do enpassant
-    uint8_t prev_castlerights[2]; //Matriz de possibilidades de dar castle
+    uint8_t prev_castlerights[2][2]; //Matriz de possibilidades de dar castle
 } Jogada;
 
 extern Jogada killer_moves[MAX_DEPTH_SEARCH][2]; //Armazena os killer moves para cada profundidade de busca
@@ -432,6 +432,7 @@ uint64_bit compute_zobrist(GameStruct * game, CorPiece turn);
 TTEntry * tt_probe(uint64_bit key);
 void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move , int ply);
 TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * beta , int * move_eval , Jogada * * hash_move , int ply);
+void updateZobrist(GameStruct * game , Jogada * jogada ,CorPiece turn , CorPiece op_turn);
 
 
 
