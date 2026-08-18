@@ -116,10 +116,10 @@ TTEntry * getPositionTTMove(uint64_bit key , int depth , int * alpha , int * bet
                 *move_eval = adjusted_score;
             }
             else if(entry->flag == TT_LOWERBOUND && adjusted_score > *alpha){
-                *alpha = entry->score;
+                *alpha = adjusted_score;
             }
             else if(entry->flag == TT_UPPERBOUND && adjusted_score < *beta){
-                *beta = entry->score;
+                *beta = adjusted_score;
             }
             if(*alpha >= *beta){
                 *move_eval = adjusted_score;
