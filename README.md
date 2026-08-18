@@ -27,6 +27,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
   * Iterative Deepening
   * Late Move Reductions
   * Search Principal Variation
+  * Null Move Pruning
 * Evaluation
   * Piece Square Tables
   * Incremental evaluation
