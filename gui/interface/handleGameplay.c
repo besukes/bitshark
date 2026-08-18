@@ -78,6 +78,7 @@ void handleJogadaChess(GameStruct *game, GUISettings *settings, SDL_Event event,
             softReset(game);
             uint64_bit key = compute_zobrist(game,game->turnoJogador);
             printf("[DEBUG] Current key : %llu , Calculated key : %llu\n",game->cur_pos_key,key);
+            printf("Turno Jogador : %d\n",game->turnoJogador);
         }
         else if ((event.button.button == SDL_BUTTON_RIGHT) && game->arrows.is_drawing_arrows){
             efetuaEventoSoltarArrows(game, event);
