@@ -32,12 +32,15 @@ int is_end_game(EstadoJogo * estado){
     Boolean white_ok = (white_queens == 0 && white_minors <= 1) || (white_minors <= 1 && white_rooks == 0);
     Boolean black_ok = (black_queens == 0 && black_minors <= 1) || (black_minors <= 1 && black_rooks == 0);
 
-    return (white_ok && black_ok);
+    Boolean white_checkmate_adv = (black_queens == 0 && black_minors <= 1 && black_rooks == 0);
+    Boolean black_checkmate_adv = (white_queens == 0 && white_minors <= 1 && white_rooks == 0);
+
+    return ((white_ok && black_ok) || white_checkmate_adv || black_checkmate_adv);
 }
 
 
 
-int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * estado){
+void calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * estado){
     *weak = pretas;
     *strong = brancas;
     int white_queens = __builtin_popcountll(estado->tabuleirojogo[brancas][Queen]);
@@ -54,22 +57,17 @@ int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * e
     int white_material = white_queens*800 + white_minors*300 + white_rooks*500;
     int black_material = black_queens*800 + black_minors*300 + black_rooks*500;
 
-    if((white_material > black_material + 1000) || (white_material >= 500 && black_material <= 300))
-        return 1;
-    else if((black_material > white_material + 1000) || (black_material >= 500 && white_material <= 300)){
+    if((black_material > white_material + 1000) || (black_material >= 500 && white_material <= 300)){
         *weak = brancas;
         *strong = pretas;
-        return 1;
-
     }
-    return 0;
 }
 
 
 int mopup_eval(GameStruct * game , CorPiece op_turn){
-    CorPiece weak , strong;
-    int exists_stronger_side = calculate_stronger_side(&weak,&strong,&game->estadoJogo);
-    if(game->is_end_game || exists_stronger_side){
+    if(game->is_end_game){
+        CorPiece weak , strong;
+        calculate_stronger_side(&weak,&strong,&game->estadoJogo);
         int strong_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[strong][King]),
             weak_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[op_turn][King]);
         if(weak_turn_king_pos < 0 || strong_king_pos < 0) return 0; // segurança: sem rei (não deve acontecer)
@@ -85,8 +83,8 @@ int mopup_eval(GameStruct * game , CorPiece op_turn){
         // fuga) — sem este termo, o motor "empurra" o rei adversário para a borda mas nunca
         // convergir para o fechar, ficando a oscilar indefinidamente perto do mate sem o concluir.
         int strong_rank = strong_king_pos/8, strong_file = strong_king_pos%8;
-        int dr = (strong_rank > strong_rank) ? (strong_rank - strong_rank) : (strong_rank - strong_rank);
-        int df = (strong_file > strong_file) ? (strong_file - strong_file) : (strong_file - strong_file);
+        int dr = (strong_rank > weak_rank) ? (strong_rank - weak_rank) : (weak_rank - strong_rank);
+        int df = (strong_file > weak_file) ? (strong_file - weak_file) : (weak_file - strong_file);
         int kings_chebyshev = (dr > df) ? dr : df;
  
         int mopup = 65*weak_king_manhattan_dist_to_center + 25*(7 - kings_chebyshev);
