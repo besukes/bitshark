@@ -52,7 +52,11 @@ int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * e
     int white_material = white_queens*800 + white_minors*300 + white_rooks*500;
     int black_material = black_queens*800 + black_minors*300 + black_rooks*500;
 
-    if((white_material > black_material + 1000) || (white_material >= 500 && black_material <= 300)) return 1;
+    if((white_material > black_material + 1000) || (white_material >= 500 && black_material <= 300)) {
+        *weak = pretas;
+        *strong = brancas;
+        return 1;
+    }
     else if((black_material > white_material + 1000) || (black_material >= 500 && white_material <= 300)){
         *weak = brancas;
         *strong = pretas;
@@ -85,7 +89,7 @@ int mopup_eval(GameStruct * game){
         int df = (strong_file > weak_file) ? (strong_file - weak_file) : (weak_file - strong_file);
         int kings_chebyshev = (dr > df) ? dr : df;
  
-        int mopup = 70*weak_king_manhattan_dist_to_center + 30*(7 - kings_chebyshev);
+        int mopup = 45*weak_king_manhattan_dist_to_center + 30*(7 - kings_chebyshev);
         return ((strong == brancas) ? mopup : -mopup);
     }
     return 0;

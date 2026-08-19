@@ -64,7 +64,7 @@ void initTabuleiroBENCHMARK(EstadoJogo * state){
     state->tabuleirojogo[brancas][Bishop] = 0;
     state->tabuleirojogo[brancas][Rook] = 0;
 
-    initPieces(&state->tabuleirojogo[pretas][King],56,E1,0); //black king
+    initPieces(&state->tabuleirojogo[pretas][King],0,E8,0); //black king
 
     state->tabuleirojogo[pretas][Pawn] = 0;
     state->tabuleirojogo[pretas][Horse] = 0;

@@ -42,7 +42,6 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     // Consulta a transposition table para obter uma "hash move" que ajuda a ordenar
     // melhor as jogadas logo desde a raiz.
-    //uint64_bit hash_key = compute_zobrist(game, turn);
     uint64_bit hash_key = game->cur_pos_key;
     TTEntry * tt_entry = tt_probe(hash_key);
     Jogada * hash_move = (tt_entry != NULL) ? &tt_entry->best_move : NULL;
@@ -130,7 +129,6 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
     int reached_depth = 0;
     jogadabot best_jogada = {0};
     total_nodes_searched = 0;
-    //hash_key_stack[hash_stack_indx++] = compute_zobrist(game,turn);
     hash_key_stack[hash_stack_indx++] = game->cur_pos_key;
     if(is_interative_deepening){
         best_jogada = iterative_deepening(game,turn,&reached_depth);
