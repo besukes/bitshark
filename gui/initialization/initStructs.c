@@ -5,8 +5,6 @@
 #include <stdio.h>
 
 
-
-
 GUISettings initGUISettings(SDL_Renderer * sdl_renderer , SDL_Window * window){
     GUISettings settings;
     settings.gameRenderer = sdl_renderer;
@@ -22,6 +20,25 @@ GUISettings initGUISettings(SDL_Renderer * sdl_renderer , SDL_Window * window){
     return settings;
 }
 
+
+EstadoJogo initCheckmateBenchmark(void){
+    EstadoJogo es;
+    es.checkMate = 0;
+    es.king_in_check[brancas] = 0;
+    es.king_in_check[pretas] = 0;
+    es.enpassant = 0;
+    es.stalemate = 0;
+    es.is_castled[0] = 0;
+    es.is_castled[1] = 0;
+    for(int i=0;i<2;i++){
+        es.canCastle[i][0] = 0;
+        es.canCastle[i][1] = 0;
+    }
+    initTabuleiroBENCHMARK(&es);
+    return es;
+}
+
+
 EstadoJogo initEstadoJogo(void){
     EstadoJogo es;
     es.checkMate = 0;
@@ -35,8 +52,8 @@ EstadoJogo initEstadoJogo(void){
         es.canCastle[i][0] = 1;
         es.canCastle[i][1] = 1;
     }
-    initTabuleiro(&(es.tabuleirojogo[0][0]),0);
-    initTabuleiro(&(es.tabuleirojogo[1][0]),56);
+    initTabuleiro(es.tabuleirojogo,0);
+    initTabuleiro(es.tabuleirojogo,56);
     init_other_bitboards(&es);
     return es;
 }
@@ -75,7 +92,7 @@ GameStruct initGameStruct(void){
 
 
 void initializeGame(GameStruct * game){
-    game->estadoJogo = initEstadoJogo();
+    game->estadoJogo = (CHECKMATE_BENCHMARK) ? initCheckmateBenchmark() : initEstadoJogo();
     game->game_needs_initialization = 0;
     game->isKeyPressedDown = 0;
     game->jogada = Valid;

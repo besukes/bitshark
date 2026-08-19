@@ -92,8 +92,8 @@ void applyNullMove(GameStruct * game , int prev_enpassant){
 }
 
 
-int nullmovepruning(GameStruct * game , int in_check , int depth ,int beta, int ply , int wb_eval , int timeI , int budget , CorPiece turn , CorPiece op_turn , int* prunes){
-    if(depth >= 3 && !in_check && ply > 0 && has_non_pawn_material(game,turn)){
+int nullmovepruning(GameStruct * game , int in_check , int depth ,int beta, int ply , int wb_eval , int timeI , int budget , CorPiece turn , CorPiece op_turn , int* prunes , int allows_nmp){
+    if(allows_nmp && depth >= 3 && !in_check && ply > 0 && has_non_pawn_material(game,turn)){
         int R = (depth > 6) ? 3 : 2; // Redução: quanto maior a profundidade, mais confiamos na poda
         int null_depth = depth - 1 - R;
         if(null_depth < 0) null_depth = 0;
@@ -101,7 +101,7 @@ int nullmovepruning(GameStruct * game , int in_check , int depth ,int beta, int 
         //Apply null move
         applyNullMove(game,prev_enpassant);
         //Search with null move
-        int null_eval = -search(game, null_depth, -beta, -beta+1, wb_eval, timeI , budget, op_turn, ply+1);
+        int null_eval = -search(game, null_depth, -beta, -beta+1, wb_eval, timeI , budget, op_turn, ply+1,0);
         //Undo null move
         undoNullMove(game,prev_enpassant);
         if(null_eval == FLAG_TIMEOUT){
@@ -122,7 +122,7 @@ int nullmovepruning(GameStruct * game , int in_check , int depth ,int beta, int 
     ->Late Move Reductions - Reduz a profundidade de moves mais tardios por serem considerados inferiores;
     ->Null Move Pruning - Passa a sua vez um turno e verifica se a posição continua muito superior , se sim não vale a pena continuar a pesquisar;
 */
-int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply){
+int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply , int allows_nmp){
     total_nodes_searched++;
     if (SDL_GetTicks() - initial_time >= time_limit) {
         return FLAG_TIMEOUT;
@@ -146,7 +146,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
 
     //Null move pruning to better optimize search
     int safe2prune = 0;
-    int nmp = nullmovepruning(game,starts_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune);
+    int nmp = nullmovepruning(game,starts_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune,allows_nmp);
     if(safe2prune) return nmp;
 
     //Get all legal moves
@@ -179,14 +179,14 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
             int pvs_beta = (i==0) ? beta : (alpha + 1); //Define a janela
             legal_moves = 1; //Para verificações de checkmate
             // 3. Chamada recursiva do NEGAMAX:
-            int eval = -search(game, reduced_depth , -pvs_beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn , ply + 1);
+            int eval = -search(game, reduced_depth , -pvs_beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn , ply + 1 , allows_nmp);
             // So faz full depth search se a jogada for muito boa , dentro da janela alpha-beta
             // Volta a procurar com null window
             if(applied_reduction && eval > alpha)
-                    eval = -search(game , depth - 1 , -pvs_beta , -alpha , wb_eval+delta , initial_time , time_limit, op_turn , ply + 1);
+                    eval = -search(game , depth - 1 , -pvs_beta , -alpha , wb_eval+delta , initial_time , time_limit, op_turn , ply + 1 , allows_nmp);
             // Re-pesquisa na profundidade normal com JANELA CHEIA
             if (eval > alpha && eval < beta && i > 0)
-                eval = -search(game, depth - 1, -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn , ply + 1);
+                eval = -search(game, depth - 1, -beta, -alpha, wb_eval + delta, initial_time, time_limit, op_turn , ply + 1 , allows_nmp);
             undoMove(game,&jogadas[i],turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if ((-eval) == FLAG_TIMEOUT) {

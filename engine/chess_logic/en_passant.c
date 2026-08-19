@@ -4,7 +4,10 @@
 
 
 void update_en_passant(GameStruct * game , Jogada * jogada , CorPiece turno){
-    if(jogada->peca_movida != Pawn) return;
+    if(jogada->peca_movida != Pawn){
+        game->estadoJogo.enpassant = 0;
+        return;
+    }
     uint64_bit coords = 1ULL<<jogada->origem;
     uint64_bit click = 1ULL<<jogada->destino;
     if(pawnFirstRank(coords,turno)){

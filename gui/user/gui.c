@@ -59,11 +59,19 @@ void desenhaInterfaceJogo(GameStruct * game ,GUISettings * settings){
     desenhaMoved(game,settings);
     desenhaCheck(game,settings);
 
-    for(int i = 0 ; i < 6 ; i++){
-        desenhaTipoPiece(game->estadoJogo.tabuleirojogo[0][i],(Pieces)i,settings,game,0);
+    if(CHECKMATE_BENCHMARK){
+        desenhaTipoPiece(game->estadoJogo.tabuleirojogo[0][Queen],Queen,settings,game,0);
+        desenhaTipoPiece(game->estadoJogo.tabuleirojogo[0][King],King,settings,game,0);
+
+        desenhaTipoPiece(game->estadoJogo.tabuleirojogo[1][King],King,settings,game,6);
     }
-    for( int i = 0; i < 6; i++){
-        desenhaTipoPiece(game->estadoJogo.tabuleirojogo[1][i],(Pieces)(i),settings,game,6);
+    else{
+        for(int i = 0 ; i < 6 ; i++){
+            desenhaTipoPiece(game->estadoJogo.tabuleirojogo[0][i],(Pieces)i,settings,game,0);
+        }
+        for( int i = 0; i < 6; i++){
+            desenhaTipoPiece(game->estadoJogo.tabuleirojogo[1][i],(Pieces)(i),settings,game,6);
+        }
     }
 
     if(game->promoted.pawnPromoted) desenhaPromotion(game,settings);

@@ -66,9 +66,9 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
         if(!in_check){
             int pvs_beta = (i==0) ? beta : (alpha + 1);
             // Chamada recursiva do NEGAMAX:
-            int eval = -search(game, depth - 1 , -pvs_beta, -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn,1);
+            int eval = -search(game, depth - 1 , -pvs_beta, -alpha, eval_wb_inicial + delta, initial_time, budget , op_turn,1 , 1);
             if(eval > alpha && eval < beta && i > 0)
-                eval = -search(game, depth - 1, -beta, -alpha, eval_wb_inicial + delta, initial_time, budget, op_turn, 1);
+                eval = -search(game, depth - 1, -beta, -alpha, eval_wb_inicial + delta, initial_time, budget, op_turn, 1 , 1);
             undoMove(game,&jogadas[i],turn);
             // Se o tempo acabou em algum nó filho, propaga o timeout para cima sem salvar nada
             if((-eval) == FLAG_TIMEOUT) {
@@ -124,6 +124,8 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
 Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening){
     memset(history_table, 0, sizeof(int) * (NUMBER_PIECES*2) * NUM_SQUARES);
     memset(killer_moves , 0 , sizeof(Jogada) * MAX_DEPTH_SEARCH * 2);
+    CorPiece strong,weak; //Doesnt really matter
+    if(calculate_stronger_side(&weak,&strong,&game->estadoJogo)) tt_init();
     double initial_time = SDL_GetTicks();
     int reached_depth = 0;
     jogadabot best_jogada = {0};

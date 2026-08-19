@@ -10,6 +10,8 @@
 #define FLAG_TIMEOUT -999999
 #define VALOR_INFINITO 99999
 
+#define CHECKMATE_BENCHMARK 0
+
 #define COLUNA_A 0x0101010101010101ULL
 #define COLUNA_H 0x8080808080808080ULL
 #define COLUNA_B 0x0202020202020202ULL
@@ -222,8 +224,9 @@ void initializeStructs(int matrix[2][NUMBER_PIECES],int indx);
 
 //Modulo initTabuleiro.c
 
-void initTabuleiro(uint64_bit pt[6], int additor);
+void initTabuleiro(uint64_bit pt[2][NUMBER_PIECES], int additor);
 void init_other_bitboards(EstadoJogo * es);
+void initTabuleiroBENCHMARK(EstadoJogo * state);
 
 
 
@@ -389,7 +392,7 @@ void checkmate_sfx (Mix_Chunk * sfxarray[]);
 
 /// search /////////////////////////////
 
-int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply);
+int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply , int allows_nmp);
 
 
 
@@ -402,7 +405,7 @@ int mopup_eval(GameStruct * game);
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn);
 int has_non_pawn_material(GameStruct * game, CorPiece turn);
 int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn);
-
+int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * estado);
 
 
 /// engine /////////////////////////////////

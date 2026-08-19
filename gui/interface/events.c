@@ -144,7 +144,12 @@ void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event e
     CorPiece op_turn = (turno==brancas) ? pretas : brancas;
     uint64_bit click = click_table_position(mouseX,mouseY);
     Jogada jogada = {.origem = posTabuleiro(game->pieceCoords) , .destino = posTabuleiro(click) , .peca_movida = game->pieceSelecionada
-                    , .peca_capturada = comparePiece(&game->estadoJogo,pretas,click) , .promocao = 0 , .especial = 0};
+                    , .peca_capturada = comparePiece(&game->estadoJogo,pretas,click) , .promocao = 0 , .especial = 0 ,
+                    .prev_enpassant = posTabuleiro(game->estadoJogo.enpassant) , .score = 0 ,
+                    .prev_castlerights[brancas][Short] = game->estadoJogo.canCastle[brancas][Short] , 
+                    .prev_castlerights[brancas][Long] = game->estadoJogo.canCastle[brancas][Long] ,
+                    .prev_castlerights[pretas][Short] = game->estadoJogo.canCastle[pretas][Short] ,
+                    .prev_castlerights[pretas][Long] = game->estadoJogo.canCastle[pretas][Long]};
     uint64_bit atks = get_magic_piece_attacks(1ULL<<jogada.origem,jogada.peca_movida,game,turno,0,game->estadoJogo.bitboard_todas_pieces);
     if(game->promoted.promotedSucessfully) {
         eventoPromotePiece(game,settings,&jogada,turno);

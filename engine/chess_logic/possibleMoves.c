@@ -197,7 +197,8 @@ int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64
     if(jogada->especial) jogada->especial = FLAG_CASTLE;
     else jogada->especial = 0;
     int tries_to_enpassant = (piece == Pawn) && (pos_dest & game->estadoJogo.enpassant);
-    int can_enpassant = can_en_passant(game,jogada,cor);
+            //&& (pos_dest & ~pos_cor_oposta); -- I havent applied this because i dont know if its an issue or not , but its here incase
+    int can_enpassant = (tries_to_enpassant) ? can_en_passant(game,jogada,cor) : 0;
     if(tries_to_enpassant){
         if(can_enpassant){
             jogada->especial = FLAG_ENPASSANT;
