@@ -6,7 +6,11 @@
 #define NO_FLAGS 0
 #define FLAG_ONLY_CAPTURES 1
 
-
+/*  Quiescence search funciona de modo a evitar um "Efeito Horizonte" na procura.
+    Esta função executa após serem executados todos os moves da depth da search (entre 1-MAX_DEPTH_SEARCH) , e procura possíveis capturas
+que possam acontecer , até não encontrar mais , ou seja , evita acabar a pesquisa em posições complexas onde podem haver muitas transposições vantajosas
+para um lado , e assim prefere acabar a pesquisa numa posição mais calma e melhor avaliável.
+*/
 int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorPiece turn , int q_depth , int init_time , int max_time){
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
     total_nodes_searched++;
@@ -15,7 +19,6 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     //Est_eval nunca é usada para além de verificações
     stc_eval += mopup_eval(game);
     stc_eval = (turn==brancas) ? stc_eval : -stc_eval;
-
 
     if (SDL_GetTicks() - init_time >= max_time) {
         return FLAG_TIMEOUT;
@@ -27,7 +30,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     Jogada * hash_move = NULL; int move_eval = 0;
     uint64_bit key = game->cur_pos_key;
     getPositionTTMove(key,0,&alpha,&beta,&move_eval,&hash_move,0);
-    // Transposition table showed us its a alpha beta cutoff
+    // Transposition table mostrou nos que é um beta cutoff
     if(alpha >= beta) return move_eval;
 
     Jogada jogadas[MAX_NUMBER_MOVES];
@@ -69,7 +72,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
 }
 
 
-
+/*Retorna a zobrist key e enpassant para oque ela era antes do null move*/
 void undoNullMove(GameStruct * game , int passant){
     uint64_bit h = game->cur_pos_key;
     if(passant != (-1)){
@@ -80,6 +83,8 @@ void undoNullMove(GameStruct * game , int passant){
     game->cur_pos_key = h;
 }
 
+
+/*Apenas altera a zobrist key para representar o novo turno e passa enpassant para 0 porque não seria válido.*/
 void applyNullMove(GameStruct * game , int prev_enpassant){
     uint64_bit h = game->cur_pos_key;
     if(prev_enpassant != (-1)){
@@ -91,15 +96,18 @@ void applyNullMove(GameStruct * game , int prev_enpassant){
 }
 
 
+/*  A função nullmovepruning baseia se em apenas passar o turno do jogador *turn* e verificar se a vantagem é maior que beta , se isso acontecer , então a 
+sequência de moves até este é demasiado boa e causa um beta cutoff.*/
 int nullmovepruning(GameStruct * game , int in_check , int depth ,int beta, int ply , int wb_eval , int timeI , int budget , CorPiece turn , CorPiece op_turn , int* prunes , int allows_nmp){
     if(allows_nmp && depth >= 3 && !in_check && ply > 0 && has_non_pawn_material(game,turn)){
         int R = (depth > 6) ? 3 : 2; // Redução: quanto maior a profundidade, mais confiamos na poda
         int null_depth = depth - 1 - R;
         if(null_depth < 0) null_depth = 0;
         int prev_enpassant = posTabuleiro(game->estadoJogo.enpassant);
-        //Apply null move
+        //Aplicar null move
         applyNullMove(game,prev_enpassant);
-        //Search with null move
+        //Search com null move
+        //Agora search é chamada com allows_null = 0 , porque aplicar dois null moves num mesmo ramo é arriscado
         int null_eval = -search(game, null_depth, -beta, -beta+1, wb_eval, timeI , budget, op_turn, ply+1,0);
         //Undo null move
         undoNullMove(game,prev_enpassant);
@@ -136,13 +144,13 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
     uint64_bit key = game->cur_pos_key;
     getPositionTTMove(key,depth,&alpha,&beta,&hash_move_eval,&hash_move,ply);
     if(is_repeated_position(key)) return 0;
-    // Transposition table showed us its a alpha beta cutoff
+    // Transposition table mostrou que é um beta cutoff
     if(alpha >= beta) return (hash_move_eval);
 
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
     int starts_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
 
-    //Null move pruning to better optimize search
+    //Null move pruning para otimizar a procura
     int safe2prune = 0;
     int nmp = nullmovepruning(game,starts_in_check,depth,beta,ply,wb_eval,initial_time,time_limit,turn,op_turn,&safe2prune,allows_nmp);
     if(safe2prune) return nmp;
@@ -165,14 +173,14 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){ // Verifica se a jogada é válida (rei atual não fica em check)
             int op_king_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[op_turn][King],op_turn);
-            // 1. Late Move reductions , it only searches the first 3 moves full depth unless the latter ones it get a really nice eval
+            // 1. Late Move reductions , só procura os primeiros 3 ordered moves em full depth , a menos que eles apresentem uma vantagem promissora
             int can_apply_lmr = i >= 3 && depth >= 3 , 
                 isnt_important_move = !jogadas[i].promocao && (jogadas[i].peca_capturada == Empty || jogadas[i].score < 0)
                                      && !op_king_in_check && !starts_in_check;
             int applied_reduction = (can_apply_lmr && isnt_important_move) ? lmr_lt[depth][i] : 0;
             int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) : (depth - 1);
 
-            // 2. Principal Variation Search , depois do primeiro move , procura numa window [alpha,alpha+1] ao invés de [alpha,beta
+            // 2. Principal Variation Search , depois do primeiro move , procura numa window [alpha,alpha+1] ao invés de [alpha,beta]
             // Se esse move ultrapassar alpha , então pvs foi refutado , e portanto procuramos na full window [alpha,beta]
             int pvs_beta = (i==0) ? beta : (alpha + 1); //Define a janela
             legal_moves = 1; //Para verificações de checkmate

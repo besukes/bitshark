@@ -76,12 +76,14 @@ TTEntry * tt_probe(uint64_bit key){
     return NULL; // slot vazio, ou colisão de índice com outra posição (entrada substituída)
 }
 
+
 int score_to_tt(int score, int ply){
     if(score >= MATE_SCORE_THRESHOLD) return score + ply;
     if(score <= -MATE_SCORE_THRESHOLD) return score - ply;
     return score;
 }
- 
+
+
 int score_from_tt(int score, int ply){
     if(score >= MATE_SCORE_THRESHOLD) return score - ply;
     if(score <= -MATE_SCORE_THRESHOLD) return score + ply;

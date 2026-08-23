@@ -56,13 +56,14 @@ void init_other_bitboards(EstadoJogo * es){
 
 
 void initTabuleiroBENCHMARK(EstadoJogo * state){
-    initPieces(&state->tabuleirojogo[brancas][Queen],0,D1,0); //white queen
+    Pieces test_piece = Rook , non_tested_piece = Queen;
+    initPieces(&state->tabuleirojogo[brancas][test_piece],0,D1,0); //white queen/rook
     initPieces(&state->tabuleirojogo[brancas][King],0,E1,0); //white king
 
     state->tabuleirojogo[brancas][Pawn] = 0;
     state->tabuleirojogo[brancas][Horse] = 0;
     state->tabuleirojogo[brancas][Bishop] = 0;
-    state->tabuleirojogo[brancas][Rook] = 0;
+    state->tabuleirojogo[brancas][non_tested_piece] = 0;
 
     initPieces(&state->tabuleirojogo[pretas][King],0,E8,0); //black king
 
@@ -72,7 +73,7 @@ void initTabuleiroBENCHMARK(EstadoJogo * state){
     state->tabuleirojogo[pretas][Rook] = 0;
     state->tabuleirojogo[pretas][Queen] = 0;
 
-    state->bitboard_brancas = state->tabuleirojogo[brancas][Queen] | state->tabuleirojogo[brancas][King];
+    state->bitboard_brancas = state->tabuleirojogo[brancas][test_piece] | state->tabuleirojogo[brancas][King];
     state->bitboard_pretas = state->tabuleirojogo[pretas][King];
 
     state->bitboard_todas_pieces = state->bitboard_brancas | state->bitboard_pretas;

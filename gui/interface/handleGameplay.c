@@ -18,7 +18,6 @@ void softReset(GameStruct *game){
 void playBotMove(GameStruct *game, GUISettings *settings, Mix_Chunk *sfxarray[], CorPiece turn){
     GameStruct game_aux = *game;
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
-    // depois substituir por game_aux
     Jogada best_move = get_best_move(&game_aux, turn , ITERATIVE_DEEPENING);
     if (best_move.peca_movida == Empty || best_move.destino >= 64 || best_move.origem >= 64){
         game->turnoJogador = op_turn;
