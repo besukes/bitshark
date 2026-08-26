@@ -33,12 +33,18 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
   * Incremental evaluation
   * Move repetition penalization
   * Static Exchange Evaluation
-* Memorization
+  * Piece Mobility Bonus 
+    * MopUp Eval
+    * King Safety 
+    * Passed Pawns 
+    * Rook Open Files
+    * Number of attacked Squares
+* Memorization Optimizations
   * Transposition Tables
   * Opening Book (Under Work)
   * Killer Moves
   * Move Heuristics
-* Magic Bitboards
+  * Magic Bitboards
 
 
 ## Estrutura do Projeto
