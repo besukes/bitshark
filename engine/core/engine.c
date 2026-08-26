@@ -129,7 +129,6 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
     int reached_depth = 0;
     jogadabot best_jogada = {0};
     total_nodes_searched = 0;
-    hash_key_stack[hash_stack_indx++] = game->cur_pos_key;
     if(is_interative_deepening){
         best_jogada = iterative_deepening(game,turn,&reached_depth);
     }

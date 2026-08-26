@@ -41,10 +41,9 @@ void playBotMove(GameStruct *game, GUISettings *settings, Mix_Chunk *sfxarray[],
     game->turnoJogador = op_turn;
     game->turns++;
     game->moved_to_square = best_move.destino;
-    uint64_bit key = compute_zobrist(game, turn);
     if (hash_stack_indx >= 2000)
         settings->screen = WinScreen;
-    else hash_key_stack[hash_stack_indx++] = key;
+    else hash_key_stack[hash_stack_indx++] = game->cur_pos_key;
     game->position_eval = game_aux.position_eval;
 }
 
