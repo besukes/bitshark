@@ -56,7 +56,7 @@ void init_other_bitboards(EstadoJogo * es){
 
 
 void initTabuleiroBENCHMARK(EstadoJogo * state){
-    Pieces test_piece = Rook , non_tested_piece = Queen;
+    Pieces test_piece = Queen , non_tested_piece = Rook;
     initPieces(&state->tabuleirojogo[brancas][test_piece],0,D1,0); //white queen/rook
     initPieces(&state->tabuleirojogo[brancas][King],0,E1,0); //white king
 

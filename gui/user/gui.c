@@ -60,7 +60,7 @@ void desenhaInterfaceJogo(GameStruct * game ,GUISettings * settings){
     desenhaCheck(game,settings);
 
     if(CHECKMATE_BENCHMARK){
-        Pieces tested_piece = Rook;
+        Pieces tested_piece = Queen;
         desenhaTipoPiece(game->estadoJogo.tabuleirojogo[0][tested_piece],tested_piece,settings,game,0);
         desenhaTipoPiece(game->estadoJogo.tabuleirojogo[0][King],King,settings,game,0);
 
