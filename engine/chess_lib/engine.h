@@ -11,6 +11,9 @@
 #define VALOR_INFINITO 99999
 
 #define CHECKMATE_BENCHMARK 0
+//Need to define one to 5 and the other to 4 and 5 = Queen , 4 = Rook
+#define BENCHMARK_TESTED 5
+#define BENCHMARK_NOT_TESTED 4
 
 #define COLUNA_A 0x0101010101010101ULL
 #define COLUNA_H 0x8080808080808080ULL

@@ -58,6 +58,11 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 
 ## Compilação
 
+Antes de compilar o projeto pode mudar certas flags para alterar o comportamento do programa. <br>
+Em **engine/chess_lib/engine.h** pode mudar CHECKMATE_BENCHMARK para 1 para testar o bot a dar checkmate em endgames com KQ vs K ou KR vs K , para isso terá de alterar as flags de **BENCHMARK_TESTED** e **BENCHMARK_NOT_TESTED** para 5 e 4 , dependendo de qual quer e qual não quer testar (5 para queen e 4 para rook).<br>
+Pode também mudar as flags **BOT_PLAYS_WHITE** para 0 e **BOT_PLAYS_BLACK** para 1 , por exemplo , jogar com as peças brancas , contra o bot com as pretas , ou deixar ambas a 1 para ver o bot a jogar contra si mesmo.
+<br>
+
 Para compilar este projeto e jogar contra o bot (que joga sempre com as pretas) execute o comando :
 
 ```
