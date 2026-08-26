@@ -26,10 +26,11 @@ GameStruct base_game(void){
 }
 
 void run_benchmark(const char * label, GameStruct * g, CorPiece turn){
+    SDL_Event e = {0};
     printf("\n===== %s =====\n", label);
     total_nodes_searched = 0;
     double t0 = SDL_GetTicks();
-    Jogada m = get_best_move(g, turn, 1);
+    Jogada m = get_best_move(g, turn, 1,&e);
     double elapsed_s = (SDL_GetTicks() - t0) / 1000.0;
     if(elapsed_s <= 0) elapsed_s = 0.001;
     double nps = total_nodes_searched / elapsed_s;
@@ -47,8 +48,8 @@ int main(void){
     // 1) Posicao inicial (abertura) -- monta o tabuleiro padrao diretamente (sem depender de assets/SDL).
     {
         GameStruct g = base_game();
-        initTabuleiro(&(g.estadoJogo.tabuleirojogo[0][0]),0);
-        initTabuleiro(&(g.estadoJogo.tabuleirojogo[1][0]),56);
+        initTabuleiro(g.estadoJogo.tabuleirojogo,0);
+        initTabuleiro(g.estadoJogo.tabuleirojogo,56);
         init_other_bitboards(&g.estadoJogo);
         for(int i=0;i<2;i++){ g.estadoJogo.canCastle[i][0]=1; g.estadoJogo.canCastle[i][1]=1; }
         run_benchmark("Abertura (posicao inicial)", &g, brancas);
