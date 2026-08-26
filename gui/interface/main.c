@@ -40,7 +40,7 @@ void interfaceCChess(GameStruct * game ,GUISettings * settings , Mix_Chunk * sfx
         }
         if(settings->screen == GameScreen){
             if(game->game_needs_initialization) initializeGame(game);
-            handleJogadaChess(game,settings,event , sfxarray);
+            handleJogadaChess(game,settings,&event , sfxarray);
             desenhaInterfaceJogo(game,settings);
         }
         else{

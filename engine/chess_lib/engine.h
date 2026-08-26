@@ -240,7 +240,7 @@ void initsfx(Mix_Chunk * sfxarray[]);
 
 //Modulo handleGameplay.c
 
-void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event event , Mix_Chunk * sfxarray[]);
+void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event * event , Mix_Chunk * sfxarray[]);
 
 
 
@@ -410,7 +410,7 @@ int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * e
 
 /// engine /////////////////////////////////
 
-Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening);
+Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening, SDL_Event * e);
 
 
 

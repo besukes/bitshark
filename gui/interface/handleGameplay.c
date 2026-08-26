@@ -15,10 +15,10 @@ void softReset(GameStruct *game){
     game->selected_piece_attacks = 0;
 }
 
-void playBotMove(GameStruct *game, GUISettings *settings, Mix_Chunk *sfxarray[], CorPiece turn){
+void playBotMove(GameStruct *game, GUISettings *settings, Mix_Chunk *sfxarray[], CorPiece turn , SDL_Event * event){
     GameStruct game_aux = *game;
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
-    Jogada best_move = get_best_move(&game_aux, turn , ITERATIVE_DEEPENING);
+    Jogada best_move = get_best_move(&game_aux, turn , ITERATIVE_DEEPENING , event);
     if (best_move.peca_movida == Empty || best_move.destino >= 64 || best_move.origem >= 64){
         game->turnoJogador = op_turn;
         return;
@@ -50,24 +50,24 @@ void playBotMove(GameStruct *game, GUISettings *settings, Mix_Chunk *sfxarray[],
 
 // teste temporario do bot , temos de mudar eventualmente
 //&& game->turnoJogador == brancas
-void handleJogadaChess(GameStruct *game, GUISettings *settings, SDL_Event event, Mix_Chunk *sfxarray[]){
-    if(game->turnoJogador == pretas && BOT_PLAYS_BLACK) playBotMove(game, settings,sfxarray,pretas);
-    else if(game->turnoJogador == brancas && BOT_PLAYS_WHITE) playBotMove(game,settings,sfxarray,brancas);
-    else if(event.type == SDL_MOUSEBUTTONDOWN){
-        if(event.button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown == 0){
+void handleJogadaChess(GameStruct *game, GUISettings *settings, SDL_Event * event, Mix_Chunk *sfxarray[]){
+    if(game->turnoJogador == pretas && BOT_PLAYS_BLACK) playBotMove(game, settings,sfxarray,pretas,event);
+    else if(game->turnoJogador == brancas && BOT_PLAYS_WHITE) playBotMove(game,settings,sfxarray,brancas,event);
+    else if(event->type == SDL_MOUSEBUTTONDOWN){
+        if(event->button.button == SDL_BUTTON_LEFT && game->isKeyPressedDown == 0){
             game->isKeyPressedDown = 1;
             cleanArrowEvent(game);
-            efetuaEventoClique(game, settings, &event);
+            efetuaEventoClique(game, settings, event);
             game->jogada = Valid;
         }
-        else if ((event.button.button == SDL_BUTTON_RIGHT) && game->arrows.is_drawing_arrows == 0){
-            efetuaEventoClickArrows(game, event);
+        else if ((event->button.button == SDL_BUTTON_RIGHT) && game->arrows.is_drawing_arrows == 0){
+            efetuaEventoClickArrows(game, *event);
         }
     }
-    else if (event.type == SDL_MOUSEBUTTONUP){
-        if (event.button.button == SDL_BUTTON_LEFT){
+    else if (event->type == SDL_MOUSEBUTTONUP){
+        if (event->button.button == SDL_BUTTON_LEFT){
             game->isKeyPressedDown = 0;
-            efetuaEventoSoltar(game, settings, event, sfxarray);
+            efetuaEventoSoltar(game, settings, *event, sfxarray);
             if (game->jogada != Invalid && !game->promoted.pawnPromoted){
                 game->turnoJogador = (game->turnoJogador == brancas) ? pretas : brancas;
                 if (game->turnoJogador == brancas)
@@ -78,8 +78,8 @@ void handleJogadaChess(GameStruct *game, GUISettings *settings, SDL_Event event,
             printf("[DEBUG] Current key : %llu , Calculated key : %llu\n",game->cur_pos_key,key);
             printf("Turno Jogador : %d\n",game->turnoJogador);
         }
-        else if ((event.button.button == SDL_BUTTON_RIGHT) && game->arrows.is_drawing_arrows){
-            efetuaEventoSoltarArrows(game, event);
+        else if ((event->button.button == SDL_BUTTON_RIGHT) && game->arrows.is_drawing_arrows){
+            efetuaEventoSoltarArrows(game, *event);
         }
     }
 }

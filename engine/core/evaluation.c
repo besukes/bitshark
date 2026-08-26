@@ -68,7 +68,7 @@ int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * e
 
 int mopup_eval(GameStruct * game){
     CorPiece weak = pretas, strong = brancas;
-    int safe2apply_mopup = calculate_stronger_side(&weak,&strong,&game->estadoJogo);
+    int safe2apply_mopup = game->is_end_game || calculate_stronger_side(&weak,&strong,&game->estadoJogo);
     if(safe2apply_mopup){
         int strong_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[strong][King]),
             weak_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[weak][King]);
@@ -89,7 +89,7 @@ int mopup_eval(GameStruct * game){
         int df = (strong_file > weak_file) ? (strong_file - weak_file) : (weak_file - strong_file);
         int kings_chebyshev = (dr > df) ? dr : df;
  
-        int mopup = 45*weak_king_manhattan_dist_to_center + 30*(7 - kings_chebyshev);
+        int mopup = 65*weak_king_manhattan_dist_to_center + 25*(7 - kings_chebyshev);
         return ((strong == brancas) ? mopup : -mopup);
     }
     return 0;

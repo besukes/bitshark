@@ -37,7 +37,7 @@ jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[MAX_NUMBER_MOV
     return move;
 }
 
-jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double initial_time , double budget){
+jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double initial_time , double budget , SDL_Event * e){
     Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     // Consulta a transposition table para obter uma "hash move" que ajuda a ordenar
@@ -54,9 +54,8 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
     Jogada best_move = {.origem = 64, .destino = 64, .peca_movida = Empty, .peca_capturada = Empty, .promocao = 0, .especial = 0};
 
     int orig_alpha = alpha;
-    SDL_Event e;
-    for (int i = 0; i < num_jogadas; i++) {
-        SDL_PollEvent(&e);
+    for (int i = 0; i < num_jogadas && e->type != SDL_QUIT ; i++) {
+        SDL_PollEvent(e);
         pick_best_move(jogadas, num_jogadas, i);
         CorPiece op_turn = (turn == brancas) ? pretas : brancas;
         // Aplica a jogada nas Bitboards e atualiza a Avaliação Incremental (Delta)
@@ -93,17 +92,17 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
 }
 
 
-jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_depth){
+jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_depth , SDL_Event * e){
     double initial_time = SDL_GetTicks();
     const double time_budget = 2000; // orçamento total para a jogada, partilhado por todas as profundidades
     jogadabot best_so_far = {0};
     int start_hash_indx = hash_stack_indx;
     // Iterative deepening: pesquisa profundidade 1, depois 2, 3... até MAX_DEPTH_SEARCH
-    for(int depth = 1; depth <= MAX_DEPTH_SEARCH; depth++){
+    for(int depth = 1; depth <= MAX_DEPTH_SEARCH && e->type != SDL_QUIT; depth++){
         hash_stack_indx = start_hash_indx;
         double elapsed = SDL_GetTicks() - initial_time;
         if(elapsed >= time_budget) break;
-        jogadabot result = engine_search(game, turn, depth , initial_time, time_budget);
+        jogadabot result = engine_search(game, turn, depth , initial_time, time_budget,e);
         if(result.completed){
             best_so_far = result;
             *reached_depth = depth;
@@ -120,7 +119,7 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
 }
 
 
-Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening){
+Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening , SDL_Event * e){
     memset(history_table, 0, sizeof(int) * (NUMBER_PIECES*2) * NUM_SQUARES);
     memset(killer_moves , 0 , sizeof(Jogada) * MAX_DEPTH_SEARCH * 2);
     CorPiece strong,weak; //Doesnt really matter
@@ -130,11 +129,11 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
     jogadabot best_jogada = {0};
     total_nodes_searched = 0;
     if(is_interative_deepening){
-        best_jogada = iterative_deepening(game,turn,&reached_depth);
+        best_jogada = iterative_deepening(game,turn,&reached_depth,e);
     }
     else{
         reached_depth = 5;
-        best_jogada = engine_search(game,turn,5,initial_time,3000);
+        best_jogada = engine_search(game,turn,10,initial_time,3000,e);
     }
     int who2Move = (turn==brancas) ? 1 : (-1);
     float evaluation = (float)(best_jogada.move_eval*who2Move) / (float)(100);
