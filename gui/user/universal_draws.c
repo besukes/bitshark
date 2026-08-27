@@ -124,16 +124,16 @@ void desenhaTipoPiece(uint64_bit pos_pieces,Pieces tipoPiece , GUISettings * set
 
 void desenhaPromotion(GameStruct * game , GUISettings * settings){
     int pos_tab = posTabuleiro(game->promoted.promoted_square);
-    int offsetY = ( (pos_tab / 8 ) < 1) ? 800 : 0,
+    int offsetY = ( (pos_tab / 8 ) < 1) ? 460 : 0,
         offsetX = pos_tab%8;
     int offset_textura = (game->turnoJogador == brancas) ? 0 : 6;
-    SDL_Rect promotion_sq = {250 + 110*offsetX,100 + offsetY,175,175};
-    SDL_RenderCopy(settings->gameRenderer,settings->textures.miscTextures[3],NULL,&promotion_sq);
+    SDL_Rect promotion_sq = {260 + SQ_SIZE*offsetX,100 + offsetY,175,175};
+    SDL_RenderCopy(settings->gameRenderer,settings->textures.miscTextures[2],NULL,&promotion_sq);
 
-    SDL_Rect queen = {255 + 110*offsetX,105 + offsetY,70,70};
-    SDL_Rect rook = {345 + 110*offsetX,105 + offsetY,70,70};
-    SDL_Rect bishop = {255 + 110*offsetX,190 + offsetY,70,70};
-    SDL_Rect knight = {345 + 110*offsetX,190 + offsetY,70,70};
+    SDL_Rect queen = {265 + SQ_SIZE*offsetX,105 + offsetY,70,70};
+    SDL_Rect rook = {355 + SQ_SIZE*offsetX,105 + offsetY,70,70};
+    SDL_Rect bishop = {265 + SQ_SIZE*offsetX,190 + offsetY,70,70};
+    SDL_Rect knight = {355 + SQ_SIZE*offsetX,190 + offsetY,70,70};
 
     SDL_RenderCopy(settings->gameRenderer,settings->textures.chessPieces[Queen + offset_textura],NULL,&queen);
     SDL_RenderCopy(settings->gameRenderer,settings->textures.chessPieces[Rook + offset_textura],NULL,&rook);

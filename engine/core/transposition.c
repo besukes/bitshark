@@ -163,6 +163,7 @@ void updateZobrist(GameStruct * game , Jogada * jogada ,CorPiece turn , CorPiece
     
     h^=zobrist_turn;
 
+    
     if(jogada->prev_castlerights[turn][Short] != game->estadoJogo.canCastle[turn][Short])
         h^=zobrist_castle[turn][Short];
 
@@ -175,6 +176,7 @@ void updateZobrist(GameStruct * game , Jogada * jogada ,CorPiece turn , CorPiece
     if(jogada->prev_castlerights[op_turn][Long] != game->estadoJogo.canCastle[op_turn][Long])
         h^=zobrist_castle[op_turn][Long];
     
+
     if(jogada->prev_enpassant != 255){
         h ^= zobrist_ep[jogada->prev_enpassant];
     }

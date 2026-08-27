@@ -186,6 +186,10 @@ int pawnPromoting(uint64_bit pos,CorPiece cor){
    else return 0;
 }
 
+int verify_pawn_promotion(Pieces piece , uint64_bit origem , uint64_bit dest , CorPiece turn){
+    return (piece == Pawn && isPromotionRank(origem,turn) && pawnPromoting(dest,turn));
+}
+
 
 int isPseudoValidMove(GameStruct * game, Jogada * jogada , CorPiece cor , uint64_bit pos_attacks){
     if(jogada->peca_movida == Empty || jogada->destino == 64 || jogada->origem == 64) return 0;
@@ -239,7 +243,7 @@ int gerar_jogadas_legais(GameStruct* game, Jogada* jogadas , CorPiece cor , int 
                                 .prev_castlerights[brancas][Short] = canCastleShortB , .prev_castlerights[brancas][Long] = canCastleLongB ,
                                 .prev_castlerights[pretas][Short] = canCastleShortP , .prev_castlerights[pretas][Long] = canCastleLongP ,
                                 .prev_enpassant = posTabuleiro(enpassant_pos)};
-                int is_promoting = (piece == Pawn) && isPromotionRank(single_piece,cor) && pawnPromoting(single_attack,cor);
+                int is_promoting = verify_pawn_promotion(piece,single_piece,single_attack,cor);
                 Boolean flags_are_respected = !only_captures || jogada.peca_capturada != Empty;
                 if (flags_are_respected && isPseudoValidMove(game, &jogada, cor , single_attack)){
                     if(is_promoting){

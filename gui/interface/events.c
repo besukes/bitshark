@@ -44,24 +44,30 @@ int clickPromotingPiece(GameStruct * game , int mouseX , int mouseY , CorPiece t
     int ret = 1 , mult = (game->turnoJogador == brancas) ? 1 : (-1);
     game->promoted.pawnPromoted = 0;
     uint64_bit promotion_square = game->promoted.promoted_square;
-    int tamSquareX = 110;
-    int offsetY = ( (posTabuleiro(promotion_square) / 8 ) < 1) ? 800 : 0;
-    int offsetX = posTabuleiro(promotion_square)%8;
-    if(dentroDoBotao(mouseX,mouseY,255 + tamSquareX*offsetX,345 + tamSquareX*offsetX,105 + offsetY,192 + offsetY)){ //Queen
+    int tamSquareX = 88;
+    int pos_tab = posTabuleiro(promotion_square);
+    int offsetY = (( pos_tab / 8 ) < 1) ? 460 : 0;
+    int offsetX = pos_tab % 8;
+    game->cur_pos_key ^= zobrist_pieces[turn][Pawn][pos_tab];
+    if(dentroDoBotao(mouseX,mouseY,265 + tamSquareX*offsetX,355 + tamSquareX*offsetX,105 + offsetY,192 + offsetY)){ //Queen
         promotePiece(game,Queen,promotion_square,turn);
         game->score_game += 8*mult;
+        game->cur_pos_key ^= zobrist_pieces[turn][Queen][pos_tab];
     }
-    else if(dentroDoBotao(mouseX,mouseY,345 + tamSquareX*offsetX,425 + tamSquareX*offsetX,105 + offsetY,192 + offsetY)){ //Rook
+    else if(dentroDoBotao(mouseX,mouseY,355 + tamSquareX*offsetX,435 + tamSquareX*offsetX,105 + offsetY,192 + offsetY)){ //Rook
         promotePiece(game,Rook,promotion_square,turn);
         game->score_game += 5*mult;
+        game->cur_pos_key ^= zobrist_pieces[turn][Rook][pos_tab];
     }
-    else if(dentroDoBotao(mouseX,mouseY,255 + tamSquareX*offsetX,345 + tamSquareX*offsetX,187 + offsetY,275 + offsetY)){ //Bishop
+    else if(dentroDoBotao(mouseX,mouseY,265 + tamSquareX*offsetX,355 + tamSquareX*offsetX,187 + offsetY,275 + offsetY)){ //Bishop
         promotePiece(game,Bishop,promotion_square,turn);
         game->score_game += 3*mult;
+        game->cur_pos_key ^= zobrist_pieces[turn][Bishop][pos_tab];
     }
-    else if(dentroDoBotao(mouseX,mouseY,345 + tamSquareX*offsetX,425 + tamSquareX*offsetX,187 + offsetY,275 + offsetY)){ //Knight
+    else if(dentroDoBotao(mouseX,mouseY,355 + tamSquareX*offsetX,435 + tamSquareX*offsetX,187 + offsetY,275 + offsetY)){ //Knight
         promotePiece(game,Horse,promotion_square,turn);
         game->score_game += 3*mult;
+        game->cur_pos_key ^= zobrist_pieces[turn][Horse][pos_tab];
     }
     else{//Invalid click
         game->promoted.pawnPromoted = 1;
@@ -171,9 +177,9 @@ void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event e
                 notInCheck(game);
                 update_en_passant(game,&jogada,turno);
                 game->moved_to_square = jogada.destino;
-                game->promoted.pawnPromoted = jogada.promocao;
-                if(jogada.promocao) {
+                if(verify_pawn_promotion(jogada.peca_movida,1ULL<<jogada.origem,1ULL<<jogada.destino,turno)) {
                     game->promoted.promoted_square = click;
+                    game->promoted.pawnPromoted = 1;
                     promote_sfx(sfxarray);
                 }
                 else {
