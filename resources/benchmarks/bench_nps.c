@@ -57,6 +57,7 @@ int main(void){
 
     // 2) Meio-jogo: uma posicao com bastante material e mobilidade dos dois lados.
     {
+        tt_init();
         GameStruct g = base_game();
         // Brancas
         place(&g.estadoJogo, brancas, King, G1);
@@ -97,6 +98,7 @@ int main(void){
 
     // 3) Final: K+R+P vs K+R (final classico, poucas pecas, mobilidade alta do rei)
     {
+        tt_init();
         GameStruct g = base_game();
         place(&g.estadoJogo, brancas, King, E1);
         place(&g.estadoJogo, brancas, Rook, D1);
