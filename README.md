@@ -54,6 +54,7 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 ├── build/         # Ficheiros binários (.o)
 ├── engine/        # Ficheiros do motor de xadrez em si 
 ├── gui/           # Ficheiros fonte da interface gráfica do programa
+├── resources/     # Ficheiros resource (Opening Book , Benchmarks , MagicFinder , etc..)
 ├── sfx/           # Sons do jogo
 ├── bshark         # Executável , ficheiro .out
 ├── LICENSE        # Copyrights do programa
