@@ -147,6 +147,7 @@ void updateZobrist(GameStruct * game , Jogada * jogada ,CorPiece turn , CorPiece
         }
         h^=(castle_indx == Short) ? zobrist_pieces[turn][Rook][shortc] : zobrist_pieces[turn][Rook][longc];
         h^=(castle_indx == Short) ? zobrist_pieces[turn][Rook][before_sc] : zobrist_pieces[turn][Rook][before_lc];
+        jogada->destino = (castle_indx == Short) ? (shortc+1) : (longc - 1);
     }
     else if(jogada->especial == FLAG_ENPASSANT){
         int sq_taken = (turn == brancas) ? (jogada->destino - 8) : (jogada->destino + 8);
