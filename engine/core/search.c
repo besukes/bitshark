@@ -211,7 +211,7 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
                     killer_moves[depth][0] = jogadas[i];
 
                     Pieces moved = jogadas[i].peca_movida;
-                    history_table[moved + moved*turn][jogadas[i].destino] += depth * depth; // Atualiza a tabela de histórico
+                    history_table[moved + NUMBER_PIECES*turn][jogadas[i].destino] += depth * depth; // Atualiza a tabela de histórico
                 }
                 // Guardamos um move na transposition table como um LOWERBOUND (causou beta pruning antes)
                 tt_store(key, depth, beta, TT_LOWERBOUND, jogadas[i] , ply);
