@@ -45,7 +45,7 @@ void moveScoringCaptures(GameStruct * game ,Jogada * jogadas , int num_jogadas ,
                 if(see<0) atual->score = see;
                 else{
                     atual->score = mvv_lva_table[captured][moved];
-                    atual->score += history_table[moved][atual->destino];
+                    atual->score += history_table[moved + moved*turn][atual->destino];
                     atual->score += see;
                     if(atual->promocao) atual->score += 100*pieces_value[atual->promocao];
                 }
@@ -61,12 +61,12 @@ void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada 
         Boolean matches_hash_move = (hash_move != NULL && atual->origem == hash_move->origem 
                                         && atual->destino == hash_move->destino 
                                         && hash_move->peca_movida == atual->peca_movida);
+        int moved = atual->peca_movida;
         if(matches_hash_move){
             atual->score = 2000000;
         }
         else if(atual->peca_capturada != Empty){
             int captured = atual->peca_capturada;
-            int moved = atual->peca_movida;
             int see = static_exchange_eval(game,atual,turn);
             if(see<0) atual->score = see;
             else atual->score = 1000000 + mvv_lva_table[captured][moved] + see;
@@ -78,7 +78,7 @@ void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada 
             atual->score = 800000;
         }
         else{
-            atual->score = history_table[atual->peca_movida][atual->destino];
+            atual->score = history_table[moved + moved*turn][atual->destino];
             if(atual->promocao) atual->score += 100*pieces_value[atual->promocao];
         }
     }
@@ -108,24 +108,16 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
     uint64_bit captured_bit = destino_bit;
     if(jogada->especial == FLAG_ENPASSANT) captured_bit = (turn == brancas) ? (destino_bit >> 8) : (destino_bit << 8);
     int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(captured_bit, peca_capturada, op_turn, game) : 0;
-    
-    int old_rook_bonus = rookOpenFilesBonus(&game->estadoJogo,turn);
 
     atualizaJogada(game, jogada, turn);
     int promote_value = (jogada->promocao) ? (pieces_value[jogada->promocao] - 100) : 0;
-
-    int new_rook_bonus = rookOpenFilesBonus(&game->estadoJogo,turn);
-    int delta_rook_bonus = new_rook_bonus - old_rook_bonus;
 
     int new_moved_eval = evaluate_piece(destino_bit, peca_movida, turn, game);
 
     int who2Move = (turn == brancas) ? 1 : -1;
     int castleBonus = (jogada->especial == FLAG_CASTLE) ? 50 : 0;
 
-    return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + castleBonus
-                        + delta_rook_bonus
-                       )
-            );
+    return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + castleBonus));
 }
 
 

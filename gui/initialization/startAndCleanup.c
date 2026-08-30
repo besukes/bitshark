@@ -7,8 +7,8 @@
 int getOption(void){
     int o=0;
     printf("Insira a resolução desejada:\n"
-            "(1)- 670x540\n"
-            "(2)- 900x720\n"
+            "(1)- 900x675\n"
+            "(2)- 1000x750\n"
             "(3)- 1200x900\n"
             "(DEFAULT) - FULLSCREEN\n");
     int u = scanf("%d",&o);
@@ -20,10 +20,10 @@ int getOption(void){
 void setResolution(int * resX,int * resY,int optn){
     switch(optn){
         case 1:
-            *resX=670;*resY=540;
+            *resX=900;*resY=675;
         break;
         case 2:
-            *resX=900;*resY=720;
+            *resX=1000;*resY=750;
         break;
         case 3:
             *resX=1200;*resY=900;

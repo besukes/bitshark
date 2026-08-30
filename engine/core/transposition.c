@@ -71,7 +71,7 @@ uint64_bit compute_zobrist(GameStruct * game, CorPiece turn){
  
 
 TTEntry * tt_probe(uint64_bit key){
-    TTEntry * entry = &transposition_table[key % TT_SIZE ];
+    TTEntry * entry = &transposition_table[key & (TT_SIZE - 1) ];
     if(entry->flag != TT_EMPTY && entry->key == key) return entry;
     return NULL; // slot vazio, ou colisão de índice com outra posição (entrada substituída)
 }

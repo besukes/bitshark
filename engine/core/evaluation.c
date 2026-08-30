@@ -96,16 +96,11 @@ int mopup_eval(GameStruct * game){
 }
 
 
-int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn){
+int rookOpenFilesBonus(uint64_bit rook_pos , uint64_bit occupancy , CorPiece turn){
     int bonus = 0;
-    uint64_bit rooks = state->tabuleirojogo[turn][Rook];
-    while(rooks != 0){
-        uint64_bit single = rooks & (-rooks);
-        int column = posTabuleiro(single) % 8;
-        if(!(rook_files[column] & (state->bitboard_todas_pieces & ~single)))
-            bonus += 15;
-        rooks &= (rooks - 1);
-    }
+    int column = posTabuleiro(rook_pos) % 8;
+    if(!(rook_files[column] & (occupancy & ~rook_pos)))
+        bonus += 15;
     return bonus;
 }
 
@@ -169,7 +164,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
             else position_score = pawn_evals_black[indx];
         break;
         case Rook:
-            position_score = black_rook_evals[indx];
+            position_score = black_rook_evals[indx] + rookOpenFilesBonus(piece_pos,game->estadoJogo.bitboard_todas_pieces,turn);
         break;
         case Horse:
             position_score = knight_evals[indx];
@@ -184,7 +179,10 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
             if(game->is_end_game){
                 position_score = black_king_endGame_evals[indx];
             }
-            else position_score = black_king_middleGame_evals[indx] + kingSafetyBonus(pos,line,column,game,turn);
+            else{
+                position_score = black_king_middleGame_evals[indx] + kingSafetyBonus(pos,line,column,game,turn);
+                if(game->estadoJogo.is_castled[turn]) position_score += 50;
+            }
         break;
         default:break;
     }
@@ -200,8 +198,6 @@ int evaluate_piece_type(uint64_bit bitboard , Pieces piece_type, CorPiece turn, 
     while(bb){
         uint64_bit single = bb & (-bb); // isola o bit mais baixo
         score += evaluate_piece(single, piece_type, turn, game); // avalia só essa peça
-        if(piece_type == Rook) score += rookOpenFilesBonus(&game->estadoJogo,turn);
-        else if(piece_type == King && (!game->is_end_game && game->estadoJogo.is_castled[turn])) score+=50;
         bb &= bb - 1; // remove esse bit
     }
     return score;

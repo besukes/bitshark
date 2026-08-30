@@ -55,7 +55,8 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
                     best_move_found = jogadas[i];
                 }
                 if (eval >= beta){
-                    history_table[jogadas[i].peca_movida][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
+                    Pieces moved = jogadas[i].peca_movida;
+                    history_table[moved + moved*turn][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
                     tt_store(key, 0 , beta, TT_LOWERBOUND, jogadas[i],0);
                     return beta;
                 }
@@ -209,7 +210,8 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
                     killer_moves[depth][1] = killer_moves[depth][0];
                     killer_moves[depth][0] = jogadas[i];
 
-                    history_table[jogadas[i].peca_movida][jogadas[i].destino] += depth * depth; // Atualiza a tabela de histórico
+                    Pieces moved = jogadas[i].peca_movida;
+                    history_table[moved + moved*turn][jogadas[i].destino] += depth * depth; // Atualiza a tabela de histórico
                 }
                 // Guardamos um move na transposition table como um LOWERBOUND (causou beta pruning antes)
                 tt_store(key, depth, beta, TT_LOWERBOUND, jogadas[i] , ply);
