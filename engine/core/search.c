@@ -56,7 +56,7 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
                 }
                 if (eval >= beta){
                     Pieces moved = jogadas[i].peca_movida;
-                    history_table[moved + moved*turn][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
+                    history_table[moved + NUMBER_PIECES*turn][jogadas[i].destino] += q_depth * q_depth; // Atualiza a tabela de histórico para capturas
                     tt_store(key, 0 , beta, TT_LOWERBOUND, jogadas[i],0);
                     return beta;
                 }
