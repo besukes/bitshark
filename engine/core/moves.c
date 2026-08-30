@@ -45,7 +45,7 @@ void moveScoringCaptures(GameStruct * game ,Jogada * jogadas , int num_jogadas ,
                 if(see<0) atual->score = see;
                 else{
                     atual->score = mvv_lva_table[captured][moved];
-                    atual->score += history_table[moved + moved*turn][atual->destino];
+                    atual->score += history_table[moved + NUMBER_PIECES*turn][atual->destino];
                     atual->score += see;
                     if(atual->promocao) atual->score += 100*pieces_value[atual->promocao];
                 }
@@ -78,7 +78,7 @@ void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada 
             atual->score = 800000;
         }
         else{
-            atual->score = history_table[moved + moved*turn][atual->destino];
+            atual->score = history_table[moved + NUMBER_PIECES*turn][atual->destino];
             if(atual->promocao) atual->score += 100*pieces_value[atual->promocao];
         }
     }
