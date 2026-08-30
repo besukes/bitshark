@@ -12,8 +12,8 @@
 
 #define CHECKMATE_BENCHMARK 1
 //Need to define one to 5 and the other to 4 and 5 = Queen , 4 = Rook
-#define BENCHMARK_TESTED 5
-#define BENCHMARK_NOT_TESTED 4
+#define BENCHMARK_TESTED 4
+#define BENCHMARK_NOT_TESTED 5
 
 #define ITERATIVE_DEEPENING 1
 #define BOT_PLAYS_BLACK 1
@@ -413,7 +413,7 @@ int is_end_game(EstadoJogo * estado);
 int mopup_eval(GameStruct * game);
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn);
 int has_non_pawn_material(GameStruct * game, CorPiece turn);
-int rookOpenFilesBonus(uint64_bit rook_pos , uint64_bit occupancy , CorPiece turn);
+int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn);
 int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * estado);
 
 

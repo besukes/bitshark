@@ -68,7 +68,8 @@ int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * e
 
 int mopup_eval(GameStruct * game){
     CorPiece weak = pretas, strong = brancas;
-    int safe2apply_mopup = game->is_end_game || calculate_stronger_side(&weak,&strong,&game->estadoJogo);
+    int exists_stronger = calculate_stronger_side(&weak,&strong,&game->estadoJogo);
+    int safe2apply_mopup = game->is_end_game || exists_stronger;
     if(safe2apply_mopup){
         int strong_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[strong][King]),
             weak_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[weak][King]);
@@ -96,11 +97,17 @@ int mopup_eval(GameStruct * game){
 }
 
 
-int rookOpenFilesBonus(uint64_bit rook_pos , uint64_bit occupancy , CorPiece turn){
-    int bonus = 0;
-    int column = posTabuleiro(rook_pos) % 8;
-    if(!(rook_files[column] & (occupancy & ~rook_pos)))
-        bonus += 15;
+int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn){
+   int bonus = 0;
+    uint64_bit rooks = state->tabuleirojogo[turn][Rook];
+    uint64_bit occupancy = state->bitboard_todas_pieces;
+    while(rooks != 0){
+        uint64_bit single = rooks & (-rooks);
+        int column = posTabuleiro(single) % 8;
+        if(!(rook_files[column] & (occupancy & ~single)))
+            bonus += 15;
+        rooks &= (rooks - 1);
+    }
     return bonus;
 }
 
@@ -164,7 +171,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
             else position_score = pawn_evals_black[indx];
         break;
         case Rook:
-            position_score = black_rook_evals[indx] + rookOpenFilesBonus(piece_pos,game->estadoJogo.bitboard_todas_pieces,turn);
+            position_score = black_rook_evals[indx];
         break;
         case Horse:
             position_score = knight_evals[indx];
