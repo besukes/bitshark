@@ -3,6 +3,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
+#define DEBUG_FLAG 0
+
 
 void softReset(GameStruct *game){
     game->pieceCoords = 0;
@@ -43,6 +45,14 @@ void playBotMove(GameStruct *game, GUISettings *settings, Mix_Chunk *sfxarray[],
 }
 
 
+void debug_key(GameStruct * game , int needs_debug){
+    if(!needs_debug) return;
+    uint64_bit key = compute_zobrist(game,game->turnoJogador);
+    printf("[DEBUG] Current key : %llu , Calculated key : %llu\n",game->cur_pos_key,key);
+    printf("[DEBUG] Hash key : %llu\n" , hash_key_stack[hash_stack_indx - 1]);
+}
+
+
 // teste temporario do bot , temos de mudar eventualmente
 //&& game->turnoJogador == brancas
 void handleJogadaChess(GameStruct *game, GUISettings *settings, SDL_Event * event, Mix_Chunk *sfxarray[]){
@@ -63,15 +73,13 @@ void handleJogadaChess(GameStruct *game, GUISettings *settings, SDL_Event * even
         if (event->button.button == SDL_BUTTON_LEFT){
             game->isKeyPressedDown = 0;
             efetuaEventoSoltar(game, settings, *event, sfxarray);
-            if (game->jogada != Invalid && !game->promoted.pawnPromoted){
+            if(game->jogada != Invalid && !game->promoted.pawnPromoted){
                 game->turnoJogador = (game->turnoJogador == brancas) ? pretas : brancas;
-                if (game->turnoJogador == brancas)
-                    game->turns++;
+                if(game->turnoJogador == brancas) game->turns++;
+                hash_key_stack[hash_stack_indx++] = game->cur_pos_key;
+                debug_key(game,DEBUG_FLAG); //Apenas utilizava antes para verificar se estava tudo bem com as keys
             }
             softReset(game);
-            uint64_bit key = compute_zobrist(game,game->turnoJogador);
-            printf("[DEBUG] Current key : %llu , Calculated key : %llu\n",game->cur_pos_key,key);
-            printf("Turno Jogador : %d\n",game->turnoJogador);
         }
         else if ((event->button.button == SDL_BUTTON_RIGHT) && game->arrows.is_drawing_arrows){
             efetuaEventoSoltarArrows(game, *event);

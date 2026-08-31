@@ -139,7 +139,7 @@ int passedPawnBonus(uint64_bit piece_pos , GameStruct * game , CorPiece turn){
 
 int kingSafetyBonus(int position , int line , int col , GameStruct* game , CorPiece turn){
     int used_line = (turn == brancas) ? (line + 1) : (line - 1);
-    if(line<0 || line > 7) return 0;
+    if(line < 0 || line > 7) return 0;
     int left_side = (col>0) ? (col - 1) : col;
     int right_side = (col<7) ? (col + 1) : col;
     uint64_bit mask = 1ULL<<(8*used_line + left_side) | 1ULL<<(8*used_line + col) | 1ULL<<(8*used_line + right_side);
@@ -186,10 +186,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
             if(game->is_end_game){
                 position_score = black_king_endGame_evals[indx];
             }
-            else{
-                position_score = black_king_middleGame_evals[indx] + kingSafetyBonus(pos,line,column,game,turn);
-                if(game->estadoJogo.is_castled[turn]) position_score += 50;
-            }
+            else position_score = black_king_middleGame_evals[indx] + kingSafetyBonus(pos,line,column,game,turn);
         break;
         default:break;
     }

@@ -10,14 +10,14 @@
 #define FLAG_TIMEOUT -999999
 #define VALOR_INFINITO 99999
 
-#define CHECKMATE_BENCHMARK 1
+#define CHECKMATE_BENCHMARK 0
 //Need to define one to 5 and the other to 4 and 5 = Queen , 4 = Rook
 #define BENCHMARK_TESTED 4
 #define BENCHMARK_NOT_TESTED 5
 
 #define ITERATIVE_DEEPENING 1
 #define BOT_PLAYS_BLACK 1
-#define BOT_PLAYS_WHITE 1
+#define BOT_PLAYS_WHITE 0
 
 
 #define COLUNA_A 0x0101010101010101ULL
