@@ -86,7 +86,6 @@ void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada 
 
 
 int is_repeated_position(uint64_bit key){
-    int counter = 0;
     for(int i = hash_stack_indx - 1; i >= 0; i--){
         //Temos de verificar se a posição já ocorreu 1 vez , porque se a repetirmos uma segunda vez
         //O oponente pode estar inclinado a repeti-la denovo , e portanto a empatar o jogo

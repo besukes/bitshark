@@ -14,8 +14,6 @@ int has_non_pawn_material(GameStruct * game, CorPiece turn){
 }
 
 
-
-
 int is_end_game(EstadoJogo * estado){
     int white_queens = __builtin_popcountll(estado->tabuleirojogo[brancas][Queen]);
     int black_queens = __builtin_popcountll(estado->tabuleirojogo[pretas][Queen]);
