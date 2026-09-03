@@ -93,7 +93,7 @@ int score_from_tt(int score, int ply){
 
 
 void tt_store(uint64_bit key, int depth, int score, TTFlag flag, Jogada best_move , int ply){
-    TTEntry * entry = &transposition_table[key % TT_SIZE];
+    TTEntry * entry = &transposition_table[key & (TT_SIZE - 1)];
     // Política de substituição simples: só substitui se a nova entrada tem profundidade
     // igual ou maior (mais fiável), ou se o slot pertence a outra posição.
     if(entry->key != key || depth >= entry->depth){

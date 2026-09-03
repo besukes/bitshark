@@ -4,6 +4,26 @@
 
 #define NO_FLAGS 0
 
+char STR_pieces_names[NUMBER_PIECES][10] = {
+    "King",
+    "Pawn",
+    "Knight",
+    "Bishop",
+    "Rook",
+    "Queen"
+};
+char STR_pieces_squares[64][3] = {
+    "a1","b1","c1","d1","e1","f1","g1","h1",
+    "a2","b2","c2","d2","e2","f2","g2","h2",
+    "a3","b3","c3","d3","e3","f3","g3","h3",
+    "a4","b4","c4","d4","e4","f4","g4","h4",
+    "a5","b5","c5","d5","e5","f5","g5","h5",
+    "a6","b6","c6","d6","e6","f6","g6","h6",
+    "a7","b7","c7","d7","e7","f7","g7","h7",
+    "a8","b8","c8","d8","e8","f8","g8", "h8"
+};
+
+
 //alpha usually starts at -99999 , int alpha = -99999; --Current best white evaluation
 //beta usually starts at 99999 , int beta = 99999; --Current best black evaluation
 //alpha - white eval , beta - black eval
@@ -119,11 +139,19 @@ jogadabot iterative_deepening(GameStruct * game , CorPiece turn , int * reached_
 }
 
 
+void printEngineMoveInfo(jogadabot best_jogada , int reached_depth , double time_taken , float eval){
+     printf("[ENGINE] get_best_move: Moved %s from %s to %s , depth alcancada %d/%d , took %d ms with an eval of %f\n", 
+                STR_pieces_names[best_jogada.best_move.peca_movida], STR_pieces_squares[best_jogada.best_move.origem], 
+                STR_pieces_squares[best_jogada.best_move.destino], reached_depth, MAX_DEPTH_SEARCH,(int)(time_taken), eval
+           );
+}
+
+
 Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepening , SDL_Event * e){
     memset(history_table, 0, sizeof(int) * (NUMBER_PIECES*2) * NUM_SQUARES);
     memset(killer_moves , 0 , sizeof(Jogada) * MAX_DEPTH_SEARCH * 2);
     CorPiece strong,weak; //Doesnt really matter
-    if(calculate_stronger_side(&weak,&strong,&game->estadoJogo)) tt_init();
+    if(calculate_stronger_side(&weak,&strong,&game->estadoJogo)) tt_init(); //Ajuda a terminar o mate em finais KQ vs K ou KQ vs KR
     double initial_time = SDL_GetTicks();
     int reached_depth = 0;
     jogadabot best_jogada = {0};
@@ -138,9 +166,7 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
     int who2Move = (turn==brancas) ? 1 : (-1);
     float evaluation = (float)(best_jogada.move_eval*who2Move) / (float)(100);
     game->position_eval = evaluation;
-    printf("[engine] get_best_move: piece %d from %d to %d , depth alcancada %d/%d , took %d ms with an eval of %f\n", best_jogada.best_move.peca_movida, 
-                (int)best_jogada.best_move.origem, (int)best_jogada.best_move.destino, reached_depth, MAX_DEPTH_SEARCH,
-                (int)(SDL_GetTicks() - initial_time), evaluation);
+    printEngineMoveInfo(best_jogada,reached_depth,SDL_GetTicks() - initial_time , evaluation);
     return (best_jogada.best_move);
 }
 

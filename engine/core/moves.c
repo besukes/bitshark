@@ -87,12 +87,10 @@ void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada 
 
 int is_repeated_position(uint64_bit key){
     int counter = 0;
-    for(int i = hash_stack_indx - 1;i>=0;i--){
-        if(hash_key_stack[i] == key) counter++;
-        //Temos de verificar se a posição já ocorreu 2 vezes , porque se a repetirmos uma segunda vez
+    for(int i = hash_stack_indx - 1; i >= 0; i--){
+        //Temos de verificar se a posição já ocorreu 1 vez , porque se a repetirmos uma segunda vez
         //O oponente pode estar inclinado a repeti-la denovo , e portanto a empatar o jogo
-        if(counter>1) return 1;
-        //Mesmo que hash stack index seja global , e portanto acumula todas as posições jogadas , não gera problemas penalizar posições repetidas
+        if(hash_key_stack[i] == key) return 1;
     }
     return 0;
 }
