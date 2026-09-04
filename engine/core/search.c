@@ -20,11 +20,9 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     stc_eval += mopup_eval(game);
     stc_eval = (turn==brancas) ? stc_eval : -stc_eval;
 
-    if (SDL_GetTicks() - init_time >= max_time) {
-        return FLAG_TIMEOUT;
-    }
-    if (stc_eval >= beta) return beta;
-    if (alpha < stc_eval) alpha = stc_eval;
+    if(SDL_GetTicks() - init_time >= max_time) return FLAG_TIMEOUT;
+    if(stc_eval >= beta) return beta;
+    if(alpha < stc_eval) alpha = stc_eval;
     
     int orig_alpha = alpha;
     Jogada * hash_move = NULL; int move_eval = 0;
@@ -132,11 +130,10 @@ int nullmovepruning(GameStruct * game , int in_check , int depth ,int beta, int 
 */
 int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply , int allows_nmp){
     total_nodes_searched++;
-    if (SDL_GetTicks() - initial_time >= time_limit) {
-        return FLAG_TIMEOUT;
-    }
+    if(SDL_GetTicks() - initial_time >= time_limit) return FLAG_TIMEOUT;
+
     // Quando atinge a profundidade 0 ou o jogo acaba, lê a avaliação incremental atual
-    if (depth == 0) return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , initial_time , time_limit);
+    if(depth == 0) return quiescence(game, alpha, beta, wb_eval, turn, MAX_DEPTH_SEARCH , initial_time , time_limit);
 
     // Acessar à tranposition table para ver qual move ela dá para esta posição
     int orig_alpha = alpha;
@@ -179,8 +176,8 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
                 isnt_important_move = !jogadas[i].promocao && (jogadas[i].peca_capturada == Empty || jogadas[i].score < 0)
                                      && !op_king_in_check && !starts_in_check;
             int applied_reduction = (can_apply_lmr && isnt_important_move) ? lmr_lt[depth][i] : 0;
-            int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) : (depth - 1);
-
+            int reduced_depth = (applied_reduction) ? maximum(1,depth - 1 - applied_reduction) 
+                                                    : (depth - 1);
             // 2. Principal Variation Search , depois do primeiro move , procura numa window [alpha,alpha+1] ao invés de [alpha,beta]
             // Se esse move ultrapassar alpha , então pvs foi refutado , e portanto procuramos na full window [alpha,beta]
             int pvs_beta = (i==0) ? beta : (alpha + 1); //Define a janela

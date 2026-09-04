@@ -10,7 +10,7 @@
 #define FLAG_TIMEOUT -999999
 #define VALOR_INFINITO 99999
 
-#define CHECKMATE_BENCHMARK 0
+#define CHECKMATE_BENCHMARK 1
 //Need to define one to 5 and the other to 4 and 5 = Queen , 4 = Rook
 #define BENCHMARK_TESTED 5
 #define BENCHMARK_NOT_TESTED 4

@@ -84,7 +84,7 @@ void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada 
     }
 }
 
-
+//This function is not currently working as intended
 int is_repeated_position(uint64_bit key){
     for(int i = hash_stack_indx - 1; i >= 0; i--){
         //Temos de verificar se a posição já ocorreu 1 vez , porque se a repetirmos uma segunda vez
@@ -125,9 +125,9 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
 
 int calculate_extension_depth(int op_king_in_check, int depth , CorPiece op_turn){
     int extension = 0;
-    if(depth < 5){
+    if(depth < 3){
         if(op_king_in_check)
-            extension++;
+            extension+=2;
     }
     return extension;
 }

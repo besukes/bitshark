@@ -122,10 +122,8 @@ uint64_bit get_king_moves(uint64_bit pos){
 }
 
 
-uint64_bit get_enpassant_move(GameStruct * game ,uint64_bit pos , uint64_bit pos_enpassant , CorPiece turn){
-    Jogada jogada = {.destino = posTabuleiro(pos_enpassant) , .origem = posTabuleiro(pos) , .peca_movida = Pawn};
-    if(can_en_passant(game,&jogada,turn)) return pos_enpassant;
-    return 0;
+uint64_bit get_enpassant_move(uint64_bit pawn_attacks , uint64_bit pos_enpassant){
+   return (pawn_attacks & pos_enpassant);
 }
 
 
@@ -138,7 +136,7 @@ uint64_bit get_possible_pawn_moves(uint64_bit pos,uint64_bit bitboard_pieces,Cor
         return ( fst_step | snd_step | ( pawn_attacks & oposto));
     }
     else{
-        return ( fst_step | ( pawn_attacks & oposto) | get_enpassant_move(game,pos,game->estadoJogo.enpassant,turno));
+        return ( fst_step | ( pawn_attacks & oposto) | get_enpassant_move(pawn_attacks,game->estadoJogo.enpassant));
     }
 }
 
