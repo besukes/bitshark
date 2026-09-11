@@ -44,18 +44,15 @@ int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * e
     int black_minors = __builtin_popcountll(estado->tabuleirojogo[pretas][Horse])
                       + __builtin_popcountll(estado->tabuleirojogo[pretas][Bishop]);
 
-    int white_pawns = __builtin_popcountll(estado->tabuleirojogo[brancas][Pawn]);
-    int black_pawns = __builtin_popcountll(estado->tabuleirojogo[pretas][Pawn]);
-
     int white_rooks = __builtin_popcountll(estado->tabuleirojogo[brancas][Rook]);
     int black_rooks = __builtin_popcountll(estado->tabuleirojogo[pretas][Rook]);
 
-    if((white_queens || white_rooks) && !(black_queens || black_rooks || black_minors || black_pawns)){
+    if((white_queens || white_rooks) && !(black_queens || black_rooks || black_minors)){
         *weak = pretas;
         *strong = brancas;
         return 1;
     }
-    else if((black_queens || black_rooks) && !(white_queens || white_rooks || white_minors || white_pawns)){
+    else if((black_queens || black_rooks) && !(white_queens || white_rooks || white_minors)){
         *weak = brancas;
         *strong = pretas;
         return 1;
