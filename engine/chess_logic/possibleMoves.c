@@ -240,7 +240,7 @@ int gerar_jogadas_legais(GameStruct* game, Jogada* jogadas , CorPiece cor , int 
                                 .peca_capturada = p_cap, .promocao = 0, .especial = 0 , .score = 0 , 
                                 .prev_castlerights[brancas][Short] = canCastleShortB , .prev_castlerights[brancas][Long] = canCastleLongB ,
                                 .prev_castlerights[pretas][Short] = canCastleShortP , .prev_castlerights[pretas][Long] = canCastleLongP ,
-                                .prev_enpassant = posTabuleiro(enpassant_pos)};
+                                .prev_enpassant = posTabuleiro(enpassant_pos) , .last_irreversible_move_indx = last_irreversible_move};
                 int is_promoting = verify_pawn_promotion(piece,single_piece,single_attack,cor);
                 Boolean flags_are_respected = !only_captures || jogada.peca_capturada != Empty;
                 if (flags_are_respected && isPseudoValidMove(game, &jogada, cor , single_attack)){

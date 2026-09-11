@@ -37,7 +37,7 @@ typedef unsigned long long uint64_bit;
 typedef uint64_bit (*ShiftFunction)(uint64_bit,int); //Tipo que define um endereço de memória de uma função que recebe um unsigned long long de 64 bits e um int normal
 
 
-// Estrutura leve para Bitboards para guardar jogadas (12 bytes)
+// Estrutura leve para Bitboards para guardar jogadas (16 bytes)
 typedef struct Jogada{
     uint8_t origem; // Guarda a posição de onde veio a peça movida
     uint8_t destino; // Guarda a posição para onde foi a peça movida
@@ -48,6 +48,7 @@ typedef struct Jogada{
     int score; // Guarda o score desta jogada em termos de relevância teórica
     uint8_t prev_enpassant; //Guarda o estado anterior do enpassant
     uint8_t prev_castlerights[2][2]; //Matriz de possibilidades de dar castle
+    uint8_t last_irreversible_move_indx; //Guarda o último index movimento irreversível do jogo
 } Jogada;
 
 extern Jogada killer_moves[MAX_DEPTH_SEARCH][2]; //Armazena os killer moves para cada profundidade de busca
@@ -59,6 +60,7 @@ extern uint64_bit zobrist_ep[64];
 extern uint64_bit zobrist_turn;
 
 extern int hash_stack_indx;
+extern int last_irreversible_move;
 extern uint64_bit hash_key_stack[2048];
 
 extern int lmr_lt[MAX_DEPTH_SEARCH][256];
@@ -402,7 +404,7 @@ void checkmate_sfx (Mix_Chunk * sfxarray[]);
 /// search /////////////////////////////
 
 int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double initial_time, double time_limit , CorPiece turn , int ply , int allows_nmp);
-int checkmate_search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double ti, double lim , CorPiece turn , int ply);
+int checkmate_search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double ti, double lim , CorPiece turn , int ply , CorPiece weak , CorPiece strong);
 
 
 
@@ -411,7 +413,7 @@ int checkmate_search(GameStruct * game, int depth, int alpha, int beta, int wb_e
 int evaluate(GameStruct * game , CorPiece turno);
 int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , GameStruct * game);
 int is_end_game(EstadoJogo * estado);
-int mopup_eval(GameStruct * game);
+int mopup_eval(GameStruct * game , CorPiece weak , CorPiece strong);
 int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn);
 int has_non_pawn_material(GameStruct * game, CorPiece turn);
 int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn);

@@ -27,7 +27,7 @@ void fetch_change_board(GameStruct * game,uint64_bit click,uint64_bit * mesmaCor
 
     //sem esta verificacao ha problemas e pecas tornam se duplicadas
     Pieces piece_comida = comparePiece(&game->estadoJogo, cor_oposta, click);
-    if(piece_comida == Empty || selected == Empty )return;
+    if(piece_comida == Empty || selected == Empty ) return;
 
     jogada->peca_capturada = piece_comida;
     game->estadoJogo.tabuleirojogo[cor_oposta][piece_comida] &= ~click;
@@ -89,6 +89,11 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
             promotePiece(game,jogada->promocao,click,turno);
         }
     }
+
+    // Se alguma destas flags disparar , entao o movimento é irreversível e o index do último movimento irreversível é atualizado
+    if(jogada->especial == FLAG_CASTLE || jogada->especial == FLAG_ENPASSANT || jogada->peca_capturada != Empty || jogada->promocao) 
+        last_irreversible_move = hash_stack_indx;
+
     verifica_direito_castle(game,jogada,turno);
     update_en_passant(game,jogada,turno);
     game->is_end_game = is_end_game(&game->estadoJogo);

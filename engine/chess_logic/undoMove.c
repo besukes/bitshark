@@ -79,4 +79,6 @@ void undoMove(GameStruct * game , Jogada * jogada , CorPiece turn){
     game->estadoJogo.enpassant = (pos_passant != 255) ? (1ULL<<pos_passant) : 0;
     game->is_end_game = is_end_game(&game->estadoJogo);
     if(jogada->especial == FLAG_CASTLE) game->estadoJogo.is_castled[turn] = 0;
+    
+    last_irreversible_move = jogada->last_irreversible_move_indx;
 }

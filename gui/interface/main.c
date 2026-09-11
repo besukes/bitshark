@@ -15,6 +15,7 @@ uint64_bit zobrist_ep[64];
 uint64_bit zobrist_turn;
 
 int hash_stack_indx = 0;
+int last_irreversible_move = 0;
 uint64_bit hash_key_stack[2048];
 
 int lmr_lt[MAX_DEPTH_SEARCH][256];

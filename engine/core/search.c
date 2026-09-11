@@ -15,9 +15,8 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     CorPiece op_turn = (turn == brancas) ? pretas : brancas;
     total_nodes_searched++;
     int stc_eval = quiescence_eval; // Avaliação estática da posição atual
-    //Como depth agora é 0  , é seguro usar mopup evaluation aqui , pois assim não ha inflação de valores
-    //Est_eval nunca é usada para além de verificações
-    stc_eval += mopup_eval(game);
+
+    stc_eval += mopup_eval(game,turn,op_turn); // Avaliação de mop-up para a posição atual
     stc_eval = (turn==brancas) ? stc_eval : -stc_eval;
 
     if(SDL_GetTicks() - init_time >= max_time) return FLAG_TIMEOUT;
@@ -234,24 +233,21 @@ int search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , doub
 }
 
 
-int checkmate_search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double ti, double lim , CorPiece turn , int ply){
+int checkmate_search(GameStruct * game, int depth, int alpha, int beta, int wb_eval , double ti, double lim , CorPiece turn , int ply , CorPiece weak , CorPiece strong){
     // Similar to search() but with a focus on finding checkmate sequences
     if(SDL_GetTicks() - ti >= lim) return FLAG_TIMEOUT;
 
-    if(depth == 0) return (wb_eval + mopup_eval(game)); // At depth 0, return the evaluation
+    if(depth == 0) return (wb_eval + mopup_eval(game,weak,strong)); // At depth 0, return the evaluation
 
-    CorPiece weak , strong;
-    calculate_stronger_side(&weak,&strong,&game->estadoJogo); // Sabemos que existe stronger side para a funcao ser chamada
     int starts_in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
 
     int orig_alpha = alpha;
+    uint64_bit key = game->cur_pos_key;
     Jogada * hash_move = NULL; 
     int hash_move_eval = 0;
-    uint64_bit key = game->cur_pos_key;
     getPositionTTMove(key,depth,&alpha,&beta,&hash_move_eval,&hash_move,ply);
     // Transposition table mostrou que é um beta cutoff
     if(alpha >= beta) return (hash_move_eval);
-
 
     Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
@@ -269,7 +265,7 @@ int checkmate_search(GameStruct * game, int depth, int alpha, int beta, int wb_e
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             legal_moves = 1;
-            int eval = -checkmate_search(game, depth - 1 , -beta , -alpha , wb_eval + delta , ti , lim , op_turn , ply + 1);
+            int eval = -checkmate_search(game, depth - 1 , -beta , -alpha , wb_eval + delta , ti , lim , op_turn , ply + 1 , weak , strong);
             undoMove(game,&jogadas[i],turn);
             if((-eval) == FLAG_TIMEOUT) {
                 hash_stack_indx--;

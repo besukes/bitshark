@@ -58,6 +58,9 @@ jogadabot timeout_reached_move(GameStruct * game , Jogada jogadas[MAX_NUMBER_MOV
 }
 
 jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double initial_time , double budget , SDL_Event * e , int is_checkmate_mode){
+    CorPiece strong = brancas , weak = pretas;
+    if(is_checkmate_mode) calculate_stronger_side(&weak,&strong,&game->estadoJogo);
+
     Jogada jogadas[MAX_NUMBER_MOVES];
     int num_jogadas = gerar_jogadas_legais(game, jogadas,turn, NO_FLAGS);
     // Consulta a transposition table para obter uma "hash move" que ajuda a ordenar
@@ -83,7 +86,7 @@ jogadabot engine_search(GameStruct * game , CorPiece turn , int depth , double i
         Boolean in_check = is_in_check(&game->estadoJogo,game->estadoJogo.tabuleirojogo[turn][King],turn);
         if(!in_check){
             if(is_checkmate_mode){
-                int eval = -checkmate_search(game, depth - 1 , -beta , -alpha , eval_wb_inicial + delta , initial_time , budget , op_turn , 1);
+                int eval = -checkmate_search(game, depth - 1 , -beta , -alpha , eval_wb_inicial + delta , initial_time , budget , op_turn , 1 , weak , strong);
                 undoMove(game,&jogadas[i],turn);
                 if((-eval) == FLAG_TIMEOUT) {
                     printf("[engine] engine_search: timeout reached during search\n");

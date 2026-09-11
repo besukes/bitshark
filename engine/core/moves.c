@@ -84,21 +84,14 @@ void moveScoring(GameStruct * game ,Jogada * jogadas , int num_jogadas , Jogada 
     }
 }
 
-int has_occured_position(uint64_bit key){
-    for(int i = hash_stack_indx - 1; i >= 0; i--){
-        //Temos de verificar se a posição já ocorreu 1 vez , porque se a repetirmos uma segunda vez
-        //O oponente pode estar inclinado a repeti-la denovo , e portanto a empatar o jogo
-        if(hash_key_stack[i] == key) return 1;
-    }
-    return 0;
-}
 
 //This function is not currently working as intended
 int is_repeated_position(uint64_bit key){
-    /*if(hash_stack_indx >= 2) return (hash_key_stack[hash_stack_indx - 2] == key);
-    return 0;*/
-    for(int i = hash_stack_indx - 2; i >= 0; i -= 2){ // só offsets pares fazem sentido (mesmo lado a jogar)
-        if(hash_key_stack[i] == key) return 1;
+    int start = last_irreversible_move;
+    int counter = 0;
+    for(int i = hash_stack_indx-1 ; i >= start ; i--){
+        if(hash_key_stack[i] == key) counter++;
+        if(counter > 2) return 1;
     }
     return 0;
 }
@@ -110,7 +103,7 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
     Pieces peca_movida = (Pieces)jogada->peca_movida;
     int old_moved_eval = evaluate_piece(origem_bit, peca_movida, turn, game);
 
-    Pieces peca_capturada = jogada->peca_capturada;
+    Pieces peca_capturada = (Pieces)jogada->peca_capturada;
     uint64_bit captured_bit = destino_bit;
     if(jogada->especial == FLAG_ENPASSANT) captured_bit = (turn == brancas) ? (destino_bit >> 8) : (destino_bit << 8);
     int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(captured_bit, peca_capturada, op_turn, game) : 0;
@@ -137,20 +130,22 @@ int applyAlgorithmDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn 
     uint64_bit weak_king_moves = get_king_moves(game->estadoJogo.tabuleirojogo[weak][King]);
 
     int old_weak_king_eval = __builtin_popcountll(weak_king_moves);
-    int old_mopup = mopup_eval(game);
+    int old_mopup = mopup_eval(game,weak,strong);
 
     atualizaJogada(game, jogada, turn);
 
     uint64_bit new_weak_king_moves = get_king_moves(game->estadoJogo.tabuleirojogo[weak][King]);
 
     int new_weak_king_eval = __builtin_popcountll(new_weak_king_moves);
-    int new_mopup = mopup_eval(game);
+    int new_mopup = mopup_eval(game,weak,strong);
 
     int whoIsWeak = (weak == brancas) ? 1 : -1;
     int who2Move = (turn == brancas) ? 1 : -1;
 
     int delta_weak_king_eval = (new_weak_king_eval - old_weak_king_eval) * 5;
     int delta_mopup = new_mopup - old_mopup;
+
+    //int test_mopup = new_mopup; // not permanent
 
     int captured_piece_eval = (jogada->peca_capturada != Empty) ? pieces_value[jogada->peca_capturada] : 0;
 

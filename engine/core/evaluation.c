@@ -44,15 +44,18 @@ int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * e
     int black_minors = __builtin_popcountll(estado->tabuleirojogo[pretas][Horse])
                       + __builtin_popcountll(estado->tabuleirojogo[pretas][Bishop]);
 
+    int white_pawns = __builtin_popcountll(estado->tabuleirojogo[brancas][Pawn]);
+    int black_pawns = __builtin_popcountll(estado->tabuleirojogo[pretas][Pawn]);
+
     int white_rooks = __builtin_popcountll(estado->tabuleirojogo[brancas][Rook]);
     int black_rooks = __builtin_popcountll(estado->tabuleirojogo[pretas][Rook]);
 
-    if((white_queens || white_rooks) && !(black_queens || black_rooks || black_minors)){
+    if((white_queens || white_rooks) && !(black_queens || black_rooks || black_minors || black_pawns)){
         *weak = pretas;
         *strong = brancas;
         return 1;
     }
-    else if((black_queens || black_rooks) && !(white_queens || white_rooks || white_minors)){
+    else if((black_queens || black_rooks) && !(white_queens || white_rooks || white_minors || white_pawns)){
         *weak = brancas;
         *strong = pretas;
         return 1;
@@ -61,32 +64,30 @@ int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * e
 }
 
 
-int mopup_eval(GameStruct * game){
+int mopup_eval(GameStruct * game , CorPiece weaki , CorPiece strongi){
     CorPiece weak = pretas, strong = brancas;
-    if(calculate_stronger_side(&weak,&strong,&game->estadoJogo)){
-        int strong_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[strong][King]),
-            weak_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[weak][King]);
-        if(weak_turn_king_pos < 0 || strong_king_pos < 0) return 0; // segurança: sem rei (não deve acontecer)
+    if(!calculate_stronger_side(&weak,&strong,&game->estadoJogo)) return 0;
+    int strong_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[strong][King]),
+        weak_turn_king_pos = posTabuleiro(game->estadoJogo.tabuleirojogo[weak][King]);
+    if(weak_turn_king_pos < 0 || strong_king_pos < 0) return 0; // segurança: sem rei (não deve acontecer)
 
-        // King Manhattan Distance (linha/coluna) ao centro do tabuleiro
-        int weak_rank = weak_turn_king_pos / 8, weak_file = weak_turn_king_pos % 8;
-        int dist_rank = (weak_rank <= 3) ? (3 - weak_rank) : (weak_rank - 4);
-        int dist_file = (weak_file <= 3) ? (3 - weak_file) : (weak_file - 4);
-        int weak_king_manhattan_dist_to_center = dist_rank + dist_file;
+    // King Manhattan Distance (linha/coluna) ao centro do tabuleiro
+    int weak_rank = weak_turn_king_pos / 8, weak_file = weak_turn_king_pos % 8;
+    int dist_rank = (weak_rank <= 3) ? (3 - weak_rank) : (weak_rank - 4);
+    int dist_file = (weak_file <= 3) ? (3 - weak_file) : (weak_file - 4);
+    int weak_king_manhattan_dist_to_center = dist_rank + dist_file;
 
-        // Distância entre os dois reis: sem aproximar o próprio rei do rei adversário, a torre
-        // sozinha não consegue fechar o mate (precisa do apoio do rei para cortar as casas de
-        // fuga) — sem este termo, o motor "empurra" o rei adversário para a borda mas nunca
-        // convergir para o fechar, ficando a oscilar indefinidamente perto do mate sem o concluir.
-        int strong_rank = strong_king_pos/8, strong_file = strong_king_pos%8;
-        int dr = (strong_rank > weak_rank) ? (strong_rank - weak_rank) : (weak_rank - strong_rank);
-        int df = (strong_file > weak_file) ? (strong_file - weak_file) : (weak_file - strong_file);
-        int kings_chebyshev = (dr > df) ? dr : df;
+    // Distância entre os dois reis: sem aproximar o próprio rei do rei adversário, a torre
+    // sozinha não consegue fechar o mate (precisa do apoio do rei para cortar as casas de
+    // fuga) — sem este termo, o motor "empurra" o rei adversário para a borda mas nunca
+    // convergir para o fechar, ficando a oscilar indefinidamente perto do mate sem o concluir.
+    int strong_rank = strong_king_pos/8, strong_file = strong_king_pos%8;
+    int dr = (strong_rank > weak_rank) ? (strong_rank - weak_rank) : (weak_rank - strong_rank);
+    int df = (strong_file > weak_file) ? (strong_file - weak_file) : (weak_file - strong_file);
+    int kings_chebyshev = (dr > df) ? dr : df;
  
-        int mopup = 65*weak_king_manhattan_dist_to_center + 25*(7 - kings_chebyshev);
-        return ((strong == brancas) ? mopup : -mopup);
-    }
-    return 0;
+    int mopup = 65*weak_king_manhattan_dist_to_center + 25*(7 - kings_chebyshev);
+    return ((strong == brancas) ? mopup : -mopup);
 }
 
 
