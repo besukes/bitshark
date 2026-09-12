@@ -86,7 +86,7 @@ typedef enum { Invalid , Leave , Valid , Checkmate , TooLarge , Stalemate} TipoJ
 
 // Transposition table: guarda resultados de posições já pesquisadas para evitar recalculá-las
 // quando se chega lá outra vez por uma ordem de jogadas diferente (transposição).
-#define TT_SIZE (1 << 22) // ~4M entradas (potência de 2 para indexar com & em vez de %)
+#define TT_SIZE (1 << 24) // ~16M entradas (potência de 2 para indexar com & em vez de %)
  
 typedef enum { TT_EMPTY, TT_EXACT, TT_LOWERBOUND, TT_UPPERBOUND } TTFlag;
  

@@ -91,7 +91,7 @@ int is_repeated_position(uint64_bit key){
     int counter = 0;
     for(int i = hash_stack_indx-1 ; i >= start ; i--){
         if(hash_key_stack[i] == key) counter++;
-        if(counter > 2) return 1;
+        if(counter > 1) return 1;
     }
     return 0;
 }

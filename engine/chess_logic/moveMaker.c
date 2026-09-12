@@ -91,7 +91,7 @@ void atualizaJogada(GameStruct * game , Jogada * jogada , CorPiece turno){
     }
 
     // Se alguma destas flags disparar , entao o movimento é irreversível e o index do último movimento irreversível é atualizado
-    if(jogada->especial == FLAG_CASTLE || jogada->especial == FLAG_ENPASSANT || jogada->peca_capturada != Empty || jogada->promocao) 
+    if(jogada->especial == FLAG_CASTLE || jogada->especial == FLAG_ENPASSANT || (jogada->peca_capturada != Empty) || jogada->promocao || (jogada->peca_movida == Pawn)) 
         last_irreversible_move = hash_stack_indx;
 
     verifica_direito_castle(game,jogada,turno);

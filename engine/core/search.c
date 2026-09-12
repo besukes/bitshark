@@ -16,7 +16,9 @@ int quiescence(GameStruct * game, int alpha, int beta, int quiescence_eval, CorP
     total_nodes_searched++;
     int stc_eval = quiescence_eval; // Avaliação estática da posição atual
 
-    stc_eval += mopup_eval(game,turn,op_turn); // Avaliação de mop-up para a posição atual
+    CorPiece weak , strong;
+    if(calculate_stronger_side(&weak,&strong,&game->estadoJogo))
+        stc_eval += mopup_eval(game,weak,strong); // Avaliação de mop-up para a posição atual
     stc_eval = (turn==brancas) ? stc_eval : -stc_eval;
 
     if(SDL_GetTicks() - init_time >= max_time) return FLAG_TIMEOUT;
