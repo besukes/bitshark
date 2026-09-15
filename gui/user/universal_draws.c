@@ -92,7 +92,10 @@ void desenharPieceAttacks(GUISettings * settings , uint64_bit passant , uint64_b
 
 void desenharPiece(Pieces tipoPiece , int linha , int coluna , GUISettings * settings, int offset){
     SDL_Rect posicaoPeca = {SQ_SIZE*coluna+253, 1080 - (SQ_SIZE * linha + 366),80,80};
-    SDL_RenderCopy(settings->gameRenderer,settings->textures.chessPieces[tipoPiece + offset],NULL,&posicaoPeca);
+    int is_right_king = (offset == 0) ? (settings->winner == pretas) : (settings->winner == brancas);
+    if(settings->screen == WinScreen && (tipoPiece == King) && is_right_king)
+        SDL_RenderCopyEx(settings->gameRenderer , settings->textures.chessPieces[tipoPiece + offset] , NULL, &posicaoPeca , 90 , NULL , SDL_FLIP_NONE);
+    else SDL_RenderCopy(settings->gameRenderer,settings->textures.chessPieces[tipoPiece + offset],NULL,&posicaoPeca);
 }
 
 

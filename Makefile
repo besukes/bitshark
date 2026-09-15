@@ -76,7 +76,7 @@ BENCH_SRC = engine/chess_logic/castle_logic.c \
 		resources/benchmarks/bench_globals.c
  
 # Benchmark de nodes/segundo, isolado do GUI (nao precisa de SDL_image/mixer/ttf/assets).
-# Usa o mesmo orcamento de tempo por jogada (3s) que o motor usa em jogo real.
+# Usa o mesmo orcamento de tempo por jogada (2s) que o motor usa em jogo real.
 bench_nps: $(BENCH_SRC)
 	$(CC) -Wall -O3 -flto -DNDEBUG -I. -Iengine/chess_lib $(BENCH_SRC) -o $@ -lSDL2 -lm
 

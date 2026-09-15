@@ -4,6 +4,10 @@
 
 extern unsigned long long passed_pawn_mask[2][64];
 
+int chain_rank_bonus[8] = { 0 , 5 , 8 , 10 , 12 , 15, 20 ,0 }; // indexado por rank (linha)
+
+
+
 
 // Usada pelo Null Move Pruning: evita aplicar a poda em finais so com reis e peoes,
 // onde o risco de zugzwang (em que "passar a vez" seria de facto a melhor jogada) e alto
@@ -87,14 +91,20 @@ int mopup_eval(GameStruct * game , CorPiece weak , CorPiece strong){
 
 
 int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn){
-   int bonus = 0;
+    CorPiece op_turn = (turn == brancas) ? pretas : brancas;
+    int bonus = 0;
     uint64_bit rooks = state->tabuleirojogo[turn][Rook];
-    uint64_bit occupancy = state->bitboard_todas_pieces;
+    uint64_bit own_pawns = state->tabuleirojogo[turn][Pawn] ,
+               enemy_pawns = state->tabuleirojogo[op_turn][Pawn];
     while(rooks != 0){
         uint64_bit single = rooks & (-rooks);
         int column = posTabuleiro(single) % 8;
-        if(!(rook_files[column] & (occupancy & ~single)))
-            bonus += 15;
+        if(!(rook_files[column] & own_pawns)){
+            if(!(rook_files[column] & enemy_pawns))
+                bonus += 20; // Open file
+            else
+                bonus += 10; // Semi-open file
+        }
         rooks &= (rooks - 1);
     }
     return bonus;
@@ -102,14 +112,18 @@ int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn){
 
 
 int mobilityScore(GameStruct * game , Pieces piece , uint64_bit piece_pos , CorPiece turn){
-    int pawn_structure_bonus = 10;
-    uint64_bit attks = get_magic_piece_attacks(piece_pos,piece,game,turn,0,game->estadoJogo.bitboard_todas_pieces);
+    uint64_bit attks = (piece == Pawn) ? get_pawn_attacks(piece_pos,turn) : get_magic_piece_attacks(piece_pos,piece,game,turn,0,game->estadoJogo.bitboard_todas_pieces);
     int number_attks = __builtin_popcountll(attks);
     if(piece == Bishop || piece == Rook) return (number_attks*2); // Really good to have active bishops and rooks
     else if(piece == Queen) return (number_attks/2); // How many squares a queen see is not as relevant
     else if(piece == Horse) return (number_attks); // An active knight is good
-    else if(piece == Pawn && (attks & game->estadoJogo.tabuleirojogo[turn][Pawn])) 
-        return (pawn_structure_bonus); // Benefit pawn structures
+    else if(piece == Pawn){
+        uint64_bit pawn_structure = game->estadoJogo.tabuleirojogo[turn][Pawn] & attks;
+        int pawn_structure_count = __builtin_popcountll(pawn_structure);
+        int posTabPawn = posTabuleiro(piece_pos);
+        if(posTabPawn < 0) return 0;
+        return (chain_rank_bonus[posTabPawn/8]*pawn_structure_count); // Benefit pawn structures 
+    }
     return 0; // King mobility score will have to be implemented later with deeper thought
 }
 
@@ -135,7 +149,7 @@ int kingSafetyBonus(int position , int line , int col , GameStruct* game , CorPi
     uint64_bit intersect = mask & game->estadoJogo.tabuleirojogo[turn][Pawn];
     int number_pawns = __builtin_popcountll(intersect);
     Boolean is_castled = game->estadoJogo.is_castled[turn];
-    if(is_castled) return (-20 + number_pawns*10);
+    if(is_castled) return (-50 + number_pawns*20);
     else if(!is_castled && !game->estadoJogo.canCastle[turn][Short] && !game->estadoJogo.canCastle[turn][Long])
         return (-10); //Penalize king for not being able to castle early/middle game
     return 0;
@@ -154,10 +168,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
     int line = pos/8 , column = pos%8 , indx = (turn==brancas) ? ((7-line)*8 + column) : pos;
     switch(piece_type){
         case Pawn :
-            if(game->is_end_game){
-                position_score = pawn_evals_black_endgame[indx] + passedPawnBonus(piece_pos,game,turn);
-            }
-            else position_score = pawn_evals_black[indx];
+            position_score = pawn_evals_black_endgame[indx] + passedPawnBonus(piece_pos,game,turn);
         break;
         case Rook:
             position_score = black_rook_evals[indx];

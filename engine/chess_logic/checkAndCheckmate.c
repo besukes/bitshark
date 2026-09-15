@@ -72,7 +72,7 @@ int isCheckMate(GameStruct * game , CorPiece cor){
 
 
 
-TipoJogada check_move(GameStruct * game, Jogada * jogada , CorPiece turno){
+TipoJogada check_move(int * winner, GameStruct * game, Jogada * jogada , CorPiece turno){
     CorPiece turno_op = (turno == pretas) ? brancas : pretas;
     uint64_bit pos_king_op = game->estadoJogo.tabuleirojogo[turno_op][King];
     if(is_in_check(&(game->estadoJogo),game->estadoJogo.tabuleirojogo[turno][King],turno)){
@@ -86,10 +86,12 @@ TipoJogada check_move(GameStruct * game, Jogada * jogada , CorPiece turno){
     Boolean cant_move_opp_king = isCheckMate(&game_aux,turno_op);
     if(is_in_check(&(game->estadoJogo),pos_king_op,turno_op)){
         if(cant_move_opp_king){
+            *winner = turno;
             return Checkmate;
         }
         game->estadoJogo.king_in_check[turno_op] = 1;
     }
     else if(cant_move_opp_king) return Stalemate;
+    if(is_repeated_position(game->cur_pos_key)) return Stalemate;
     return Valid;
 }

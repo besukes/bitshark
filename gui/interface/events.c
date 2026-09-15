@@ -104,7 +104,7 @@ void efetuaEventoClique(GameStruct * game , GUISettings * settings,SDL_Event * e
 
 
 void eventoPromotePiece(GameStruct * game , GUISettings * settings,Jogada * j , CorPiece turn){
-    game->jogada = check_move(game,j,turn);
+    game->jogada = check_move(&settings->winner,game,j,turn);
     game->promoted.promotedSucessfully = 0;
     if(game->jogada == Checkmate || game->jogada == Stalemate) settings->screen = WinScreen;
     else if(game->jogada == Invalid) game->jogada = Valid; //Apenas para prevenir bugs
@@ -164,7 +164,7 @@ void efetuaEventoSoltar(GameStruct * game , GUISettings * settings , SDL_Event e
     else if(click != 0 && isPseudoValidMove(game,&jogada,turno,atks) && !game->promoted.pawnPromoted){
             int check_antes = game->estadoJogo.king_in_check[game->turnoJogador];
             atualizaJogada(game,&jogada,turno);
-            game->jogada = check_move(game,&jogada,turno);
+            game->jogada = check_move(&settings->winner,game,&jogada,turno);
             if(game->jogada==Invalid){
                 undoMove(game,&jogada,turno);
                 game->estadoJogo.king_in_check[game->turnoJogador] = check_antes;

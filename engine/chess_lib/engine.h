@@ -214,6 +214,7 @@ typedef struct GuiSettings{
     int posMouseY; //Posição vertical do rato do utilizador , em termos de píxeis
     UserScreen screen; //Screen atual
     int ticks; //Número de ticks que já passaram desde o começo do jogo (importante para o timer)
+    int winner; //Guarda o vencedor do jogo (brancas ou pretas) , ou -1 caso não haja vencedor
 }GUISettings;
 
 
@@ -328,7 +329,7 @@ void desenharPieceDrag(Pieces tipoPiece , int mouseX , int mouseY , GUISettings 
 
 //Modulo checkAndCheckmate.c
 
-TipoJogada check_move(GameStruct * game, Jogada * jogada , CorPiece turno);
+TipoJogada check_move(int * winner , GameStruct * game, Jogada * jogada , CorPiece turno);
 int isCheckMate(GameStruct * game, CorPiece cor);
 void notInCheck(GameStruct * game);
 Boolean is_in_check(EstadoJogo * estado , uint64_bit kingpos , CorPiece cor);

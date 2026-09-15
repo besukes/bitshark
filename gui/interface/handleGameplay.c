@@ -21,8 +21,8 @@ void playBotMove(GameStruct *game, GUISettings *settings, Mix_Chunk *sfxarray[],
         return;
     }
     atualizaJogada(game, &best_move, turn);
-    TipoJogada t = check_move(game, &best_move, turn);
-    if (t == Checkmate){
+    TipoJogada t = check_move(&settings->winner, game, &best_move, turn);
+    if (t == Checkmate || t == Stalemate){
         settings->screen = WinScreen;
         game->estadoJogo.checkMate = 1;
     }
