@@ -51,12 +51,15 @@ int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * e
     int white_rooks = __builtin_popcountll(estado->tabuleirojogo[brancas][Rook]);
     int black_rooks = __builtin_popcountll(estado->tabuleirojogo[pretas][Rook]);
 
-    if((white_queens || white_rooks) && !(black_queens || black_rooks || black_minors)){
+    int white_pawns = __builtin_popcountll(estado->tabuleirojogo[brancas][Pawn]) , 
+        black_pawns = __builtin_popcountll(estado->tabuleirojogo[pretas][Pawn]);
+
+    if((white_queens || white_rooks) && !(black_queens || black_rooks || black_minors || black_pawns)){
         *weak = pretas;
         *strong = brancas;
         return 1;
     }
-    else if((black_queens || black_rooks) && !(white_queens || white_rooks || white_minors)){
+    else if((black_queens || black_rooks) && !(white_queens || white_rooks || white_minors || white_pawns)){
         *weak = brancas;
         *strong = pretas;
         return 1;
@@ -120,9 +123,10 @@ int mobilityScore(GameStruct * game , Pieces piece , uint64_bit piece_pos , CorP
     else if(piece == Pawn){
         uint64_bit pawn_structure = game->estadoJogo.tabuleirojogo[turn][Pawn] & attks;
         int pawn_structure_count = __builtin_popcountll(pawn_structure);
-        int posTabPawn = posTabuleiro(piece_pos);
+        int posTabPawn = posTabuleiro(piece_pos) ,
+            indx_bonus = (turn == brancas) ? (posTabPawn/8) : (7 - posTabPawn/8);
         if(posTabPawn < 0) return 0;
-        return (chain_rank_bonus[posTabPawn/8]*pawn_structure_count); // Benefit pawn structures 
+        return (chain_rank_bonus[indx_bonus]*pawn_structure_count); // Benefit pawn structures 
     }
     return 0; // King mobility score will have to be implemented later with deeper thought
 }
@@ -168,7 +172,10 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
     int line = pos/8 , column = pos%8 , indx = (turn==brancas) ? ((7-line)*8 + column) : pos;
     switch(piece_type){
         case Pawn :
-            position_score = pawn_evals_black_endgame[indx] + passedPawnBonus(piece_pos,game,turn);
+            if(game->is_end_game){
+                position_score = pawn_evals_black_endgame[indx] + passedPawnBonus(piece_pos,game,turn);
+            }
+            else position_score = pawn_evals_black[indx] + passedPawnBonus(piece_pos,game,turn);
         break;
         case Rook:
             position_score = black_rook_evals[indx];
