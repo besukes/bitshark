@@ -106,14 +106,21 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
     Pieces peca_capturada = (Pieces)jogada->peca_capturada;
     uint64_bit captured_bit = destino_bit;
     if(jogada->especial == FLAG_ENPASSANT) captured_bit = (turn == brancas) ? (destino_bit >> 8) : (destino_bit << 8);
-    int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(captured_bit, peca_capturada, op_turn, game) : 0;
 
+    int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(captured_bit, peca_capturada, op_turn, game) : 0;
     int old_rook_bonus = rookOpenFilesBonus(&game->estadoJogo,turn);
+    int old_black_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[pretas][King],game,turn);
+    int old_white_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[brancas][King],game,turn);
 
     atualizaJogada(game, jogada, turn);
     int promote_value = (jogada->promocao) ? (pieces_value[jogada->promocao] - 100) : 0;
 
     int new_rook_bonus = rookOpenFilesBonus(&game->estadoJogo,turn);
+    int new_black_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[pretas][King],game,turn);
+    int new_white_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[brancas][King],game,turn);
+
+    int delta_bks = new_black_king_safety - old_black_king_safety;
+    int delta_wks = new_white_king_safety - old_white_king_safety;
     int delta_rook_bonus = new_rook_bonus - old_rook_bonus;
 
     int new_moved_eval = evaluate_piece(destino_bit, peca_movida, turn, game);
@@ -121,7 +128,8 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
     int who2Move = (turn == brancas) ? 1 : -1;
     int castleBonus = (jogada->especial == FLAG_CASTLE) ? 50 : 0;
 
-    return (who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + castleBonus + delta_rook_bonus));
+    return ((delta_bks + delta_wks) + 
+            who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + castleBonus + delta_rook_bonus));
 }
 
 

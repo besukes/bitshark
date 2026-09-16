@@ -144,7 +144,9 @@ int passedPawnBonus(uint64_bit piece_pos , GameStruct * game , CorPiece turn){
 }
 
 
-int kingSafetyBonus(int position , int line , int col , GameStruct* game , CorPiece turn){
+int kingSafetyBonus(uint64_bit piece_pos , GameStruct * game , CorPiece turn){
+    int posTab = posTabuleiro(piece_pos);
+    int line = posTab/8 , col = posTab%8;
     int used_line = (turn == brancas) ? (line + 1) : (line - 1);
     if(line < 0 || line > 7) return 0;
     int left_side = (col>0) ? (col - 1) : col;
@@ -193,7 +195,7 @@ int evaluate_piece(uint64_bit piece_pos , Pieces piece_type , CorPiece turn , Ga
             if(game->is_end_game){
                 position_score = black_king_endGame_evals[indx];
             }
-            else position_score = black_king_middleGame_evals[indx] + kingSafetyBonus(pos,line,column,game,turn);
+            else position_score = black_king_middleGame_evals[indx] + kingSafetyBonus(piece_pos,game,turn);
         break;
         default:break;
     }
