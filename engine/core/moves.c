@@ -109,15 +109,15 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
 
     int old_captured_eval = (peca_capturada != Empty) ? evaluate_piece(captured_bit, peca_capturada, op_turn, game) : 0;
     int old_rook_bonus = rookOpenFilesBonus(&game->estadoJogo,turn);
-    int old_black_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[pretas][King],game,turn);
-    int old_white_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[brancas][King],game,turn);
+    int old_black_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[pretas][King],game,pretas);
+    int old_white_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[brancas][King],game,brancas);
 
     atualizaJogada(game, jogada, turn);
     int promote_value = (jogada->promocao) ? (pieces_value[jogada->promocao] - 100) : 0;
 
     int new_rook_bonus = rookOpenFilesBonus(&game->estadoJogo,turn);
-    int new_black_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[pretas][King],game,turn);
-    int new_white_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[brancas][King],game,turn);
+    int new_black_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[pretas][King],game,pretas);
+    int new_white_king_safety = kingSafetyBonus(game->estadoJogo.tabuleirojogo[brancas][King],game,brancas);
 
     int delta_bks = new_black_king_safety - old_black_king_safety;
     int delta_wks = new_white_king_safety - old_white_king_safety;
