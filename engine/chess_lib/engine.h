@@ -419,6 +419,7 @@ int static_exchange_eval(GameStruct * game , Jogada * jogada , CorPiece turn);
 int has_non_pawn_material(GameStruct * game, CorPiece turn);
 int rookOpenFilesBonus(EstadoJogo * state , CorPiece turn);
 int calculate_stronger_side(CorPiece * weak , CorPiece * strong , EstadoJogo * estado);
+int kingSafetyBonus(uint64_bit piece_pos , GameStruct * game , CorPiece turn);
 
 
 /// engine /////////////////////////////////
