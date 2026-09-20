@@ -128,7 +128,7 @@ int applyDeltaMove(GameStruct * game , Jogada * jogada , CorPiece turn , CorPiec
     int who2Move = (turn == brancas) ? 1 : -1;
     int castleBonus = (jogada->especial == FLAG_CASTLE) ? 50 : 0;
 
-    return ((delta_bks + delta_wks) + 
+    return ((delta_wks - delta_bks) + 
             who2Move * (new_moved_eval - old_moved_eval + old_captured_eval + promote_value + castleBonus + delta_rook_bonus));
 }
 
