@@ -180,7 +180,7 @@ Jogada get_best_move(GameStruct * game , CorPiece turn , int is_interative_deepe
     jogadabot best_jogada = {0};
     total_nodes_searched = 0;
     if(is_interative_deepening){
-        if(algorithm_mode) tt_init();
+        if(algorithm_mode || game->is_end_game) tt_init();
         best_jogada = iterative_deepening(game,turn,&reached_depth,e,algorithm_mode);
     }
     else{
