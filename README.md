@@ -6,6 +6,7 @@ width = 25% alt = "Bitshark">
    An average chess engine.
   <br>
 </div>
+
 ## Overview
 
 **Bitshark** é uma pequena chess engine feita em C para o jogo clássico de xadrez, que depois vai ser modificada para ser um BOT no modo história do jogo CChess, feito pelo mesmo criador desta engine.
