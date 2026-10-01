@@ -20,30 +20,30 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 ## Features
 
 * Search
-* NegaMax search
-* Alpha-Beta pruning
-* Quiescence Search
-* Move ordering
-* Iterative Deepening
-* Late Move Reductions
-* Search Principal Variation
-* Null Move Pruning
+ * NegaMax search
+ * Alpha-Beta pruning
+ * Quiescence Search
+ * Move ordering
+ * Iterative Deepening
+ * Late Move Reductions
+ * Search Principal Variation
+ * Null Move Pruning
 * Evaluation
-* Piece Square Tables
-* Incremental evaluation
-* Move repetition penalization
-* Static Exchange Evaluation
-* Piece Mobility Bonus 
-* MopUp Eval
-* King Safety 
-* Passed Pawns 
-* Rook Open Files
-* Number of attacked Squares
+ * Piece Square Tables
+ * Incremental evaluation
+ * Move repetition penalization
+ * Static Exchange Evaluation
+ * Piece Mobility Bonus 
+  * MopUp Eval
+  * King Safety 
+  * Passed Pawns 
+  * Rook Open Files
+  * Number of attacked Squares
 * Memorization Optimizations
-* Transposition Tables
-* Opening Book (Under Work)
-* Killer Moves
-* Move Heuristics
+ * Transposition Tables
+ * Opening Book (Under Work)
+ * Killer Moves
+ * Move Heuristics
 * Magic Bitboards
 
 
