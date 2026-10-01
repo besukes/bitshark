@@ -1,12 +1,11 @@
 <div align="center">
   <img src="assets/logo/bitshark.png"
-     width = 25% alt = "Bitshark">
+width = 25% alt = "Bitshark">
 
   <h3>BITSHARK</h3>
    An average chess engine.
   <br>
 </div>
-  
 ## Overview
 
 **Bitshark** é uma pequena chess engine feita em C para o jogo clássico de xadrez, que depois vai ser modificada para ser um BOT no modo história do jogo CChess, feito pelo mesmo criador desta engine.
@@ -20,31 +19,31 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 ## Features
 
 * Search
-  * NegaMax search
-  * Alpha-Beta pruning
-  * Quiescence Search
-  * Move ordering
-  * Iterative Deepening
-  * Late Move Reductions
-  * Search Principal Variation
-  * Null Move Pruning
+* NegaMax search
+* Alpha-Beta pruning
+* Quiescence Search
+* Move ordering
+* Iterative Deepening
+* Late Move Reductions
+* Search Principal Variation
+* Null Move Pruning
 * Evaluation
-  * Piece Square Tables
-  * Incremental evaluation
-  * Move repetition penalization
-  * Static Exchange Evaluation
-  * Piece Mobility Bonus 
-    * MopUp Eval
-    * King Safety 
-    * Passed Pawns 
-    * Rook Open Files
-    * Number of attacked Squares
+* Piece Square Tables
+* Incremental evaluation
+* Move repetition penalization
+* Static Exchange Evaluation
+* Piece Mobility Bonus 
+* MopUp Eval
+* King Safety 
+* Passed Pawns 
+* Rook Open Files
+* Number of attacked Squares
 * Memorization Optimizations
-  * Transposition Tables
-  * Opening Book (Under Work)
-  * Killer Moves
-  * Move Heuristics
-  * Magic Bitboards
+* Transposition Tables
+* Opening Book (Under Work)
+* Killer Moves
+* Move Heuristics
+* Magic Bitboards
 
 
 ## Estrutura do Projeto
@@ -65,14 +64,30 @@ Este projeto foi iniciado no dia **18 de julho de 2026** por um estudante de Eng
 
 ## Compilação
 
+### Dependências
+
+Este projeto precisa de **gcc**, **make**, **pkg-config** e das bibliotecas **SDL2**, **SDL2_image**, **SDL2_mixer**, **SDL2_ttf** e **SDL2_gfx**. <br>
+
+Para verificar se estão todas instaladas :
+
+```
+make check
+```
+
+Para verificar e instalar automaticamente o que faltar (suporta **apt**, **dnf**, **pacman** e **zypper**, e pede `sudo` se não for root) :
+
+```
+make deps
+```
+
 Antes de compilar o projeto pode mudar certas flags para alterar o comportamento do programa. <br>
 
 Em *___engine/chess_lib/engine.h___* pode mudar **CHECKMATE_BENCHMARK** para 1 para testar o bot a dar checkmate em endgames com KQ vs K ou KR vs K , para isso terá de alterar as flags de **BENCHMARK_TESTED** e **BENCHMARK_NOT_TESTED** para 5 e 4 , dependendo de qual quer e qual não quer testar (5 para queen e 4 para rook).<br>
 
-Pode também mudar as flags **BOT_PLAYS_WHITE** para 0 e **BOT_PLAYS_BLACK** para 1 , por exemplo , jogar com as peças brancas , contra o bot com as pretas , ou deixar ambas a 1 para ver o bot a jogar contra si mesmo.
+Por defeito, **BOT_PLAYS_WHITE** está a 0 e **BOT_PLAYS_BLACK** a 1 , ou seja , o programa abre em modo de jogo : joga com as peças brancas contra o bot com as pretas. Pode mudar estas flags , por exemplo **BOT_PLAYS_WHITE** para 1 e **BOT_PLAYS_BLACK** para 0 para jogar com as pretas , ou deixar ambas a 1 para ver o bot a jogar contra si mesmo.
 <br>
 
-Para compilar este projeto e jogar contra o bot (que joga sempre com as pretas) execute o comando :
+Para compilar este projeto e jogar contra o bot (que por defeito joga com as pretas) execute o comando :
 
 ```
 make bshark
