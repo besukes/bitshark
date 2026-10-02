@@ -21,15 +21,39 @@ void desenhaBitshark(GUISettings * settings){
 
 void desenhaEvalBar(float eval , GUISettings * settings){
     //Evaluation Bar
-    roundedBoxRGBA(settings->gameRenderer,180,100,220,800,0,0,0,0, 200);
-
-    int eval_size = eval + 0.5;
-    if(eval <= (-850.0)) eval_size = -12;
-    else if(eval >= 850.0) eval_size = 12;
+    
+    
+    SDL_Color cor = {255, 255 , 255 , 200};
+    int switch_case = 0;
+    char res[128];
+    int eval_size = eval + 0.5 , n_mate = 0;
     int starting_white_y = 450 - 29*eval_size;
     starting_white_y = (starting_white_y <= 100) ? 105 : starting_white_y;
     starting_white_y = (starting_white_y > 800) ? 800 : starting_white_y;
-    roundedBoxRGBA(settings->gameRenderer,180, starting_white_y ,220,800,0,255,255,255, 200);
+    roundedBoxRGBA(settings->gameRenderer,170,100,220,800,0,60,60,60, 255);
+    roundedBoxRGBA(settings->gameRenderer,170, starting_white_y ,220,800,0,255,255,255, 255);
+    if(eval <= (-850.0)){
+        eval_size = -12;
+        n_mate = (99999 - eval*(-100));
+        snprintf(res,128,"M%d",n_mate);
+    }
+    else if(eval >= 850.0){
+        eval_size = 12;
+        n_mate = (99999 - eval*100);
+        snprintf(res,128,"M%d",n_mate);
+    }
+    else snprintf(res,128,"%.1f",(eval<0)?-eval:eval);
+    if(eval < 0) 
+    {
+        cor.r = 255, cor.g = 255, cor.b = 255;
+        switch_case = 0;
+    }
+    else{
+        cor.r = 0, cor.g = 0, cor.b = 0;
+        switch_case = 1;
+    }  
+
+    renderTextoCentradoBasico(settings->gameRenderer,settings->fonteJogoSmallerTitles,res,cor,197,110+(switch_case*640),0.75);
 }
 
 
@@ -43,7 +67,27 @@ void desenhaMoved(GameStruct * game,GUISettings * settings){
     SDL_RenderFillRect(settings->gameRenderer, &moved);
 }
 
+void desenhaWinScreen (GameStruct * game , GUISettings * settings){
+    SDL_Color white = {.r = 255 , .b = 255 , .g = 255 ,.a = 255};
+    char result[128];
+    if(settings->winner == brancas) snprintf(result,sizeof(result),"Brancas Venceram em : %d",game->turns);
+    else if(settings->winner == pretas) snprintf(result,sizeof(result),"Pretas Venceram em : %d",game->turns);
+    else snprintf(result,sizeof(result),"Empate em : %d",game->turns);
+    renderTextoCentradoSombra(settings->gameRenderer,settings->fonteJogoTitles,result,white,600,800,2);
+    renderTextoCentradoSombra(settings->gameRenderer,settings->fonteJogoTitles,"Retry",white,1000,800,2);
+    renderTextoCentradoSombra(settings->gameRenderer,settings->fonteJogoTitles,"Exit",white,200,800,2);
+}
 
+void desenhaChoosingScreen (GameStruct * game , GUISettings * settings){
+    SDL_Rect bg = {0,0,0,0};
+    SDL_SetRenderDrawColor(settings->gameRenderer, 125, 125, 255, 255);
+    SDL_RenderDrawRect(settings->gameRenderer, &bg);
+    SDL_Color white = {.r = 255 , .b = 255 , .g = 255 ,.a = 255};
+    renderTextoCentradoSombra(settings->gameRenderer,settings->fonteJogoTitles,"Escolha o tipo de jogador",white,600,400,2);
+    renderTextoCentradoSombra(settings->gameRenderer,settings->fonteJogoTitles,"Player",white,500,800,2);
+    renderTextoCentradoSombra(settings->gameRenderer,settings->fonteJogoTitles,"Bot",white,700,800,2);
+    
+}
 
 void desenhaInterfaceJogo(GameStruct * game ,GUISettings * settings){
     desenhaFundo(settings,settings->textures.fundo);

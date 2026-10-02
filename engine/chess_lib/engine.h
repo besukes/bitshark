@@ -17,7 +17,7 @@
 
 #define ITERATIVE_DEEPENING 1
 #define BOT_PLAYS_BLACK 1
-#define BOT_PLAYS_WHITE 1
+extern int BOT_PLAYS_WHITE;
 
 
 #define COLUNA_A 0x0101010101010101ULL
@@ -79,6 +79,8 @@ typedef struct SDL_Initializators{
     SDL_Renderer * renderer; //renderer do jogo
     SDL_Window * window; //window do jogo
 }SDL_Initializators;
+
+typedef enum {Escolha, Bot , Player} PlayerType;
 
 typedef enum { GameScreen , WinScreen } UserScreen;
 
@@ -213,6 +215,7 @@ typedef struct GuiSettings{
     int posMouseX; //Posição horizontal do rato do utilizador , em termos de píxeis
     int posMouseY; //Posição vertical do rato do utilizador , em termos de píxeis
     UserScreen screen; //Screen atual
+    PlayerType player_type; //Informa se as brancas são um jogador ou um bot
     int ticks; //Número de ticks que já passaram desde o começo do jogo (importante para o timer)
     int winner; //Guarda o vencedor do jogo (brancas ou pretas) , ou -1 caso não haja vencedor
 }GUISettings;
@@ -252,6 +255,8 @@ void initsfx(Mix_Chunk * sfxarray[]);
 //Modulo handleGameplay.c
 
 void handleJogadaChess(GameStruct* game , GUISettings * settings,SDL_Event * event , Mix_Chunk * sfxarray[]);
+void handleEndgame(GameStruct * game , GUISettings * settings , SDL_Event * event);
+void handlePlayerType(GameStruct * game , GUISettings * settings , SDL_Event * event);
 
 
 
@@ -287,7 +292,10 @@ void cleanArrowEvent(GameStruct * game);
 void efetuaEventoClickArrows(GameStruct * game , SDL_Event event);
 void efetuaEventoSoltarArrows(GameStruct * game , SDL_Event event);
 void updateScore(GameStruct * game , Jogada* jogada,CorPiece turn);
-
+void efetuaEventoLeave(GameStruct * game , GUISettings * settings);
+void efetuaEventoReset(GameStruct * game , GUISettings * settings);
+void efetuaEventoPlayer(GameStruct * game , GUISettings * settings);
+void efetuaEventoBot(GameStruct * game , GUISettings * settings);
 
 
 
@@ -321,8 +329,9 @@ int verify_pawn_promotion(Pieces piece , uint64_bit origem , uint64_bit dest , C
 //Modulo userinterface.c
 
 void desenhaInterfaceJogo(GameStruct * game ,GUISettings * settings);
-void desenhaWinScreen(GameStruct * game ,GUISettings * settings,SDL_Event event);
+void desenhaWinScreen(GameStruct * game ,GUISettings * settings);
 void desenharPieceDrag(Pieces tipoPiece , int mouseX , int mouseY , GUISettings * settings , int offset);
+void desenhaChoosingScreen (GameStruct * game , GUISettings * settings);
 
 
 

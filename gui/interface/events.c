@@ -110,7 +110,47 @@ void eventoPromotePiece(GameStruct * game , GUISettings * settings,Jogada * j , 
     else if(game->jogada == Invalid) game->jogada = Valid; //Apenas para prevenir bugs
 }
 
+void efetuaEventoLeave(GameStruct * game , GUISettings * settings){
+    SDL_Rect Exit = {100,800,200,100};
+    SDL_Point mouse = {settings->posMouseX,settings->posMouseY};
+    if(SDL_PointInRect(&mouse, &Exit)){
+        game->jogada = Leave;
+    }
+}
+void efetuaEventoReset(GameStruct * game , GUISettings * settings){
+    SDL_Rect Retry = {900,800,200,100};
+    SDL_Point mouse = {settings->posMouseX,settings->posMouseY};
+    if(SDL_PointInRect(&mouse, &Retry)){
+        initializeGame(game);
+        tt_init();
+        memset(history_table, 0, sizeof(int) * (NUMBER_PIECES*2) * NUM_SQUARES);
+        memset(killer_moves , 0 , sizeof(Jogada) * MAX_DEPTH_SEARCH * 2);
+        hash_stack_indx = 0;
+        last_irreversible_move = 0;
 
+        settings->screen = GameScreen;
+    }
+}
+
+void efetuaEventoPlayer(GameStruct * game , GUISettings * settings){
+    SDL_Rect choosePlayer = {390,800,200,100};
+    SDL_Point mouse = {settings->posMouseX,settings->posMouseY};
+    if(SDL_PointInRect(&mouse, &choosePlayer)){
+        printf("[INFO] Player will play as white\n");
+        BOT_PLAYS_WHITE = 0;
+        settings->player_type = Player;
+    }
+}
+
+void efetuaEventoBot(GameStruct * game , GUISettings * settings){
+    SDL_Rect chooseBot = {600,800,200,100};
+    SDL_Point mouse = {settings->posMouseX,settings->posMouseY};
+    if(SDL_PointInRect(&mouse, &chooseBot)){
+        printf("[INFO] Bot will play as white\n");
+        BOT_PLAYS_WHITE = 1;
+        settings->player_type = Bot;
+    }
+}
 
 void updateScore(GameStruct * game , Jogada* jogada,CorPiece turn){
     if(jogada->peca_capturada != Empty){

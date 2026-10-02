@@ -86,3 +86,21 @@ void handleJogadaChess(GameStruct *game, GUISettings *settings, SDL_Event * even
         }
     }
 }
+
+void handleEndgame(GameStruct * game , GUISettings * settings , SDL_Event * event){
+    if(event->type == SDL_MOUSEBUTTONDOWN && event->button.button == SDL_BUTTON_LEFT){
+        settings->posMouseX = event->button.x;
+        settings->posMouseY = event->button.y;
+        efetuaEventoLeave(game,settings);
+        efetuaEventoReset(game,settings);
+    }
+}
+
+void handlePlayerType(GameStruct * game , GUISettings * settings , SDL_Event * event){
+    if(event->type == SDL_MOUSEBUTTONDOWN && event->button.button == SDL_BUTTON_LEFT){
+        settings->posMouseX = event->button.x;
+        settings->posMouseY = event->button.y;
+        efetuaEventoPlayer(game,settings);
+        efetuaEventoBot(game,settings);
+    }
+}

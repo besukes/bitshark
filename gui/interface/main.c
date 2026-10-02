@@ -5,7 +5,7 @@
 
 Jogada killer_moves[MAX_DEPTH_SEARCH][2] = {0};
 int history_table[NUMBER_PIECES*2][NUM_SQUARES] = {0};
-
+int BOT_PLAYS_WHITE = 0;
 // Chaves de Zobrist: um número aleatório fixo por (cor, tipo de peça, casa),
 // mais chaves para direitos de castle, casa de en passant e de quem joga.
 // O hash de uma posição é o XOR de todas as chaves que "estão ativas" nela.
@@ -39,18 +39,26 @@ void interfaceCChess(GameStruct * game ,GUISettings * settings , Mix_Chunk * sfx
                 settings->posMouseY = tmp.motion.y;
             }
         }
-        if(settings->screen == GameScreen){
+        if(settings->player_type == Escolha){
+            desenhaChoosingScreen(game,settings);
+            handlePlayerType(game,settings,&event);
+            
+
+        }
+        if(settings->screen == GameScreen && settings->player_type != Escolha){
             if(game->game_needs_initialization) initializeGame(game);
             handleJogadaChess(game,settings,&event , sfxarray);
             desenhaInterfaceJogo(game,settings);
         }
-        else{
+        else if(settings->screen == WinScreen){
             printf("Numero de moves : %d\n",game->turns);
-            while(event.type != SDL_QUIT ){
+            while(event.type != SDL_QUIT && game->jogada != Leave && settings->screen != GameScreen){
                 SDL_RenderClear(settings->gameRenderer);
                 SDL_PollEvent(&event);
                 desenhaInterfaceJogo(game,settings);
+                desenhaWinScreen(game,settings);
                 SDL_RenderPresent(settings->gameRenderer);
+                handleEndgame(game,settings,&event);
             }
             
         } //Por fazer endscreen

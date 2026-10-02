@@ -13,6 +13,7 @@ GUISettings initGUISettings(SDL_Renderer * sdl_renderer , SDL_Window * window){
     settings.posMouseY = 0;
     settings.ticks = 0;
     settings.screen = GameScreen;
+    settings.player_type = Escolha;
     settings.winner = (-1);
     loadAssets(&settings,sdl_renderer);
     TTF_Init();
